@@ -1,0 +1,18 @@
+from fastapi import APIRouter
+from src.db import SessionDepend
+from src.models.{{ model_name_camel }} import CreateSchema, {{ model_name }}Model, UpdateSchema
+from src.service.crud import CRUD
+
+{{ model_name_snake }}_router = APIRouter()
+
+@{{ model_name_snake }}_router.post("/")
+def create_one(db: SessionDepend, create_data: CreateSchema):
+    return CRUD.create_one(db, {{ model_name }}Model, create_data)
+
+@{{ model_name_snake }}_router.put("/{{'{'}}id{{'}'}}")
+def update_one(db: SessionDepend, update_data: UpdateSchema, id: int):
+    return CRUD.update_one_by_id(db, {{ model_name }}Model, update_data, id)
+
+@{{ model_name_snake }}_router.delete("/{{'{'}}id{{'}'}}")
+def delete_one(db: SessionDepend, id: int):
+    return CRUD.delete_one_by_id(db, {{ model_name }}Model, id)
