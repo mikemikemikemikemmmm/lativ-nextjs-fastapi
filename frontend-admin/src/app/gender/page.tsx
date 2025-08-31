@@ -16,7 +16,7 @@ export default function () {
     //TODO
   }
   if (genders === "loading") {
-    return <div className="text-center text-2xl m-6">loading...</div>
+    return null
   }
   return (
     <>

@@ -14,6 +14,7 @@ export const ModalContainer = (
         transform: 'translate(-50%, -50%)',
         maxHeight: '80%',
         maxWidth: "80%",
+        overflowY:"scroll",
         bgcolor: 'background.paper',
         boxShadow: 24,
         p: 3

@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 class ProductModel(BaseSQLModel):
     __tablename__ = "product"  
     name: Mapped[str]
+    img_url: Mapped[str]
     order: Mapped[int] = mapped_column(unique=True)
     gender_id: Mapped[int]= mapped_column(ForeignKey("gender.id"))
     gender: Mapped["GenderModel"] = relationship()

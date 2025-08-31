@@ -33,24 +33,20 @@ def switch_order(db: SessionDepend, id1: int, id2: int):
 @series_router.get("/sub_category_id/{sub_category_id}")
 def get_series_by_sub_category_id(db: SessionDepend, sub_category_id: int):
     stmt = text("""
-        SELECT s.id AS series_id, s.name AS series_name, p.id AS product_id
+        SELECT s.id AS series_id, s.name AS series_name
         FROM series s
-        LEFT JOIN product p 
-            ON p.series_id = s.id
         WHERE s.sub_category_id = :sub_category_id
     """)
     #TODO
     result = db.execute(stmt, {"sub_category_id": sub_category_id}).fetchall()
 
     # 聚合成字典
-    series_dict = defaultdict(lambda: {"id": 0, "name": "", "product_ids": []})
+    series_dict = defaultdict(lambda: {"id": 0, "name": ""})
 
     for row in result:
         sid = row.series_id
         if series_dict[sid]["id"] == 0:
             series_dict[sid]["id"] = row.series_id
             series_dict[sid]["name"] = row.series_name
-        if row.product_id is not None:
-            series_dict[sid]["product_ids"].append(row.product_id)
 
     return list(series_dict.values())

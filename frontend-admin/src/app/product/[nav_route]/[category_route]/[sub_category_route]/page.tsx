@@ -54,7 +54,7 @@ export default () => {
 
     }
     if (subCategory === "loading") {
-        return <div>loading...</div>
+        return null
     }
     if (subCategory === "noSubcategory") {
         return <div>no category</div>
@@ -95,7 +95,7 @@ export default () => {
                                 />
                             </div>
                         </div>
-                        <ProductCardContainer productIds={s.product_ids} seriesId={s.id} />
+                        <ProductCardContainer seriesId={s.id} />
                     </div>
                 ))
             }

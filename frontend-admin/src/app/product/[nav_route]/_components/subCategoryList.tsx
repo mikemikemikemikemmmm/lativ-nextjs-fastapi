@@ -30,7 +30,7 @@ export const SubCategoryList = (props: { navRoute: string, category: CategoryRea
     } as SubCategoryRead, "sub_category", getSubCategorys
     )
     if (subCategorys === "loading") {
-        return <div>loading...</div>
+        return null
     }
     return <>
         {isModalOpen &&

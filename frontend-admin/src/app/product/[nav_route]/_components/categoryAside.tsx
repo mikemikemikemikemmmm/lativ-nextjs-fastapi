@@ -31,7 +31,7 @@ export const CategoryAside = (props: { nav: NavRead }) => {
     } as CategoryRead, "category", getCategorys
     )
     if (categorys === "loading") {
-        return <div>loading...</div>
+        return null
     }
     return <>
         {isModalOpen &&

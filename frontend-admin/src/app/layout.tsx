@@ -8,6 +8,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import { Alarm } from "@mui/icons-material";
 import { AlertContainer } from "@/components/alertContainer";
 import { WIDTH } from "@/style/cssConst";
+import { LoadingContainer } from "@/components/loading";
 
 export default function RootLayout({
   children,
@@ -20,9 +21,10 @@ export default function RootLayout({
         <AppRouterCacheProvider>
           <StoreProvider>
             <ThemeProvider theme={theme}>
-              <AlertContainer />
               <AdminHeader />
               {children}
+              <LoadingContainer />
+              <AlertContainer />
             </ThemeProvider>
           </StoreProvider>
         </AppRouterCacheProvider>

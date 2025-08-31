@@ -10,11 +10,11 @@ export const SeriesModal = (props: {
     modalProps: SeriesRead,
     closeModal: () => void,
     refresh: () => void,
-    subCategoryId:number
+    subCategoryId: number
 }) => {
-    const { modalProps, closeModal, refresh,subCategoryId } = props
+    const { modalProps, closeModal, refresh, subCategoryId } = props
     const isCreate = modalProps.id === FAKE_ID_FOR_CREATE
-    const [input, setInput] = useState<SeriesRead>({ ...modalProps,sub_category_id:subCategoryId })
+    const [input, setInput] = useState<SeriesRead>({ ...modalProps })
     const isInputPass = () => {
         let result = true
         if (input.name === '') {
@@ -28,8 +28,8 @@ export const SeriesModal = (props: {
             return
         }
         const api = isCreate ?
-            postApi("series", { ...input }) :
-            putApi("series/" + input.id, { ...input })
+            postApi("series", { ...input, sub_category_id: subCategoryId }) :
+            putApi("series/" + input.id, { ...input, sub_category_id: subCategoryId })
         const { error } = await api
         if (error) {
             return errorHandler(error)

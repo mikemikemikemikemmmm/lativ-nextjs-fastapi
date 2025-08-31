@@ -7,5 +7,5 @@ export interface ProductModal_SubProductRead {
     color_id: number
     color_name: string
     color_img_url: string
-    sizes: SizeRead[]
+    size_ids: number[]
 }

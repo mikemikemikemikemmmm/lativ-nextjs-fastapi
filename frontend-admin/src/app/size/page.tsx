@@ -17,7 +17,7 @@ export default function () {
     //TODO
   }
   if (sizes === "loading") {
-    return <div className="text-center text-2xl m-6">loading...</div>
+    return null
   }
   return (
     <>

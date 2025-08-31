@@ -1,8 +1,8 @@
 export const FAKE_ID_FOR_CREATE = -999
 export const IMG_SIZE = {
     color: {
-        w: 11,
-        h: 11
+        w: 48,
+        h: 48
     },
     productCard: {
         w: 11,
@@ -17,3 +17,4 @@ export const IMG_SIZE = {
         h: 444
     }
 }
+export const API_TIMEOUT = 10*1000 

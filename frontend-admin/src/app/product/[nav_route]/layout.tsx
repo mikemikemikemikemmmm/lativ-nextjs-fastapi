@@ -27,7 +27,7 @@ export default function NavLayout({
         getNav()
     }, [nav_route])
     if (nav==="loading") {
-        return <div>loading...</div>
+        return null
     }
     if(nav==="noNav"){
         return <div>no nav</div>

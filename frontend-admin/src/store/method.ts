@@ -1,4 +1,4 @@
-import { AlertItem, AppStore, deleteAlertListItemById, pustAlertListSingleItem, shiftAlertListItem, store } from "./store"
+import { AlertItem,  deleteAlertListItemById, pustAlertListSingleItem, shiftAlertListItem, store } from "./store"
 
 export const pushAlertItem = (alertItem: AlertItem) => {
   const state = store.getState()
@@ -13,6 +13,8 @@ export const pushAlertItem = (alertItem: AlertItem) => {
   }, 3000)
 }
 export const dispatchError = (error: string ) => {
-    // const message = getErrorMessage(error)//TODO
     pushAlertItem({ severity: 'error', text: error })
+}
+export const dispatchSuccess = (message: string ) => {
+    pushAlertItem({ severity: "success", text: message })
 }

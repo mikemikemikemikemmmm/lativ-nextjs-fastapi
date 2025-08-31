@@ -1,14 +1,10 @@
-import { useDispatch } from "react-redux"
 import { useState } from "react"
-import { setIsLoading } from "../../store/store"
-import { Box, Button, IconButton, Stack, TextField } from "@mui/material"
-import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
-import { ColorRead } from "@/types/color"
+import {  Button,  Stack } from "@mui/material"
 import { postApi, putApi } from "@/api/base"
-import { COLOR_IMG_WIDTH, FAKE_ID_FOR_CREATE } from "@/utils/constant"
+import {  FAKE_ID_FOR_CREATE } from "@/utils/constant"
 import { dispatchError } from "@/store/method";
 import { errorHandler } from "@/utils/errorHandler";
-import { InputWrapper } from "@/utils/inputWrapper";
+import { InputWrapper } from "@/components/inputWrapper";
 import { SizeRead } from "@/types/size";
 export const SizeModal = (props: {
     modalProps: SizeRead,

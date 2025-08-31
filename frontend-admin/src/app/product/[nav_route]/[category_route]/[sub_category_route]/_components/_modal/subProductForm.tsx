@@ -1,36 +1,27 @@
 import { postApi, putApi } from "@/api/base"
 import { useGetData } from "@/hook/useGetData"
 import { dispatchError } from "@/store/method"
-import { GenderRead } from "@/types/gender"
-import { ProductModalRead } from "@/types/product"
+import { ColorRead } from "@/types/color"
+import { SizeRead } from "@/types/size"
+import { ProductModal_SubProductRead } from "@/types/subProduct"
 import { FAKE_ID_FOR_CREATE, IMG_SIZE } from "@/utils/constant"
 import { errorHandler } from "@/utils/errorHandler"
-import { IconButton } from "@mui/material"
-import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import { useState } from "react"
-
 interface Props {
+    sizes: SizeRead[]
+    colors: ColorRead[]
     isEditing: boolean
-    product: ProductModalRead
-    seriesId: number
+    productId: number
+    subproduct: ProductModal_SubProductRead
 }
-export const ProductModalForm = (props: Props) => {
-    const { isEditing, product, seriesId, } = props
-    const isCreate = product.id === FAKE_ID_FOR_CREATE
-    const [getGenders, genders] = useGetData<GenderRead>("gender")
-    const [input, setInput] = useState<{ name: string, gender_id: number, img_url: string }>({
-        name: product.name,
-        gender_id: product.gender_id,
-        img_url: ""
-    })
+export const SubProductModalForm = (props: Props) => {
+    const { isEditing, subproduct } = props
+    const isCreate = subproduct.id === FAKE_ID_FOR_CREATE
+    const [input, setInput] = useState<ProductModal_SubProductRead>({ ...subproduct, size_ids: [...subproduct.size_ids] })
     const [imgFile, setImgFile] = useState<File | null>(null)
-    const [previewImgUrl, setPreviewImgUrl] = useState<string | null>(null)
+    const [previewImgUrl, setPreviewImgUrl] = useState<string>("")
     const isInputPass = () => {
         let result = true
-        if (input.name === '') {
-            dispatchError('名稱為必須');
-            result = false
-        }
         if (isCreate && (!imgFile || imgFile.size === 0)) {
             dispatchError('圖片為必須');
             result = false
@@ -42,23 +33,20 @@ export const ProductModalForm = (props: Props) => {
             return
         }
         const api = isCreate ?
-            postApi("product", { ...input, file: imgFile }) :
-            putApi("product/" + product.id, { ...input, file: imgFile })
+            postApi("sub_product", { ...input, file: imgFile }) :
+            putApi("sub_product/" + subproduct.id, { ...input, file: imgFile })
         const { error } = await api
         if (error) {
             return errorHandler(error)
         }
         refresh()
     }
-    const handleChangeName = (val: string) => {
-        setInput({ ...input, name: val })
-    }
     const getImagePreviewUrl = () => {
         if (previewImgUrl) {
             return previewImgUrl
         }
         if (isCreate) {
-            return undefined
+            return ""
         }
         return input.img_url
     }
@@ -68,11 +56,11 @@ export const ProductModalForm = (props: Props) => {
             dispatchError('上傳圖片失敗')
             return
         }
-        dispatch(setIsLoading(true))
+        // dispatch(setIsLoading(true))
         const fileReader = new FileReader()
         fileReader.onload = (e) => {
             if (!e.target?.result) {
-                dispatch(setIsLoading(false))
+                // dispatch(setIsLoading(false))
                 dispatchError('上傳圖片失敗')
                 return
             }
@@ -89,7 +77,7 @@ export const ProductModalForm = (props: Props) => {
                 }
                 setImgFile(uploadedImageFile)
                 setPreviewImgUrl(tempImageBase64Url)
-                dispatch(setIsLoading(false))
+                // dispatch(setIsLoading(false))
             }
             tempImageDom.src = tempImageBase64Url
         };
@@ -120,10 +108,7 @@ export const ProductModalForm = (props: Props) => {
                         height: previewImgUrl ? IMG_SIZE.productCard.h : 0
                     }}
                     src={getImagePreviewUrl()} />
-                <IconButton color="primary" component="label">
-                    <AddPhotoAlternateIcon />
-                    <input hidden accept=".jpg" type="file" onChange={e => handleUploadImg(e)} />
-                </IconButton>
+                <input accept=".jpg" type="file" onChange={e => handleUploadImg(e)} >修改圖片</input>
                 <div>上傳圖片 僅限 {IMG_SIZE.color.w}px x {IMG_SIZE.color.h}px jpg檔案</div>
             </div >
             <div className="btn mp2" onClick={() => handleSubmit()}>

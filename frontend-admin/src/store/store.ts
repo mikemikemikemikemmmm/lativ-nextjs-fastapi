@@ -3,31 +3,23 @@ import type { PayloadAction } from '@reduxjs/toolkit'
 type AlertSeverity = 'error' | 'warning' | 'info' | 'success'
 export interface AlertItem { severity: AlertSeverity, text: string, id?: number }
 interface State {
-  // isLoading: boolean
   alertList: AlertItem[],
-  loadingList: number[]
+  loadingCount: number
 }
 
 const initialState: State = {
-  // isLoading: false,
   alertList: [],
-  loadingList: []
+  loadingCount: 0
 }
 export const appSlice = createSlice({
   name: 'appSlice',
   initialState,
   reducers: {
-    // setIsLoading: (state, action: PayloadAction<boolean>) => {
-    //   if (state.isLoading === action.payload) {
-    //     return
-    //   }
-    //   state.isLoading = action.payload
-    // },
-    pushIdToLoadingList: (state, action: PayloadAction<number>) => {
-      state.loadingList = [...state.loadingList, action.payload]
+    increaseLoadingCount: (state) => {
+      state.loadingCount += 1
     },
-    deleteIdToLoadingList: (state, action: PayloadAction<number>) => {
-      state.loadingList = [...state.loadingList, action.payload]
+    decreaseLoadingCount: (state) => {
+      state.loadingCount -= 1
     },
     pustAlertListSingleItem: (state, action: PayloadAction<AlertItem>) => {
       state.alertList = [...state.alertList, action.payload]
@@ -51,7 +43,8 @@ export const appSlice = createSlice({
 })
 export const {
   pustAlertListSingleItem,
-  // setIsLoading,
+  increaseLoadingCount,
+  decreaseLoadingCount,
   shiftAlertListItem,
   deleteAlertListItemById } = appSlice.actions
 
