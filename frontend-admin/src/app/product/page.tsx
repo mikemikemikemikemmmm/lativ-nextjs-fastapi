@@ -1,3 +1,3 @@
 export default () => {
-    return <div>product</div>
+    return <div></div>
 }

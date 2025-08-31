@@ -1,18 +1,71 @@
 from fastapi import APIRouter
 from src.db import SessionDepend
 from src.models.subCategory import CreateSchema, SubCategoryModel, UpdateSchema
-from src.service.crud import CRUD
+from src.service.common import common_service
+from pydantic import BaseModel as BasePydanticSchema
+from sqlalchemy import text
+from src.errorHandler._global import ErrorHandler
 
 sub_category_router = APIRouter()
 
+
+@sub_category_router.get("/category_id/{category_id}")
+def get_sub_category_by_category_id(db: SessionDepend, category_id: int):
+    return (
+        db.query(SubCategoryModel)
+        .filter(SubCategoryModel.category_id == category_id)
+        .order_by(SubCategoryModel.order)
+        .all()
+    )
+
+
+@sub_category_router.get("/routes/{nav_route}/{category_route}/{sub_category_route}")
+def get_sub_category_by_routes(
+    db: SessionDepend, nav_route: str, category_route: str, sub_category_route: str
+):
+    stmt = text("""
+        SELECT sc.name, sc.id
+        FROM sub_category sc
+        INNER JOIN category c 
+            ON c.id = sc.category_id AND c.route = :category_route
+        INNER JOIN nav n
+            ON n.id = c.nav_id AND n.route = :nav_route
+        WHERE sc.route = :sub_category_route
+        ORDER BY sc."order"
+        LIMIT 1 
+    """)
+
+    result = db.execute(
+        stmt,
+        {
+            "category_route": category_route,
+            "nav_route": nav_route,
+            "sub_category_route": sub_category_route,
+        },
+    ).fetchone()
+
+    if not result:
+        return ErrorHandler.raise_404_not_found()
+
+    # 將 SQLAlchemy Row 轉成 dict 再由 Pydantic 返回
+    return SubCategoryModel(id=result.id, name=result.name)
+
+
 @sub_category_router.post("/")
 def create_one(db: SessionDepend, create_data: CreateSchema):
-    return CRUD.create_one(db, SubCategoryModel, create_data)
+    return common_service.create_one(db, SubCategoryModel, create_data)
+
+
+@sub_category_router.put("/switch_order/{id1}/{id2}")
+def switch_order(db: SessionDepend, id1: int, id2: int):
+    return common_service.switch_order(db, SubCategoryModel, id1, id2)
+
 
 @sub_category_router.put("/{id}")
 def update_one(db: SessionDepend, update_data: UpdateSchema, id: int):
-    return CRUD.update_one_by_id(db, SubCategoryModel, update_data, id)
+    return common_service.update_one_by_id(db, SubCategoryModel, update_data, id)
+
 
 @sub_category_router.delete("/{id}")
 def delete_one(db: SessionDepend, id: int):
-    return CRUD.delete_one_by_id(db, SubCategoryModel, id)
+    return common_service.delete_one_by_id(db, SubCategoryModel, id)

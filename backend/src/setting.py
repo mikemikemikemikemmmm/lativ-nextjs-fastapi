@@ -9,7 +9,6 @@ class Settings(BaseSettings):
     frontend_origin: str = os.getenv("ORIGIN", "")
     aws_access_key_id: str = os.getenv("AWS_ACCESS_KEY_ID", "")
     aws_secret_access_key: str = os.getenv("AWS_SECRET_ACCESS_KEY", "")
-    # aws_account_id: str = os.getenv("ORIGIN", "")
     aws_region: str = os.getenv("AWS_REGION", "")
     s3_bucket_name: str = os.getenv("S3_BUCKET_NAME", "")
 
@@ -17,9 +16,9 @@ settings = Settings()
 
 empty_fields = [k for k, v in settings.model_dump().items() if v == ""]
 if empty_fields:
-    print("以下欄位是空字串:", empty_fields)
+    print("以下環境變數欄位是空字串:", empty_fields)
 else:
-    print("所有欄位都有值")
+    print("所有環境變數欄位都有值")
 
 
 @lru_cache

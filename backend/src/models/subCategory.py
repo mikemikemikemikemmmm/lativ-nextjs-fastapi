@@ -11,9 +11,9 @@ if TYPE_CHECKING:
 
 class SubCategoryModel(BaseSQLModel):
     __tablename__ = "sub_category"
-    order: Mapped[int]
     route: Mapped[str]
     name: Mapped[str]
+    order: Mapped[int] = mapped_column(unique=True)
 
     category_id: Mapped[int] = mapped_column(ForeignKey("category.id"))
     category: Mapped["CategoryModel"] = relationship(back_populates="sub_categorys")
@@ -22,7 +22,6 @@ class SubCategoryModel(BaseSQLModel):
     
     __table_args__ = (
         UniqueConstraint("category_id", "route", name="category_sub_category_route_uc"),
-        UniqueConstraint("category_id", "order", name="category_sub_category_order_uc"),
         UniqueConstraint("category_id", "name", name="category_sub_category_name_uc"),
     )
 
@@ -39,4 +38,3 @@ class CreateSchema(BaseSchema):
 
 class UpdateSchema(BaseSchema):
     order: int
-    series_ids: List[int]

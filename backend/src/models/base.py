@@ -41,5 +41,4 @@ class UniqueNameMixin:
 common_model_config_dict = ConfigDict(
     from_attributes=True,
     extra="ignore",
-    #  validate_assignment=True,
 )

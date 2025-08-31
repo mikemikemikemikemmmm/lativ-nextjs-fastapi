@@ -8,62 +8,34 @@ import { ModalContainer } from "@/components/modalContainer";
 import { FAKE_ID_FOR_CREATE } from "@/utils/constant";
 import { ColorModal } from "./modal";
 import { ProductCard } from "@/types/product";
-import { AdminProductCardComponent } from "@/components/productCard";
+import { useGetData } from "@/hook/useGetData";
+import { useModalMethod } from "@/hook/useModalMethod";
 const emptyColor = {
   id: FAKE_ID_FOR_CREATE,
   name: "",
   img_url: ""
 }
 
-export default function AdminColor() {
-  const [colors, setColors] = useState<ColorRead[]>([])
-  const getAllColors = async () => {
-    const { data, error } = await getApi<ColorRead[]>("colors")
-    if (error) {
-      return errorHandler(error)
-    }
-    setColors(data)
+export default function Color() {
+  const [getColors, colors] = useGetData<ColorRead>("color")
+  const { handleCreate, handleEdit, isModalOpen, modalProps, closeModal } = useModalMethod({
+    id: FAKE_ID_FOR_CREATE, name: "", img_url: ""
+  } as ColorRead, "color", getColors)
+  const handleDelete = (c: ColorRead) => {
+    //TODO
   }
-  useEffect(() => {
-    getAllColors()
-  }, [])
-  const [modalProps, setModalProps] = useState<ColorRead | undefined>(undefined)
-  const isModalOpen = !!modalProps
-  const handleEdit = (color: ColorRead) => {
-    setModalProps({ ...color })
-  }
-  const handleCreate = () => {
-    setModalProps({ ...emptyColor })
-  }
-  const handleDelete = async (c: ColorRead) => {
-    if (!confirm(`確定刪除"${c.name}"?`)) {
-      return
-    }
-    const { error } = await deleteApi("colors/" + c.id)
-    if (error) {
-      return errorHandler(error)
-    }
-  }
-  const closeModal = () => {
-    setModalProps(undefined)
-  }
-
-  const [productCards, setProductCards] = useState<ProductCard[]>([])
-  const handleSelect = async (c: ColorRead) => {
-    const { data, error } = await getApi<ProductCard[]>(`product_cards/?color_id=${c.id}`)
-    if (error) {
-      return errorHandler(error)
-    }
-    setProductCards(data)
+  if (colors === "loading") {
+    return <div className="text-center text-2xl m-6">loading...</div>
   }
   return (
     <>
       {isModalOpen &&
         <ModalContainer closeFn={closeModal} isOpen={isModalOpen}>
           <ColorModal
-            colorsData={colors}
-            modalProps={modalProps}
+            colors={colors}
+            modalProps={modalProps as ColorRead}
             closeModal={closeModal}
+            refresh={getColors}
           />
         </ModalContainer>
       }
@@ -78,7 +50,8 @@ export default function AdminColor() {
             <Grid size={{ xs: 12 }}>無顏色</Grid>
             :
             colors.map(c => <div key={c.id}>
-              <div onClick={() => handleSelect(c)}>
+              {/* <div onClick={() => handleSelect(c)}> */}
+              <div>
                 <img src={c.img_url} alt={c.name} />
                 <div>{c.name}</div>
               </div>
@@ -89,7 +62,7 @@ export default function AdminColor() {
             </div>)
         }
       </Grid>
-      <Grid container sx={{ margin: 1 }} spacing={2}>
+      {/* <Grid container sx={{ margin: 1 }} spacing={2}>
         <Grid size={{ xs: 12 }}>
           <Button variant="contained" onClick={() => setProductCards([])}>
             清空產品資料
@@ -104,7 +77,7 @@ export default function AdminColor() {
             </Grid>)
           )
         }
-      </Grid>
+      </Grid> */}
     </>
   )
 }

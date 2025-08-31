@@ -1,9 +1,8 @@
 from sqlalchemy.orm import Mapped, relationship, mapped_column
 from pydantic import BaseModel as BasePydanticSchema
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey,UniqueConstraint
 from typing import List, TYPE_CHECKING
 from .base import BaseSQLModel
-
 if TYPE_CHECKING:
     from .gender import GenderModel
     from .series import SeriesModel
@@ -12,9 +11,8 @@ if TYPE_CHECKING:
 
 class ProductModel(BaseSQLModel):
     __tablename__ = "product"  
-    order: Mapped[int] 
     name: Mapped[str]
-
+    order: Mapped[int] = mapped_column(unique=True)
     gender_id: Mapped[int]= mapped_column(ForeignKey("gender.id"))
     gender: Mapped["GenderModel"] = relationship()
 
@@ -22,7 +20,6 @@ class ProductModel(BaseSQLModel):
     series: Mapped["SeriesModel"] = relationship(back_populates="products")
 
     sub_products: Mapped[List["SubProductModel"]] = relationship(back_populates="product")
-
 
 class BaseSchema(BasePydanticSchema):
     name: str

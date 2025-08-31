@@ -1,9 +1,11 @@
-export interface SubProductCreate {
-    price: number
-    color_id: number,
-    size_ids: number[],
-    img_url: string
-}
-export interface SubProductUpdate extends SubProductCreate {
+import { SizeRead } from "./size"
 
+export interface ProductModal_SubProductRead {
+    id: number
+    price: number
+    img_url: string
+    color_id: number
+    color_name: string
+    color_img_url: string
+    sizes: SizeRead[]
 }

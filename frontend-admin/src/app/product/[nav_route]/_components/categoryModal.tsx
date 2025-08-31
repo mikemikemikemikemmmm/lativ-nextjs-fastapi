@@ -1,15 +1,36 @@
-import { useDispatch } from "react-redux"
+
+
+
+
+
+// import { useState } from "react"
+// import { Button, Stack } from "@mui/material"
+// import { postApi, putApi } from "@/api/base"
+// import { FAKE_ID_FOR_CREATE } from "@/utils/constant"
+// import { dispatchError } from "@/store/method";
+// import { errorHandler } from "@/utils/errorHandler";
+// import { InputWrapper } from "@/utils/inputWrapper";
+// import { CategoryRead } from "@/types/nav";
+// import { useModal } from "@/hook/useModal";
+// export const CategoryModal = (props: {
+//     modalProps: CategoryRead,
+//     categorys: CategoryRead[],
+//     closeModal: () => void,
+//     refresh: () => void,
+// }) => {
+//     const {modalProps,categorys,closeModal,refresh}=props
+//     const = useModal(modalProps,categorys,)
+//     return <div></div>
+// }
+
 import { useState } from "react"
-import { setIsLoading } from "../../store/store"
-import { Box, Button, IconButton, TextField } from "@mui/material"
-import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
-import { ColorRead } from "@/types/color"
+import { Button, Stack } from "@mui/material"
 import { postApi, putApi } from "@/api/base"
-import { COLOR_IMG_WIDTH, FAKE_ID_FOR_CREATE } from "@/utils/constant"
+import { FAKE_ID_FOR_CREATE } from "@/utils/constant"
 import { dispatchError } from "@/store/method";
 import { errorHandler } from "@/utils/errorHandler";
-import { InputWrapper } from "@/utils/inputWrapper";
-import { CategoryRead, NavRead } from "@/types/nav";
+import { CategoryRead } from "@/types/nav";
+import { InputWrapper } from "@/components/inputWrapper";
 export const CategoryModal = (props: {
     modalProps: CategoryRead,
     categorys: CategoryRead[],
@@ -30,7 +51,10 @@ export const CategoryModal = (props: {
             result = false
         }
 
-        if (navs.find(n => n.route === input.route && n.id !== input.id)) {
+        if (categorys.find(c => c.nav_id === modalProps.nav_id &&
+            c.route === input.route &&
+            c.id !== input.id)
+        ) {
             dispatchError('路由重複');
             result = false
         }
@@ -41,8 +65,8 @@ export const CategoryModal = (props: {
             return
         }
         const api = isCreate ?
-            postApi("colors", { ...input }) :
-            putApi("colors/" + input.id, { ...input })
+            postApi("category", { ...input }) :
+            putApi("category/" + input.id, { ...input })
         const { error } = await api
         if (error) {
             return errorHandler(error)
@@ -54,21 +78,23 @@ export const CategoryModal = (props: {
         setInput({ ...input, [key]: val })
     }
     return (
-        <>
+        <Stack>
             <InputWrapper
+                sx={{ m: 2 }}
                 label="名稱"
                 value={input.name}
                 onChange={val => handleChange(val, "name")}
             />
             <InputWrapper
+                sx={{ m: 2 }}
                 label="路由"
                 value={input.route}
                 onChange={val => handleChange(val, "route")}
             />
 
-            <Button size="small" variant="contained" onClick={() => handleSubmit()}>
+            <Button sx={{ m: 2 }} size="small" variant="contained" onClick={() => handleSubmit()}>
                 送出
             </Button>
-        </>
+        </Stack>
     )
 }

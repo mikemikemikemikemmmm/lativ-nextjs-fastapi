@@ -1,2 +1,16 @@
 @layer theme, base, mui, components, utilities;
 @import 'tailwindcss';
+
+.btn {
+  @apply border hover:cursor-pointer hover:bg-blue-300;
+}
+
+.mp2 {
+  @apply m-2 p-2;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

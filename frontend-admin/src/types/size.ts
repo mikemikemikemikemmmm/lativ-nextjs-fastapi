@@ -1,4 +1,4 @@
-export interface SizeCreateDto{
-    name:string
+export interface SizeRead {
+    id: number,
+    name: string
 }
-export interface SizeUpdateDto extends SizeCreateDto{}

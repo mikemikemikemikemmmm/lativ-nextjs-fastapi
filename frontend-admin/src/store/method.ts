@@ -12,7 +12,7 @@ export const pushAlertItem = (alertItem: AlertItem) => {
     store.dispatch(deleteAlertListItemById(alertData.id))
   }, 3000)
 }
-export const dispatchError = (error: string | Error | undefined | unknown) => {
+export const dispatchError = (error: string ) => {
     // const message = getErrorMessage(error)//TODO
-    pushAlertItem({ severity: 'error', text: "1111" })
+    pushAlertItem({ severity: 'error', text: error })
 }

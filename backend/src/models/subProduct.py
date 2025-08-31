@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Mapped, relationship, mapped_column
 from pydantic import BaseModel as BasePydanticSchema
 from typing import List, TYPE_CHECKING
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey,UniqueConstraint
 from .base import BaseSQLModel
 
 if TYPE_CHECKING:
@@ -12,8 +12,8 @@ if TYPE_CHECKING:
 
 class SubProductModel(BaseSQLModel):
     __tablename__ = "sub_product"
-    order: Mapped[int] 
     price:Mapped[int]
+    order: Mapped[int] = mapped_column(unique=True)
     
     color_id: Mapped[int]= mapped_column(ForeignKey("color.id"))
     color: Mapped["ColorModel"] = relationship()
@@ -22,7 +22,6 @@ class SubProductModel(BaseSQLModel):
     product: Mapped["ProductModel"] = relationship(back_populates="sub_products")
 
     sizes: Mapped[List["SizeSubProductModel"]] = relationship()
-
 
 class BaseSchema(BasePydanticSchema):
     sizes: str

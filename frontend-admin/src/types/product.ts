@@ -1,48 +1,25 @@
-export interface ProductCreate {
+import { ProductModal_SubProductRead } from "./subProduct"
+
+export interface ProductModalRead {
     name: string
-    gender_id: number,
-    img_url: string,
+    id: number
+    gender_name: string
+    gender_id: number
     series_id: number
-}
-export interface ProductUpdate extends ProductCreate { }
-
-export interface ProductDetail {
-    name: string
-    id: number
-    gender_name: string
-    sub_category_id: number
-    sub_products: SubProduct[]
-}
-export interface SubProduct {
-    id: number
-    price: number
-    img_url: string
-    color_id: number
-    color_name: string
-    color_img_url: string
-    sizes: Size[]
+    sub_product_ids: number[]
 }
 
 
 
-
-export interface ProductCard {
+export interface ProductCardRead {
     id: number
     img_url: string
     name: string
     gender_name: string
-    sub_products: ProductCard_SubProduct[]
     price: number
-}
-
-export interface ProductCard_SubProduct {
-    id: number
-    color_img_url: string
-    color_name: string
-}
-
-export interface Size {
-    id: number
-    name: string
-    is_show: boolean
+    sub_products: {
+        id: number
+        color_img_url: string
+        color_name: string
+    }[]
 }

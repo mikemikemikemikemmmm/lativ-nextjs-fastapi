@@ -23,3 +23,5 @@ def get_product_cards(
         return get_product_cards_by_nav_id(db, nav_id)
     if sub_category_id:
         return get_product_cards_by_sub_category_id(db, sub_category_id)
+    else:
+        return []

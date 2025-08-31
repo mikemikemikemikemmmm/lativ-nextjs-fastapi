@@ -13,14 +13,13 @@ export const ModalContainer = (
         left: '50%',
         transform: 'translate(-50%, -50%)',
         maxHeight: '80%',
-        maxWidth:"80%",
-        overflow:"scroll",
+        maxWidth: "80%",
         bgcolor: 'background.paper',
         boxShadow: 24,
-        p: 3,
+        p: 3
     }
     return (
-        <Modal sx={{zIndex:ZIndex.modal}} open={props.isOpen} onClose={props.closeFn}>
+        <Modal sx={{ zIndex: ZIndex.modal }} open={props.isOpen} onClose={props.closeFn}>
             <Box sx={boxStyle}>
                 {props.children}
             </Box>

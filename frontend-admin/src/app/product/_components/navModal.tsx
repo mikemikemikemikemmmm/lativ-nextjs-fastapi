@@ -4,7 +4,7 @@ import { postApi, putApi } from "@/api/base"
 import { FAKE_ID_FOR_CREATE } from "@/utils/constant"
 import { dispatchError } from "@/store/method";
 import { errorHandler } from "@/utils/errorHandler";
-import { InputWrapper } from "@/utils/inputWrapper";
+import { InputWrapper } from "@/components/inputWrapper";
 import { NavRead } from "@/types/nav";
 import { useAppStore } from "@/store/hook";
 export const NavModal = (props: {

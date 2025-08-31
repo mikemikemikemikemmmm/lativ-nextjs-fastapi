@@ -1,12 +1,6 @@
-import { ProductCard } from "./product"
-
-export interface SeriesCreateDto {
-    sub_category_id: number
-    name: string
-}
-export interface SeriesUpdateDto extends SeriesCreateDto { }
-export interface SeriesResponse {
+export interface SeriesRead {
+    sub_category_id:number
     id: number
     name: string
-    product_cards: ProductCard[]
+    product_ids: number[]
 }

@@ -1,5 +1,5 @@
 'use client'
-import NavHeader from "./_nav/header";
+import NavHeader from "./_components/navHeader";
 export default function ProductLayout({
   children,
 }: Readonly<{
@@ -8,6 +8,7 @@ export default function ProductLayout({
   return (
     <>
       <NavHeader />
+      <div className="my-1 mx-6 bg-black" style={{height:0.5}} />
       {children}
     </>
   );

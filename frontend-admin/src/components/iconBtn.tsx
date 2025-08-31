@@ -1,12 +1,26 @@
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import EditIcon from '@mui/icons-material/Edit';
 import LowPriorityIcon from '@mui/icons-material/LowPriority';
-export const DeleteBtn = (props: { onClick: () => void }) => {
-    return <DeleteForeverIcon onClick={props.onClick} />
+interface Props {
+    onDelete?: () => void
+    onEdit?: () => void
+    onDragStart?: () => void
+    classProps?: string
+
 }
-export const EditBtn = (props: { onClick: () => void }) => {
-    return <EditIcon onClick={props.onClick} />
-}
-export const SwitchOrderBtn = (props: { onClick: () => void }) => {
-    return <LowPriorityIcon onClick={props.onClick} />
-}
+export const IconBtnGroup = (props: Props) => {
+    const { onDelete, onEdit, onDragStart} = props
+    return <span className=" whitespace-nowrap">
+        {
+            onDelete && <DeleteForeverIcon className='hover:text-teal-700 hover:cursor-pointer' onClick={onDelete} />
+        }
+        {
+            onEdit && <EditIcon className='hover:text-teal-700 hover:cursor-pointer' onClick={onEdit} />
+        }
+        {
+            onDragStart && <span className='hover:text-teal-700 hover:cursor-pointer' onDragStart={onDragStart} draggable>
+                <LowPriorityIcon />
+            </span>
+        }
+    </span>
+} 

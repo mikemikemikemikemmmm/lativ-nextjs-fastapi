@@ -1,54 +1,78 @@
 from fastapi import APIRouter
-from sqlalchemy import select, func, asc, types, literal
+from sqlalchemy import text
 from src.db import SessionDepend
-from src.models.category import CategoryModel
+from src.models.category import CategoryModel, CreateSchema, UpdateSchema
 from src.models.subCategory import SubCategoryModel
+from src.models.nav import NavModel
+from src.service.common import common_service
+from src.errorHandler._global import ErrorHandler
 
 category_router = APIRouter()
 
 
-@category_router.get("/")
-def get_all_category_and_sub_categorys_by_nav_id(db: SessionDepend, nav_id: int):
-    subquery = (
-        select(
-            SubCategoryModel.category_id,
-            func.json_agg(
-                func.json_build_object(
-                    "id",
-                    SubCategoryModel.id,
-                    "name",
-                    SubCategoryModel.name,
-                    "order",
-                    SubCategoryModel.order,
-                    "route",
-                    SubCategoryModel.route,
-                ).order_by(asc(SubCategoryModel.order))
-            ).label("sub_categorys"),
-        ).group_by(SubCategoryModel.category_id)
-    ).subquery()
+@category_router.post("/")
+def create_one(db: SessionDepend, create_data: CreateSchema):
+    return common_service.create_one(db, CategoryModel, create_data)
 
-    stmt = (
-        select(
-            func.json_agg(
-                func.json_build_object(
-                    "id",
-                    CategoryModel.id,
-                    "name",
-                    CategoryModel.name,
-                    "order",
-                    CategoryModel.order,
-                    "sub_categorys",
-                    func.coalesce(
-                        subquery.c.sub_categorys,
-                        func.cast(literal([]), type_=types.JSON),
-                    ),
-                ).order_by(asc(CategoryModel.order))
-            )
-        )
-        .select_from(CategoryModel)
-        .outerjoin(subquery, subquery.c.category_id == CategoryModel.id)
-        .where(CategoryModel.nav_id == nav_id)
+
+@category_router.delete("/{id}")
+def delete_one(db: SessionDepend, id: int):
+    return common_service.delete_one_by_id(db, CategoryModel, id)
+
+
+@category_router.put("/switch_order/{id1}/{id2}")
+def switch_order(db: SessionDepend, id1: int, id2: int):
+    return common_service.switch_order(db, CategoryModel, id1, id2)
+
+
+@category_router.put("/{id}")
+def update_one(db: SessionDepend, update_data: UpdateSchema, id: int):
+    return common_service.update_one_by_id(db, CategoryModel, update_data, id)
+
+
+@category_router.get("/nav_id/{nav_id}")
+def get_category_and_sub_categorys_by_nav_id(db: SessionDepend, nav_id: int):
+    return (
+        db.query(CategoryModel)
+        .filter(CategoryModel.nav_id == nav_id)
+        .order_by(CategoryModel.order)
+        .all()
     )
 
-    result = db.execute(stmt).scalar_one()
-    return result or []
+
+# @category_router.get("/")
+# def get_category_and_sub_categorys_by_nav_id(db: SessionDepend, nav_id: int):
+#     target_nav = db.query(NavModel).filter(NavModel.id == nav_id).first()
+#     if not target_nav:
+#         return ErrorHandler.raise_404_not_found()
+
+#     sql = text("""
+#         SELECT COALESCE(json_agg(cat), '[]'::json) AS categories
+#         FROM (
+#             SELECT
+#                 c.id,
+#                 c.name,
+#                 c."order",
+#                 COALESCE(
+#                     (
+#                         SELECT json_agg(sc ORDER BY sc."order")
+#                         FROM (
+#                             SELECT
+#                                 id,
+#                                 name,
+#                                 "order",
+#                                 route
+#                             FROM sub_category
+#                             WHERE category_id = c.id
+#                         ) sc
+#                     ),
+#                     '[]'::json
+#                 ) AS sub_categorys
+#             FROM category c
+#             WHERE c.nav_id = :nav_id
+#             ORDER BY c."order"
+#         ) cat
+#     """)
+
+#     result = db.execute(sql, {"nav_id": nav_id}).scalar()
+#     return result or []

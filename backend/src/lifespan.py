@@ -10,7 +10,7 @@ async def lifespan(app:FastAPI):
         with engine.connect() as conn:
             conn.execute(text("SELECT 1"))
         print("✅ Database connected successfully")
-    except Exception as e:
-        print("❌ Database connection failed:", e)
-        raise e
+    except Exception:
+        print("❌ Database connection failed")
+        # raise e
     yield

@@ -6,8 +6,7 @@ from src.models.series import SeriesModel
 from src.models.subCategory import SubCategoryModel
 from src.models.category import CategoryModel
 from src.db import SessionDepend
-from src.dto.product_card import ProductCard, ProductCardSubProduct
-
+from src.schema.product_card import ProductCard, ProductCardSubProduct
 
 from typing import Sequence
 

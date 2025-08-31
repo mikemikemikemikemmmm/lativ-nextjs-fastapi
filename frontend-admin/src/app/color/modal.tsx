@@ -5,19 +5,19 @@ import { Box, Button, IconButton, TextField } from "@mui/material"
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import { ColorRead } from "@/types/color"
 import { postApi, putApi } from "@/api/base"
-import { COLOR_IMG_WIDTH, FAKE_ID_FOR_CREATE } from "@/utils/constant"
+import { IMG_SIZE, FAKE_ID_FOR_CREATE } from "@/utils/constant"
 import { dispatchError } from "@/store/method";
 import { errorHandler } from "@/utils/errorHandler";
-import { InputWrapper } from "@/utils/inputWrapper";
+import { InputWrapper } from "@/components/inputWrapper";
 export const ColorModal = (props: {
     modalProps: ColorRead,
-    colorsData: ColorRead[],
+    colors: ColorRead[],
     closeModal: () => void,
-    // forcedRender: () => void,
+    refresh: () => void,
 }) => {
-    const { modalProps, closeModal, colorsData } = props
-    const isCreate = modalProps.id === FAKE_ID_FOR_CREATE
     const dispatch = useDispatch()
+    const { modalProps, closeModal, colors, refresh } = props
+    const isCreate = modalProps.id === FAKE_ID_FOR_CREATE
     const [input, setInput] = useState<ColorRead>({ ...modalProps })
     const [imgFile, setImgFile] = useState<File | null>(null)
     const [previewImgUrl, setPreviewImgUrl] = useState<string | null>(null)
@@ -27,7 +27,7 @@ export const ColorModal = (props: {
             dispatchError('名稱為必須');
             result = false
         }
-        if (colorsData.find(c => c.name === input.name && input.id !== c.id)) {
+        if (colors.find(c => c.name === input.name && input.id !== c.id)) {
             dispatchError('已有相同名稱的顏色');
             result = false
         }
@@ -44,14 +44,14 @@ export const ColorModal = (props: {
             return
         }
         const api = isCreate ?
-            postApi("colors", { ...input, file: imgFile }) :
-            putApi("colors/" + input.id, { ...input, file: imgFile })
+            postApi("color", { ...input, file: imgFile }) :
+            putApi("color/" + input.id, { ...input, file: imgFile })
         const { error } = await api
         if (error) {
             return errorHandler(error)
         }
         closeModal()
-        // forcedRender()
+        refresh()
     }
     const handleChangeName = (val: string) => {
         setInput({ ...input, name: val })
@@ -84,10 +84,10 @@ export const ColorModal = (props: {
             tempImageDom.onload = () => {
                 const { width } = tempImageDom
                 const { height } = tempImageDom
-                if (width !== COLOR_IMG_WIDTH ||
-                    height !== COLOR_IMG_WIDTH) {
+                if (width !== IMG_SIZE.color.w ||
+                    height !== IMG_SIZE.color.h) {
                     dispatch(setIsLoading(false))
-                    dispatchError(`長寬有一不為${COLOR_IMG_WIDTH}px`)
+                    dispatchError(`長寬有一不為${IMG_SIZE.color.w}px`)
                     return
                 }
                 setImgFile(uploadedImageFile)
@@ -108,15 +108,15 @@ export const ColorModal = (props: {
             <Box sx={{ margin: 1, padding: 1, display: 'flex', justifyContent: 'center' }}>
                 <img
                     style={{
-                        width: previewImgUrl ? COLOR_IMG_WIDTH : 0,
-                        height: previewImgUrl ? COLOR_IMG_WIDTH : 0
+                        width: previewImgUrl ?  IMG_SIZE.color.w : 0,
+                        height: previewImgUrl ?  IMG_SIZE.color.h : 0
                     }}
                     src={getImagePreviewUrl()} />
                 <IconButton color="primary" component="label">
                     <AddPhotoAlternateIcon />
                     <input hidden accept=".jpg" type="file" onChange={e => handleUploadImg(e)} />
                 </IconButton>
-                <div>上傳圖片 僅限 {COLOR_IMG_WIDTH}px x {COLOR_IMG_WIDTH}px jpg檔案</div>
+                <div>上傳圖片 僅限 { IMG_SIZE.color.w}px x { IMG_SIZE.color.h}px jpg檔案</div>
             </Box>
             <Button size="small" variant="contained" onClick={() => handleSubmit()}>
                 送出
