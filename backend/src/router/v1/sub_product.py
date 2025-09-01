@@ -22,15 +22,17 @@ def delete_one(db: SessionDepend, id: int):
     return common_service.delete_one_by_id(db, SubProductModel, id)
 
 
-@sub_product_router.get("/sub_product/modal/{product_id}")
+@sub_product_router.get("/modal/{product_id}")
 def get_at_modal_by_product_id(db: SessionDepend, product_id: int):
+
     stmt = text("""
         SELECT
             sp.id,
             sp.price,
-            sp.img_url,
+            sp.img_file_name,
             c.id AS color_id,
             c.name AS color_name,
+            c.img_url AS color_img_url,
             array_agg(s.id ORDER BY s."order") AS size_ids
         FROM sub_product sp
         INNER JOIN product p
@@ -41,20 +43,19 @@ def get_at_modal_by_product_id(db: SessionDepend, product_id: int):
             ON ssp.sub_product_id = sp.id
         INNER JOIN size s
             ON ssp.size_id = s.id
-        GROUP BY sp.id, sp.price, sp.img_url, c.id, c.name
+        GROUP BY sp.id, sp.price, sp.img_file_name, c.id, c.name,c.img_url
         ORDER BY sp."order"
     """)
 
     result = db.execute(stmt, {"product_id": product_id}).fetchall()
-
-    # 將 SQLAlchemy Row 轉換成字典列表
     return [
         {
             "id": row.id,
             "price": row.price,
-            "img_url": row.img_url,
+            "img_file_name": row.img_file_name,
             "color_id": row.color_id,
             "color_name": row.color_name,
+            "color_img_url":row.color_img_url,
             "size_ids": row.size_ids,  # 直接是整數陣列
         }
         for row in result

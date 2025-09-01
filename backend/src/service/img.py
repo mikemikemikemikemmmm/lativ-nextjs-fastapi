@@ -3,8 +3,6 @@ from mypy_boto3_s3 import S3Client
 from src.setting import get_settings
 from fastapi import UploadFile
 import uuid
-from typing import Literal
-from src.errorHandler._global import ErrorHandler
 
 setting = get_settings()
 s3_client: S3Client = boto3.client(
@@ -15,7 +13,7 @@ s3_client: S3Client = boto3.client(
 
 
 def upload_img_to_s3(
-    file: UploadFile, file_name_prefix
+    file: UploadFile, file_name_prefix:str
 ) -> tuple[str | None, str | None]:
     if not file.filename:
         return None, "no filename"

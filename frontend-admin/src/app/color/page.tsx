@@ -1,34 +1,20 @@
 'use client'
-import { Button, Grid } from "@mui/material";
 import { ColorRead } from "@/types/color";
 import { ModalContainer } from "@/components/modalContainer";
 import { FAKE_ID_FOR_CREATE, IMG_SIZE } from "@/utils/constant";
 import { ColorModal } from "./modal";
 import { useGetData } from "@/hook/useGetData";
-import { useModalMethod } from "@/hook/useModalMethod";
 import { IconBtnGroup } from "@/components/iconBtn";
-import { deleteApi } from "@/api/base";
-import { errorHandler } from "@/utils/errorHandler";
-import { dispatchError, dispatchSuccess } from "@/store/method";
-import { imgUrlPrefix } from "@/utils/env";
-const emptyColor = {
-  id: FAKE_ID_FOR_CREATE,
-  name: "",
-  img_url: ""
-}
+import { getImgUrl } from "@/utils/env";
+import { useCommonMethods } from "@/hook/useCommonMethods";
 
 export default function Color() {
   const [getColors, colors] = useGetData<ColorRead>("color")
-  const { handleCreate, handleEdit, isModalOpen, modalProps, closeModal } = useModalMethod({
+  const { handleCreate, handleEdit, isModalOpen, modalProps, closeModal, handleDelete } = useCommonMethods({
     id: FAKE_ID_FOR_CREATE, name: "", img_url: ""
   } as ColorRead, "color", getColors)
-  const handleDelete = async (c: ColorRead) => {
-    const { error } = await deleteApi(`color/${c.id}`)
-    if (error) {
-      return errorHandler(error)
-    }
-    dispatchSuccess("刪除成功")
-    getColors()
+  const _handleDelete = async (c: ColorRead) => {
+    handleDelete(c.id)
   }
   if (colors === "loading") {
     return null
@@ -58,13 +44,13 @@ export default function Color() {
                 <img className="inline-block" style={{
                   width: IMG_SIZE.color.w,
                   height: IMG_SIZE.color.h
-                }} src={imgUrlPrefix + c.img_url} alt={c.name} />
+                }} src={getImgUrl(c.img_url)} alt={c.name} />
               </div>
               <div>{c.name}</div>
               <div>
                 <IconBtnGroup
                   onEdit={() => handleEdit(c)}
-                  onDelete={() => handleDelete(c)} />
+                  onDelete={() => _handleDelete(c)} />
               </div>
             </div>
           </div>)

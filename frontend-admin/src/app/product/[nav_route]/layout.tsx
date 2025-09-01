@@ -12,7 +12,7 @@ export default function NavLayout({
 }>) {
     const params = useParams();
     const { nav_route } = params
-    const [nav, setNav] = useState<NavRead | "loading"|"noNav">("loading")
+    const [nav, setNav] = useState<NavRead | "loading" | "noNav">("loading")
     const getNav = async () => {
         const { data, error } = await getApi<NavRead>(
             `nav/nav_route/${nav_route}`
@@ -26,15 +26,17 @@ export default function NavLayout({
     useEffect(() => {
         getNav()
     }, [nav_route])
-    if (nav==="loading") {
+    if (nav === "loading") {
         return null
     }
-    if(nav==="noNav"){
+    if (nav === "noNav") {
         return <div>no nav</div>
     }
     return (
         <div className="flex justify-stretch">
-            <div className=' inline-block min-w-2/6 p-4'><CategoryAside nav={nav} /></div>
+            <div className=' inline-block min-w-2/6 p-4'>
+                <CategoryAside nav={nav} />
+            </div>
             <div className=' inline-block min-w-4/6 p-4'> {children}</div>
         </div>
     )

@@ -1,26 +1,27 @@
-import { postApi, putApi } from "@/api/base"
-import { useGetData } from "@/hook/useGetData"
+import { baseFetch } from "@/api/base"
 import { dispatchError } from "@/store/method"
 import { GenderRead } from "@/types/gender"
-import { ProductCardRead, ProductModalRead } from "@/types/product"
+import { ProductCardRead } from "@/types/product"
 import { FAKE_ID_FOR_CREATE, IMG_SIZE } from "@/utils/constant"
 import { errorHandler } from "@/utils/errorHandler"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
+import { useUploadImg } from "@/hook/useUploadImg"
+import { getImgUrl } from "@/utils/env"
 
 interface Props {
     isEditing: boolean
     product: ProductCardRead
     seriesId: number
     genders: GenderRead[]
+    cancelEditing: (refresh?: boolean) => void
 }
 export const ProductModalForm = (props: Props) => {
-    const { isEditing, product, seriesId, genders } = props
+    const { isEditing, product, seriesId, genders, cancelEditing } = props
     const isCreate = product.id === FAKE_ID_FOR_CREATE
     const [input, setInput] = useState<ProductCardRead>({ ...product })
-    const [imgFile, setImgFile] = useState<File | null>(null)
-    const [previewImgUrl, setPreviewImgUrl] = useState<string>("")
-    const fileInputRef = useRef(null); // 建立一個 ref 指向 input
+    const { handleUploadImg, imgFile, previewImgUrl, setImgFile, setPreviewImgUrl } = useUploadImg(IMG_SIZE.productCard)
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const handleGender = (genderId: string) => {
         const num = Number(genderId)
         if (!Number.isInteger(num) || num < 0) {
@@ -48,73 +49,67 @@ export const ProductModalForm = (props: Props) => {
         if (!isInputPass()) {
             return
         }
+        const formData = new FormData();
+        if (imgFile) {
+            formData.append("file", imgFile)
+        }
+        formData.append("product_name", input.name);
+        formData.append("gender_id", String(input.gender_id));
+        formData.append("series_id", String(seriesId));
         const api = isCreate ?
-            postApi("product", { ...input, file: imgFile }) :
-            putApi("product/" + product.id, { ...input, file: imgFile })
+            baseFetch<ProductCardRead>("product", {
+                method: "POST",
+                body: formData
+            }) :
+            baseFetch<ProductCardRead>(`product/${input.id}`, {
+                method: "PUT",
+                body: formData
+            })
         const { error } = await api
         if (error) {
             return errorHandler(error)
         }
-        refresh()
+        cancelEditing(true)
     }
     const handleChangeName = (val: string) => {
         setInput({ ...input, name: val })
     }
-    const getImagePreviewUrl = () => {
-        if (previewImgUrl) {
-            return previewImgUrl
-        }
-        if (isCreate) {
-            return undefined
-        }
-        return input.img_url
-    }
-    const handleUploadImg = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const uploadedImageFile = e.target.files?.[0]
-        if (!uploadedImageFile) {
-            dispatchError('上傳圖片失敗')
-            return
-        }
-        // dispatch(setIsLoading(true))
-        const fileReader = new FileReader()
-        fileReader.onload = (e) => {
-            if (!e.target?.result) {
-                // dispatch(setIsLoading(false))
-                dispatchError('上傳圖片失敗')
-                return
-            }
-            const tempImageBase64Url = e.target.result as string
-            const tempImageDom = new Image()
-            tempImageDom.onload = () => {
-                const { width } = tempImageDom
-                const { height } = tempImageDom
-                if (width !== IMG_SIZE.productCard.w ||
-                    height !== IMG_SIZE.productCard.h) {
-                    // dispatch(setIsLoading(false))
-                    dispatchError(`長寬有一不為${IMG_SIZE.color.w}px`)
-                    return
-                }
-                setImgFile(uploadedImageFile)
-                setPreviewImgUrl(tempImageBase64Url)
-                // dispatch(setIsLoading(false))
-            }
-            tempImageDom.src = tempImageBase64Url
-        };
-        fileReader.readAsDataURL(uploadedImageFile);
-    }
-    const refresh = () => { }
     const handleCancel = () => {
-
+        setInput({ ...product })
+        setImgFile(null)
+        setPreviewImgUrl(null)
+        cancelEditing()
     }
+    const [imgUrl, setImgUrl] = useState<string | undefined>(() => product.img_url)
+    useEffect(() => {
+        if (previewImgUrl) {
+            setImgUrl(previewImgUrl)
+        }
+        else if (isCreate) {
+            setImgUrl(undefined)
+        } else {
+            setImgUrl(getImgUrl(product.img_url))
+        }
+    }, [previewImgUrl])
     return (
         <>
-            <div className="flex-center">
-                <div className="w-1/2 inline-block">
+            <div className="flex items-start">
+                <div className=" inline-block">
                     <div className="m-2 text-center">
-                        <img className="inline-block"
-                            style={{ width: 100, height: 150 }}
-                            src={getImagePreviewUrl()} />
+                        {
+                            imgUrl ?
+
+                                <img className="inline-block"
+                                    style={{ width: 100, height: 150 }}
+                                    src={imgUrl} />
+                                :
+                                <div className="inline-block border flex-center"
+                                    style={{ width: 100, height: 150 }}>
+                                    no img
+                                </div>
+                        }
                         <input
+                            disabled={!isEditing}
                             ref={fileInputRef}
                             style={{ display: "none" }}
                             accept=".jpg"
@@ -123,16 +118,17 @@ export const ProductModalForm = (props: Props) => {
                         />
                     </div>
                 </div >
-                <div className="w-1/2 inline-block">
+                <div className="flex-1 inline-block">
                     <div className="w-full">
                         <div className="m-2 flex-center">
-                            <div className="inline-block hover:text-amber-600 hover:cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+                            <div className="inline-block hover:cursor-pointer" onClick={() => fileInputRef.current?.click()}>
                                 <AddPhotoAlternateIcon style={{ fontSize: 40 }} />
                             </div>
-                            <div className="inline-block flex-1 text-center">
-                                <div>
-                                    {IMG_SIZE.color.w}px x {IMG_SIZE.color.h}px
+                            <div className="inline-block text-center">
+                                <div className="">
+                                    {IMG_SIZE.productCard.w}px寬
                                 </div>
+                                <div className="">{IMG_SIZE.productCard.h}px高</div>
                                 <div className="">jpg file</div>
                             </div>
                         </div>
@@ -142,14 +138,14 @@ export const ProductModalForm = (props: Props) => {
                             <span className="inline-block">
                                 名稱
                             </span>
-                            <input className="flex-1 inline-block w-1/2 border ml-2" type="text" name="" id="" />
+                            <input disabled={!isEditing} value={input.name} className="flex-1 inline-block w-1/2 border ml-2 px-2" type="text" onChange={e => handleChangeName(e.target.value)} />
                         </div></div>
                     <div className=" w-full">
                         <div className="m-2 flex">
                             <span className="inline-block">
                                 性別
                             </span>
-                            <select className="flex-1 inline-block w-1/2 border ml-2" onChange={(e) => handleGender(e.target.value)} >
+                            <select disabled={!isEditing} value={input.gender_id} className="flex-1 inline-block w-1/2 border ml-2 px-1" onChange={(e) => handleGender(e.target.value)} >
                                 <option value={FAKE_ID_FOR_CREATE}>no selected</option>
                                 {
                                     genders.map(g => <option key={g.id} value={g.id}>{g.name}</option>)
@@ -158,9 +154,12 @@ export const ProductModalForm = (props: Props) => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div >
             {
                 isEditing && <div className="w-full text-center">
+                    <div className="border inline-block mp2 bg-blue-300" >
+                        編輯中
+                    </div>
                     <div className="btn inline-block mp2" onClick={() => handleSubmit()}>
                         送出
                     </div>
@@ -169,7 +168,6 @@ export const ProductModalForm = (props: Props) => {
                     </div>
                 </div>
             }
-            <div style={{ height: 1000 }}></div>
         </>
     )
 }

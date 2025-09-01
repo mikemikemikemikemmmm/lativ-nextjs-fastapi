@@ -1,22 +1,22 @@
-import { dispatchError } from "@/store/method";
+import { dispatchError, dispatchSuccess } from "@/store/method";
 import { store, increaseLoadingCount, decreaseLoadingCount } from "@/store/store";
 import { API_TIMEOUT } from "@/utils/constant";
-import { getRandomInt } from "@/utils/randomInt";
-const backendBaseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
+import { ENV } from "@/utils/env";
 export interface ApiErrorObj {
     detail: string
 } //TODO
 type ErrResult = { data: undefined; error: ApiErrorObj }
 type SuccessResult<T> = { data: T; error: undefined }
 type ApiResult<T> = SuccessResult<T> | ErrResult
-export async function baseFetch<Response>(url: string, options?: RequestInit): Promise<ApiResult<Response>> {
-    const urlWithBase = `${backendBaseUrl}/v1/${url}`
+export async function baseFetch<Response>(url: string, options?: RequestInit, alertStr?: string): Promise<ApiResult<Response>> {
+    const urlWithBase = `${ENV.backendUrl}/v1/${url}`
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), API_TIMEOUT);
     store.dispatch(increaseLoadingCount())
     try {
         const response = await fetch(urlWithBase, { ...options, signal: controller.signal });
         if (!response.ok) {
+            console.log("a", response)
             return {
                 data: undefined,
                 error: {
@@ -25,11 +25,28 @@ export async function baseFetch<Response>(url: string, options?: RequestInit): P
             } as ErrResult
         }
         const jsonData = await response.json()
+        if (alertStr) {
+            dispatchSuccess(alertStr)
+        } else {
+            const method = options?.method
+            switch (method) {
+                case "POST":
+                    dispatchSuccess("新增成功")
+                    break;
+                case "PUT":
+                    dispatchSuccess("修改成功")
+                    break;
+                case "DELETE":
+                    dispatchSuccess("刪除成功")
+                    break;
+            }
+        }
         return {
             data: jsonData as Response,
             error: undefined
         } as SuccessResult<Response>
     } catch (error: any) {
+        console.log("error", error)
         if (error.name === "AbortError") {
             return {
                 data: undefined,

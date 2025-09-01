@@ -1,9 +1,10 @@
 import { errorHandler } from "@/utils/errorHandler"
 import { useState } from "react"
 import { useDrag } from "./useDrag"
-import { putApi } from "@/api/base"
+import { deleteApi, putApi } from "@/api/base"
+import { dispatchSuccess } from "@/store/method"
 
-export function useModalMethod<T>(emptyData: T, switchOrderApiPrefix: string, refresh: () => void) {
+export function useCommonMethods<T>(emptyData: T, apiPrefix: string, refresh: () => void) {
     const [modalProps, setModalProps] = useState<T | null>(null)
     const isModalOpen = !!modalProps
     const closeModal = () => {
@@ -16,18 +17,29 @@ export function useModalMethod<T>(emptyData: T, switchOrderApiPrefix: string, re
         setModalProps({ ...c })
     }
     const handleSwitchOrder = async (id1: number, id2: number) => {
-        const { error } = await putApi<boolean>(`${switchOrderApiPrefix}/switch_order/${id1}/${id2}`, {
+        const { error } = await putApi<boolean>(`${apiPrefix}/switch_order/${id1}/${id2}`, {
             method: "PUT"
         })
         if (error) {
             return errorHandler(error)
         }
+        dispatchSuccess("交換排序成功")
         refresh()
     }
     const { handleDragStart, handleDragOver, handleDrop } = useDrag((startId: number, endId: number) => {
         handleSwitchOrder(startId, endId)
     })
+    const handleDelete = async (id: number) => {
+        if (!confirm("確定刪除嗎？")) {
+            return
+        }
+        const { error } = await deleteApi(`${apiPrefix}/${id}`)
+        if (error) {
+            return errorHandler(error)
+        }
+        refresh()
+    }
     return {
-        modalProps, isModalOpen, closeModal, handleCreate, handleDragOver, handleDragStart, handleDrop, handleEdit
+        modalProps, isModalOpen, handleDelete, closeModal, handleCreate, handleDragOver, handleDragStart, handleDrop, handleEdit
     }
 }

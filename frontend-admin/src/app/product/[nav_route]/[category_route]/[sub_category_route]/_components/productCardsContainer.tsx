@@ -5,9 +5,14 @@ import { FAKE_ID_FOR_CREATE } from "@/utils/constant"
 import { IconBtnGroup } from "@/components/iconBtn"
 import { useGetData } from "@/hook/useGetData"
 import { ProductCardRead } from "@/types/product"
+import { getImgUrl } from "@/utils/env"
+import { putApi } from "@/api/base"
+import { errorHandler } from "@/utils/errorHandler"
+import { dispatchSuccess } from "@/store/method"
+import { useDrag } from "@/hook/useDrag"
 export const ProductCardContainer = (props: { seriesId: number }) => {
     const { seriesId } = props
-    const [getCards, cards] = useGetData<ProductCardRead>(`product/cards/${seriesId}`)
+    const [getProducts, products] = useGetData<ProductCardRead>(`product/cards/${seriesId}`)
     const [modalProps, setModalProps] = useState<ProductCardRead | null>(null)
     const isModalOpen = modalProps !== null
     const handleCreate = () => {
@@ -24,19 +29,30 @@ export const ProductCardContainer = (props: { seriesId: number }) => {
     const handleEdit = (pc: ProductCardRead) => {
         setModalProps({ ...pc })
     }
-    const handleSwitchOrder = (id1: number, id2: number) => {
-
+    const { handleDragStart, handleDragOver, handleDrop } = useDrag((startId: number, endId: number) => {
+        handleSwitchOrder(startId, endId)
+    })
+    const handleSwitchOrder = async (id1: number, id2: number) => {
+        const { error } = await putApi<boolean>(`product/switch_order/${id1}/${id2}`, {
+            method: "PUT"
+        })
+        if (error) {
+            return errorHandler(error)
+        }
+        dispatchSuccess("交換排序成功")
+        getProducts()
     }
     const closeModal = () => {
         setModalProps(null)
     }
-    if (cards === "loading") {
+    if (products === "loading") {
         return null
     }
     return <>
         {isModalOpen &&
             <ModalContainer closeFn={closeModal} isOpen={isModalOpen}>
                 <ProductModal
+                    refresh={getProducts}
                     seriesId={seriesId}
                     productCard={modalProps as ProductCardRead}
                     closeModal={closeModal}
@@ -48,19 +64,26 @@ export const ProductCardContainer = (props: { seriesId: number }) => {
                 <div onClick={handleCreate} className="btn p-2 inline-block">新增商品</div>
             </div>
             {
-                cards.map(c => <div className="border mp2" key={c.id}>
-                    <div>
-                        <img src={c.img_url} />
-                        <div>{c.name}-{c.gender_name}</div>
-                        <div>副產品數量{c.sub_product_count}</div>
+                products.map(p => (
+                    <div className="w-1/3 inline-block"
+                        onDragOver={handleDragOver}
+                        onDrop={() => handleDrop(p.id)}
+                        key={p.id}>
+                        <div className="border mp2 text-center">
+                            <div>
+                                <img className="w-full" src={getImgUrl(p.img_url)} />
+                                <div>{p.name}-{p.gender_name}</div>
+                                <div style={{ color: p.sub_product_count === 0 ? "red" : "black" }}>副產品數量{p.sub_product_count}</div>
+                            </div>
+                            <div>
+                                <IconBtnGroup
+                                    onEdit={() => handleEdit(p)}
+                                    onDragStart={() => { handleDragStart(p.id) }}
+                                />
+                            </div>
+                        </div>
                     </div>
-                    <div className="text-center">
-                        <IconBtnGroup
-                            onEdit={() => handleEdit(c)}
-                            onDragStart={() => { }}
-                        />
-                    </div>
-                </div>)
+                ))
             }
         </div>
     </>

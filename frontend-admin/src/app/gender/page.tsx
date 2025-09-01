@@ -1,7 +1,7 @@
 'use client'
 import { ModalContainer } from "@/components/modalContainer";
 import { useGetData } from "@/hook/useGetData";
-import { useModalMethod } from "@/hook/useModalMethod";
+import { useCommonMethods } from "@/hook/useCommonMethods";
 import { FAKE_ID_FOR_CREATE } from "@/utils/constant";
 import { GenderModal } from "./modal";
 import { IconBtnGroup } from "@/components/iconBtn";
@@ -9,11 +9,11 @@ import { GenderRead } from "@/types/gender";
 
 export default function () {
   const [getGenders, genders] = useGetData<GenderRead>("gender")
-  const { handleCreate, handleEdit,  isModalOpen, modalProps, closeModal } = useModalMethod({
+  const { handleCreate, handleEdit, isModalOpen, modalProps, closeModal, handleDelete } = useCommonMethods({
     id: FAKE_ID_FOR_CREATE, name: ""
   } as GenderRead, "gender", getGenders)
-  const handleDelete = (s: GenderRead) => {
-    //TODO
+  const _handleDelete = async (g: GenderRead) => {
+    handleDelete(g.id)
   }
   if (genders === "loading") {
     return null
@@ -45,7 +45,7 @@ export default function () {
               >{g.name}</div>
               <div>
                 <IconBtnGroup
-                  onDelete={() => handleDelete(g)}
+                  onDelete={() => _handleDelete(g)}
                   onEdit={() => handleEdit(g)} />
               </div>
             </div>

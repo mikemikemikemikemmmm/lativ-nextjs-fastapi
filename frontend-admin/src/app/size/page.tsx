@@ -1,7 +1,7 @@
 'use client'
 import { ModalContainer } from "@/components/modalContainer";
 import { useGetData } from "@/hook/useGetData";
-import { useModalMethod } from "@/hook/useModalMethod";
+import { useCommonMethods } from "@/hook/useCommonMethods";
 import { SizeRead } from "@/types/size";
 import { FAKE_ID_FOR_CREATE } from "@/utils/constant";
 import { SizeModal } from "./modal";
@@ -10,11 +10,11 @@ import { IconBtnGroup } from "@/components/iconBtn";
 
 export default function () {
   const [getSizes, sizes] = useGetData<SizeRead>("size")
-  const { handleCreate, handleEdit, handleDragOver, handleDragStart, handleDrop, isModalOpen, modalProps, closeModal } = useModalMethod({
+  const { handleCreate, handleEdit, handleDragOver, handleDragStart, handleDelete,handleDrop, isModalOpen, modalProps, closeModal } = useCommonMethods({
     id: FAKE_ID_FOR_CREATE, name: ""
   } as SizeRead, "size", getSizes)
-  const handleDelete = (s: SizeRead) => {
-    //TODO
+  const _handleDelete = async (s: SizeRead) => {
+    handleDelete(s.id)
   }
   if (sizes === "loading") {
     return null
@@ -49,7 +49,7 @@ export default function () {
               >{s.name}</div>
               <div>
                 <IconBtnGroup
-                  onDelete={() => handleDelete(s)}
+                  onDelete={() => _handleDelete(s)}
                   onEdit={() => handleEdit(s)}
                   onDragStart={() => handleDragStart(s.id)} />
               </div>

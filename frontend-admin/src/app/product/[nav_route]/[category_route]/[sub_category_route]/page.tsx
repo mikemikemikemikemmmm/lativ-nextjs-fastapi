@@ -1,8 +1,8 @@
 'use client'
-import { getApi } from "@/api/base";
+import { deleteApi, getApi } from "@/api/base";
 import { IconBtnGroup } from "@/components/iconBtn";
 import { ModalContainer } from "@/components/modalContainer";
-import { useModalMethod } from "@/hook/useModalMethod";
+import { useCommonMethods } from "@/hook/useCommonMethods";
 import { SubCategoryRead } from "@/types/nav";
 import { SeriesRead } from "@/types/series";
 import { FAKE_ID_FOR_CREATE } from "@/utils/constant";
@@ -11,6 +11,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SeriesModal } from "./_components/seriesModal";
 import { ProductCardContainer } from "./_components/productCardsContainer";
+import { dispatchSuccess } from "@/store/method";
 
 export default () => {
     const params = useParams();
@@ -45,13 +46,17 @@ export default () => {
         getSeries()
     }, [subCategory])
     // ----------------------------
-    const { isModalOpen, modalProps, closeModal, handleCreate, handleDragOver, handleDragStart, handleDrop, handleEdit } = useModalMethod({
+    const { isModalOpen, modalProps, closeModal, handleCreate, handleDragOver, handleDragStart, handleDrop, handleEdit } = useCommonMethods({
         id: FAKE_ID_FOR_CREATE,
         name: "",
         sub_category_id: FAKE_ID_FOR_CREATE
     } as SeriesRead, "series", getSeries)
-    const handleDelete = (s: SeriesRead) => {
-
+    const handleDelete = async (s: SeriesRead) => {
+        const { error } = await deleteApi(`series/${s.id}`)
+        if (error) {
+            return errorHandler(error)
+        }
+        getSeries()
     }
     if (subCategory === "loading") {
         return null

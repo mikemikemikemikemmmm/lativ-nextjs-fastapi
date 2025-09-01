@@ -1,17 +1,24 @@
 import { ModalContainer } from "@/components/modalContainer"
 import { useGetData } from "@/hook/useGetData"
-import { useModalMethod } from "@/hook/useModalMethod"
+import { useCommonMethods } from "@/hook/useCommonMethods"
 import { CategoryRead, SubCategoryRead } from "@/types/nav"
 import { FAKE_ID_FOR_CREATE } from "@/utils/constant"
 import { SubCategoryModal } from "./subCategoryModal"
 import Link from "next/link"
 import { IconBtnGroup } from "@/components/iconBtn"
 import { useRouter } from "next/navigation"
+import { deleteApi } from "@/api/base"
+import { errorHandler } from "@/utils/errorHandler"
+import { dispatchSuccess } from "@/store/method"
 
 export const SubCategoryList = (props: { navRoute: string, category: CategoryRead }) => {
     const [getSubCategorys, subCategorys] = useGetData<SubCategoryRead>(`sub_category/category_id/${props.category.id}`)
-    const handleDelete = (sc: SubCategoryRead) => {
-        //TODO
+    const handleDelete = async (sc: SubCategoryRead) => {
+        const { error } = await deleteApi(`sub_category/${sc.id}`)
+        if (error) {
+            return errorHandler(error)
+        }
+        getSubCategorys()
     }
     const {
         handleCreate,
@@ -22,7 +29,7 @@ export const SubCategoryList = (props: { navRoute: string, category: CategoryRea
         closeModal,
         modalProps,
         isModalOpen
-    } = useModalMethod({
+    } = useCommonMethods({
         id: FAKE_ID_FOR_CREATE,
         name: "",
         route: "",

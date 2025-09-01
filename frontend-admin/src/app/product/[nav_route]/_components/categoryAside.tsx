@@ -6,12 +6,17 @@ import { FAKE_ID_FOR_CREATE } from "@/utils/constant"
 import { CategoryModal } from "./categoryModal"
 import { useGetData } from "@/hook/useGetData"
 import { IconBtnGroup } from "@/components/iconBtn"
-import { useModalMethod } from "@/hook/useModalMethod"
+import { deleteApi } from "@/api/base"
+import { errorHandler } from "@/utils/errorHandler"
+import { useCommonMethods } from "@/hook/useCommonMethods"
 export const CategoryAside = (props: { nav: NavRead }) => {
     const [getCategorys, categorys] = useGetData<CategoryRead>(`category/nav_id/${props.nav.id}`)
-
-    const handleDelete = (c: CategoryRead) => {
-        //TODO
+    const handleDelete = async (c: CategoryRead) => {
+        const { error } = await deleteApi(`category/${c.id}`)
+        if (error) {
+            return errorHandler(error)
+        }
+        getCategorys()
     }
     const {
         handleCreate,
@@ -22,7 +27,7 @@ export const CategoryAside = (props: { nav: NavRead }) => {
         closeModal,
         modalProps,
         isModalOpen
-    } = useModalMethod({
+    } = useCommonMethods({
         id: FAKE_ID_FOR_CREATE,
         name: "",
         route: "",

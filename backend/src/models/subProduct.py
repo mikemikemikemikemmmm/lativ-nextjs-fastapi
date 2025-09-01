@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 
 class SubProductModel(BaseSQLModel):
     __tablename__ = "sub_product"
+    img_file_name:Mapped[str]= mapped_column(unique=True)
     price:Mapped[int]
     order: Mapped[int] = mapped_column(unique=True)
     
