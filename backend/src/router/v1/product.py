@@ -138,3 +138,86 @@ def get_card_by_series_id(db: SessionDepend, series_id: int):
 
     result = db.execute(stmt).mappings().all()
     return result
+
+
+@product_router.get("/cards")
+def get_all_cards(db: SessionDepend):
+    stmt = text("""
+        SELECT 
+            p.id,
+            p.name,
+            p.series_id,
+            p.img_url,
+            g.name AS gender_name,
+            g.id AS gender_id,
+            COUNT(sp.id) AS sub_product_count
+        FROM product p
+        INNER JOIN gender g
+            ON g.id = p.gender_id
+        LEFT JOIN sub_product sp
+            ON sp.product_id = p.id
+        GROUP BY p.id,g.id,g.name
+        ORDER BY p."order"
+    """)
+
+    result = db.execute(stmt).mappings().all()
+    return result
+
+
+
+    # name: string
+    # id: number
+    # gender_name: string
+    # gender_id: number
+    # series_id: number
+    # img_url: string
+    # sub_product_count: number
+    # sub_products: SubProductRead[]
+
+    # id: number
+    # price: number
+    # img_file_name: string
+    # color_id: number
+    # color_name: string
+    # color_img_url: string
+    # size_ids: number[]
+
+@product_router.get("/{productId}")
+def get_all(db: SessionDepend , productId: int):
+    stmt = text("""
+        SELECT 
+            p.id,
+            p.img_url,
+            p.name,
+            g.name AS gender_name,
+            g.id AS gender_id,
+            COUNT(sp.id) AS sub_product_count,
+            p.series_id,
+            COALESCE(
+                JSON_AGG(
+                    JSON_BUILD_OBJECT(
+                        'id', sp.id,
+                        'price', sp.price,
+                        'img_file_name', sp.img_file_name,
+                        'color_id', c.id,
+                        'color_name', c.name,
+                        'color_img_url', c.img_url,
+                        'size_ids', (
+                            SELECT ARRAY_AGG(ssp.size_id ORDER BY s."order")
+                            FROM size_sub_product ssp
+                            JOIN size s ON ssp.size_id = s.id
+                            WHERE ssp.sub_product_id = sp.id
+                        )
+                    ) ORDER BY sp."order"
+                ) FILTER (WHERE sp.id IS NOT NULL), '[]'
+            ) AS sub_products
+        FROM product p
+        JOIN gender g ON p.gender_id = g.id
+        LEFT JOIN sub_product sp ON sp.product_id = p.id
+        LEFT JOIN color c ON sp.color_id = c.id
+        WHERE p.id = :productId
+        GROUP BY p.id, p.img_url, p.name, g.name, g.id, p.series_id;
+    """)
+
+    result = db.execute(stmt, {"productId": productId}).mappings().first()
+    return result

@@ -5,18 +5,20 @@ export const ModalContainer = (
     props: {
         children: JSX.Element,
         closeFn: () => void,
-        isOpen: boolean
+        isOpen: boolean,
+        style?:object
     }) => {
     const boxStyle = {
         position: 'absolute',
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
-        maxHeight: '80%',
-        maxWidth: "80%",
+        maxHeight: '90%',
+        maxWidth: "90%",
         bgcolor: 'background.paper',
         boxShadow: 24,
-        overflowY:"scroll"
+        overflowY:"scroll",
+        ...props.style
     }
     return (
         <Modal id="modal-container" sx={{ zIndex: ZIndex.modal }} open={props.isOpen} onClose={props.closeFn}>

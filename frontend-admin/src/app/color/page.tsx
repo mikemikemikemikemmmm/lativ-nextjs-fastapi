@@ -38,7 +38,7 @@ export default function Color() {
       </div>
       <div>
         {
-          colors.map(c => <div className="mp2 border inline-block w-1/9" key={c.id}>
+          colors.map(c => <div className="mp2 border inline-block w-1/13" key={c.id}>
             <div className="text-center">
               <div>
                 <img className="inline-block" style={{

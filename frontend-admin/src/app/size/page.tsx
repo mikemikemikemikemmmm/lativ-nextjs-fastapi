@@ -25,7 +25,7 @@ export default function () {
         <ModalContainer closeFn={closeModal} isOpen={isModalOpen}>
           <SizeModal
             sizes={sizes}
-            modalProps={modalProps as SeriesRead}
+            modalProps={modalProps as SizeRead}
             closeModal={closeModal}
             refresh={getSizes}
           />
@@ -43,7 +43,7 @@ export default function () {
             draggable
             onDragOver={handleDragOver}
             onDrop={() => handleDrop(s.id)}
-            className="w-1/6" key={s.id}>
+            className="w-1/10" key={s.id}>
             <div className="mp2 border text-center">
               <div
               >{s.name}</div>

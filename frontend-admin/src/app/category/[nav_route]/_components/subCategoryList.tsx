@@ -62,7 +62,7 @@ export const SubCategoryList = (props: { navRoute: string, category: CategoryRea
                     <li draggable onDrop={() => handleDrop(sc.id)} onDragOver={handleDragOver} className="w-full flex flex-wrap border p-2 m-2" key={sc.id}>
                         <Link
                             className="flex-1 hover:text-blue-500"
-                            href={`/product/${props.navRoute}/${props.category.route}/${sc.route}`}>
+                            href={`/category/${props.navRoute}/${props.category.route}/${sc.route}`}>
                             {sc.name}
                         </Link>
                         <div className=" inline-block">

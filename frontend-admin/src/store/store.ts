@@ -19,6 +19,10 @@ export const appSlice = createSlice({
       state.loadingCount += 1
     },
     decreaseLoadingCount: (state) => {
+      if (state.loadingCount <= 0) {
+        console.error("loading can't decrease")
+        return
+      }
       state.loadingCount -= 1
     },
     pustAlertListSingleItem: (state, action: PayloadAction<AlertItem>) => {

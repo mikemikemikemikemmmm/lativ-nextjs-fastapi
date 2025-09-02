@@ -1,6 +1,6 @@
 import { SizeRead } from "./size"
 
-export interface ProductModal_SubProductRead {
+export interface SubProductRead {
     id: number
     price: number
     img_file_name: string

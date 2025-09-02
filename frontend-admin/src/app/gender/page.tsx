@@ -39,7 +39,7 @@ export default function () {
             <div className="text-center text-2xl m-2">沒有任何性別</div>
           }
           {genders.map(g => <div
-            className="w-1/6" key={g.id}>
+            className="w-1/13" key={g.id}>
             <div className="mp2 border text-center">
               <div
               >{g.name}</div>

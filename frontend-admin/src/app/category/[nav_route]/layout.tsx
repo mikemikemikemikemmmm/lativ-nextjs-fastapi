@@ -34,10 +34,10 @@ export default function NavLayout({
     }
     return (
         <div className="flex justify-stretch">
-            <div className=' inline-block min-w-2/6 p-4'>
+            <div className=' inline-block min-w-1/5 p-4'>
                 <CategoryAside nav={nav} />
             </div>
-            <div className=' inline-block min-w-4/6 p-4'> {children}</div>
+            <div className=' inline-block min-w-4/5 p-4'> {children}</div>
         </div>
     )
 }

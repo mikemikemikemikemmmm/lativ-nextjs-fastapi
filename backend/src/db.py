@@ -4,6 +4,7 @@ from typing import Annotated
 from fastapi import Depends
 from src.setting import get_settings
 setting = get_settings()
+
 engine = create_engine(
    url=setting.sql_url
 )

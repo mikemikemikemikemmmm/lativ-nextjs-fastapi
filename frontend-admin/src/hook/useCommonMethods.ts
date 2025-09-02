@@ -19,11 +19,10 @@ export function useCommonMethods<T>(emptyData: T, apiPrefix: string, refresh: ()
     const handleSwitchOrder = async (id1: number, id2: number) => {
         const { error } = await putApi<boolean>(`${apiPrefix}/switch_order/${id1}/${id2}`, {
             method: "PUT"
-        })
+        },{},"交換排序")
         if (error) {
             return errorHandler(error)
         }
-        dispatchSuccess("交換排序成功")
         refresh()
     }
     const { handleDragStart, handleDragOver, handleDrop } = useDrag((startId: number, endId: number) => {

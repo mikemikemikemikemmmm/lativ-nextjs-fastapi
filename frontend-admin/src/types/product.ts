@@ -1,15 +1,15 @@
-import { SizeRead } from "./size"
-import { ProductModal_SubProductRead } from "./subProduct"
 
-export interface ProductModalRead {
-    name: string
-    id: number
-    gender_name: string
-    gender_id: number
-    series_id: number
-    img_url: string
-    sub_product_ids: number[]
-}
+import { SubProductRead } from "./subProduct"
+
+// export interface ProductModalRead {
+//     name: string
+//     id: number
+//     gender_name: string
+//     gender_id: number
+//     series_id: number
+//     img_url: string
+//     sub_product_ids: number[]
+// }
 
 
 
@@ -21,4 +21,8 @@ export interface ProductCardRead {
     gender_id: number
     sub_product_count: number
     series_id: number
+}
+
+export interface ProductRead extends ProductCardRead {
+    sub_products: SubProductRead[]
 }

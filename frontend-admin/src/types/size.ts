@@ -1,4 +1,5 @@
 export interface SizeRead {
     id: number,
-    name: string
+    name: string,
+    order:number
 }

@@ -45,7 +45,7 @@ export default function NavHeader() {
                         key={n.id}
                         data-id={n.id}
                     >
-                        <Link className="mp2 hover:cursor-pointer hover:text-blue-700" href={`/product/${n.route}`}>
+                        <Link className="mp2 hover:cursor-pointer hover:text-blue-700" href={`/category/${n.route}`}>
                             {n.name}
                         </Link>
                         <div>
