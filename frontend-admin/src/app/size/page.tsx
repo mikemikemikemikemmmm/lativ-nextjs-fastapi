@@ -32,9 +32,9 @@ export default function () {
         </ModalContainer>
       }
       <div>
-        <div className="btn inline-block mp2" onClick={handleCreate}>
+        <button className="btn inline-block mp2" onClick={handleCreate}>
           新增尺寸
-        </div>
+        </button>
         <div className="flex flex-wrap">
           {sizes.length === 0 &&
             <div className="text-center text-2xl m-2">沒有任何尺寸</div>

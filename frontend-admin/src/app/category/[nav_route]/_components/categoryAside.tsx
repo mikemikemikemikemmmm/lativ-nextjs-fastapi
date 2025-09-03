@@ -9,14 +9,24 @@ import { IconBtnGroup } from "@/components/iconBtn"
 import { deleteApi } from "@/api/base"
 import { errorHandler } from "@/utils/errorHandler"
 import { useCommonMethods } from "@/hook/useCommonMethods"
+import { useParams, useRouter } from "next/navigation"
 export const CategoryAside = (props: { nav: NavRead }) => {
+    const { category_route, nav_route } = useParams()
+    const router = useRouter()
     const [getCategorys, categorys] = useGetData<CategoryRead>(`category/nav_id/${props.nav.id}`)
     const handleDelete = async (c: CategoryRead) => {
+        if (!confirm("確定刪除嗎？")) {
+            return
+        }
         const { error } = await deleteApi(`category/${c.id}`)
         if (error) {
             return errorHandler(error)
         }
+        if (c.route === category_route) {
+            router.push(`/category/${nav_route}`)
+        }
         getCategorys()
+
     }
     const {
         handleCreate,

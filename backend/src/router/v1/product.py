@@ -82,7 +82,6 @@ def update_one(
         # 更新欄位
         product.name = product_name
         product.gender_id = gender_id
-
         db.commit()
         db.refresh(product)
         return product
@@ -115,75 +114,8 @@ def delete_one(db: SessionDepend, id: int):
         return ErrorHandler.raise_500_server_error(detail="刪除產品失敗")
 
 
-@product_router.get("/cards/{series_id}")
-def get_card_by_series_id(db: SessionDepend, series_id: int):
-    stmt = text("""
-        SELECT 
-            p.id,
-            p.name,
-            p.series_id,
-            p.img_url,
-            g.name AS gender_name,
-            g.id AS gender_id,
-            COUNT(sp.id) AS sub_product_count
-        FROM product p
-        INNER JOIN gender g
-            ON g.id = p.gender_id
-        LEFT JOIN sub_product sp
-            ON sp.product_id = p.id
-        WHERE p.series_id = :series_id
-        GROUP BY p.id,g.id,g.name
-        ORDER BY p."order"
-    """).bindparams(series_id=series_id)
-
-    result = db.execute(stmt).mappings().all()
-    return result
-
-
-@product_router.get("/cards")
-def get_all_cards(db: SessionDepend):
-    stmt = text("""
-        SELECT 
-            p.id,
-            p.name,
-            p.series_id,
-            p.img_url,
-            g.name AS gender_name,
-            g.id AS gender_id,
-            COUNT(sp.id) AS sub_product_count
-        FROM product p
-        INNER JOIN gender g
-            ON g.id = p.gender_id
-        LEFT JOIN sub_product sp
-            ON sp.product_id = p.id
-        GROUP BY p.id,g.id,g.name
-        ORDER BY p."order"
-    """)
-
-    result = db.execute(stmt).mappings().all()
-    return result
-
-
-
-    # name: string
-    # id: number
-    # gender_name: string
-    # gender_id: number
-    # series_id: number
-    # img_url: string
-    # sub_product_count: number
-    # sub_products: SubProductRead[]
-
-    # id: number
-    # price: number
-    # img_file_name: string
-    # color_id: number
-    # color_name: string
-    # color_img_url: string
-    # size_ids: number[]
-
 @product_router.get("/{productId}")
-def get_all(db: SessionDepend , productId: int):
+def get_all(db: SessionDepend, productId: int):
     stmt = text("""
         SELECT 
             p.id,

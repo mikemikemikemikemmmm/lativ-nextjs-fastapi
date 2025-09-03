@@ -33,7 +33,7 @@ export default () => {
     // ----------------------------
     const [series, setSeries] = useState<SeriesRead[]>([])
     const getSeries = async () => {
-        const { data, error } = await getApi<SeriesRead[]>(`series/sub_category_id/${(subCategory as SubCategoryRead).id}`)
+        const { data, error } = await getApi<SeriesRead[]>(`series?sub_category_id=${(subCategory as SubCategoryRead).id}`)
         if (error) {
             return errorHandler(error)
         }
@@ -52,6 +52,9 @@ export default () => {
         sub_category_id: FAKE_ID_FOR_CREATE
     } as SeriesRead, "series", getSeries)
     const handleDelete = async (s: SeriesRead) => {
+        if (!confirm("確認刪除嗎")) {
+            return
+        }
         const { error } = await deleteApi(`series/${s.id}`)
         if (error) {
             return errorHandler(error)
@@ -82,13 +85,13 @@ export default () => {
             {
                 series.map(s => (
                     <div
+                        draggable
+                        onDrop={() => handleDrop(s.id)}
+                        onDragOver={handleDragOver}
                         className="mp2 border"
                         key={s.id}>
                         <div className="flex">
                             <div
-                                draggable
-                                onDrop={() => handleDrop(s.id)}
-                                onDragOver={handleDragOver}
                                 className="flex-1">
                                 {s.name}
                             </div>

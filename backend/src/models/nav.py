@@ -2,7 +2,6 @@ from sqlalchemy.orm import Mapped, relationship, mapped_column
 from pydantic import BaseModel as BasePydanticSchema
 from typing import List, TYPE_CHECKING
 from .base import BaseSQLModel
-from sqlalchemy import Sequence,Integer
 
 if TYPE_CHECKING:
     from .category import CategoryModel
@@ -12,7 +11,7 @@ class NavModel(BaseSQLModel):
     order: Mapped[int] = mapped_column(unique=True)
     route: Mapped[str] = mapped_column(unique=True)
     name: Mapped[str] 
-
+    img_file_name:Mapped[str] 
     categorys: Mapped[List["CategoryModel"]] = relationship(back_populates="nav")
 
 

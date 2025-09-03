@@ -10,7 +10,7 @@ interface Props {
 }
 export const IconBtnGroup = (props: Props) => {
     const { onDelete, onEdit, onDragStart} = props
-    return <span className=" whitespace-nowrap">
+    return <span className=" whitespace-nowrap" onDragStart={e=>e.stopPropagation()} onClick={e=>e.stopPropagation()}>
         {
             onDelete && <DeleteForeverIcon className='hover:text-teal-700 hover:cursor-pointer' onClick={onDelete} />
         }

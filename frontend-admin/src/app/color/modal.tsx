@@ -19,7 +19,7 @@ export const ColorModal = (props: {
     const { modalProps, closeModal, colors, refresh } = props
     const isCreate = modalProps.id === FAKE_ID_FOR_CREATE
     const [input, setInput] = useState<ColorRead>({ ...modalProps })
-    const { handleUploadImg, previewImgUrl, imgFile } = useUploadImg(IMG_SIZE.color, 1)
+    const { handleUploadImg, previewImgUrl, imgFile } = useUploadImg(IMG_SIZE.color, 5)
     const isInputPass = () => {
         let result = true
         if (input.name === '') {
@@ -101,7 +101,7 @@ export const ColorModal = (props: {
             </div>
         </div>
         <div className="text-center">
-            <div className="btn mp2 inline-block" onClick={handleSubmit}>送出</div>
+            <button className="btn mp2 inline-block" onClick={handleSubmit}>送出</button>
         </div>
     </div>
     // return (

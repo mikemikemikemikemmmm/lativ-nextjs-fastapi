@@ -7,8 +7,8 @@ import { useEffect, useState } from "react"
 
 export default () => {
     const [searchStr, setSearchStr] = useState("")
-    const handleSearch = async () => {
-        const api = searchStr === "" ? getApi<ProductCardRead[]>(`product/cards/`) : getApi<ProductCardRead[]>(`product/cards/?product_name=${searchStr}`)
+    const handleSearch = async (query: string) => {
+        const api = query === "" ? getApi<ProductCardRead[]>(`product_card/`) : getApi<ProductCardRead[]>(`product_card/?product_name=${query}`)
         const { data, error } = await api
         if (error) {
             return errorHandler(error)
@@ -18,7 +18,7 @@ export default () => {
     const [cards, setCards] = useState<ProductCardRead[]>([])
 
     useEffect(() => {
-        handleSearch()
+        handleSearch("")
     }, [])
     return <section>
         <div className="flex-center">
@@ -26,11 +26,19 @@ export default () => {
                 產品名稱
             </span>
             <input type="text" className="mp2 border" value={searchStr} onChange={e => setSearchStr(e.target.value)} />
-            <span className="btn mp2" onClick={handleSearch}>
+            <button className="btn mp2" onClick={() => handleSearch(searchStr)}>
                 搜尋
-            </span>
+            </button>
+            <button className="btn mp2" onClick={() => handleSearch("")}>
+                取消搜尋結果
+            </button>
         </div>
-        <div>
+        <div className="text-center">
+            {cards.length === 0 &&
+                <div className="inline-block border mp2">
+                    無產品
+                </div>
+            }
             {cards.map(c => <div key={c.id} className="w-1/8 inline-block">
                 <ProductCard pc={c} />
             </div>)}

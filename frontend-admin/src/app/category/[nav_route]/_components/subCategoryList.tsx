@@ -6,19 +6,26 @@ import { FAKE_ID_FOR_CREATE } from "@/utils/constant"
 import { SubCategoryModal } from "./subCategoryModal"
 import Link from "next/link"
 import { IconBtnGroup } from "@/components/iconBtn"
-import { useRouter } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { deleteApi } from "@/api/base"
 import { errorHandler } from "@/utils/errorHandler"
-import { dispatchSuccess } from "@/store/method"
-
 export const SubCategoryList = (props: { navRoute: string, category: CategoryRead }) => {
+    const { nav_route, sub_category_route } = useParams()
+    const router = useRouter()
     const [getSubCategorys, subCategorys] = useGetData<SubCategoryRead>(`sub_category/category_id/${props.category.id}`)
     const handleDelete = async (sc: SubCategoryRead) => {
+        if (!confirm("確定刪除嗎？")) {
+            return
+        }
         const { error } = await deleteApi(`sub_category/${sc.id}`)
         if (error) {
             return errorHandler(error)
         }
+        if (sc.route === sub_category_route) {
+            router.push(`/category/${nav_route}`)
+        }
         getSubCategorys()
+
     }
     const {
         handleCreate,

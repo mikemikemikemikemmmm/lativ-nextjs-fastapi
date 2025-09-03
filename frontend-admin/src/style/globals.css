@@ -1,10 +1,10 @@
 @layer theme, base, mui, components, utilities;
 @import 'tailwindcss';
 .btn {
-  @apply border hover:cursor-pointer hover:bg-blue-300;
+  @apply border hover:cursor-pointer hover:bg-blue-200;
 }
 .hover-blue{
-  @apply hover:cursor-pointer hover:bg-blue-300
+  @apply hover:cursor-pointer hover:bg-blue-200;
 }
 .mp2 {
   @apply m-2 p-2;

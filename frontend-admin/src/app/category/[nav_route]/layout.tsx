@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { NavRead } from "@/types/nav";
 import { getApi } from "@/api/base";
 import { errorHandler } from "@/utils/errorHandler";
+import { getImgUrl } from "@/utils/env";
 export default function NavLayout({
     children,
 }: Readonly<{
@@ -37,7 +38,15 @@ export default function NavLayout({
             <div className=' inline-block min-w-1/5 p-4'>
                 <CategoryAside nav={nav} />
             </div>
-            <div className=' inline-block min-w-4/5 p-4'> {children}</div>
+            <div className=' inline-block min-w-4/5 p-4'>
+                {/* <div className="w-full">
+                    <img src={getImgUrl(nav.img_file_name)}
+                        alt={nav.name}
+                        className="block w-auto p-2"
+                    />
+                </div> */}
+                {children}
+            </div>
         </div>
     )
 }

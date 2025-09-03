@@ -35,4 +35,4 @@ class CreateSchema(BaseSchema):
 
 
 class UpdateSchema(BaseSchema):
-    order: int
+    pass

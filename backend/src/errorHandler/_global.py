@@ -2,7 +2,7 @@ from fastapi import HTTPException, FastAPI, Request
 from sqlalchemy.exc import SQLAlchemyError
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError, ResponseValidationError
-
+from psycopg2.errors import ForeignKeyViolation
 
 class ErrorHandler:
     @staticmethod
@@ -43,7 +43,11 @@ def setup_global_error_handler(app: FastAPI):
         if "UNIQUE constraint failed" in exc_str:
             detail = "已有同名物件"
         elif "NOT NULL constraint failed" in exc_str:
-            detail = "已被其他表外鍵參考"
+            detail = "此物件被其他物件使用中"
+        elif "ForeignKeyViolation" in exc_str:
+            detail = "此物件被其他物件使用中"
+        elif "NotNullViolation" in exc_str:
+            detail = "此物件被其他物件使用中"
         return JSONResponse(
             status_code=409,
             content={"detail": detail},
@@ -57,6 +61,15 @@ def setup_global_error_handler(app: FastAPI):
             content={"detail": "輸入驗證錯誤"},
         )
 
+    @app.exception_handler(ForeignKeyViolation)
+    def handleForeignKeyViolation(request: Request, exc: Exception):
+        print(str(exc))
+        return JSONResponse(
+            status_code=400,
+            content={"detail": "此物件被其他物件使用中"},
+        )
+
+
     @app.exception_handler(ResponseValidationError)
     def handleResponseValidationError(request: Request, exc: Exception):
         print(str(exc))
@@ -64,7 +77,6 @@ def setup_global_error_handler(app: FastAPI):
             status_code=400,
             content={"detail": "伺服器輸出驗證錯誤"},
         )
-
     @app.exception_handler(Exception)
     def global_exception_handler(request: Request, exc: Exception):
         if isinstance(exc, HTTPException):

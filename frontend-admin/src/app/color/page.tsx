@@ -7,6 +7,11 @@ import { useGetData } from "@/hook/useGetData";
 import { IconBtnGroup } from "@/components/iconBtn";
 import { getImgUrl } from "@/utils/env";
 import { useCommonMethods } from "@/hook/useCommonMethods";
+import { useState } from "react";
+import { ProductCardRead } from "@/types/product";
+import { ProductCard } from "@/components/productCard";
+import { getApi } from "@/api/base";
+import { errorHandler } from "@/utils/errorHandler";
 
 export default function Color() {
   const [getColors, colors] = useGetData<ColorRead>("color")
@@ -16,6 +21,14 @@ export default function Color() {
   const _handleDelete = async (c: ColorRead) => {
     handleDelete(c.id)
   }
+  const getProductCards = async (colorId: number) => {
+    const { data, error } = await getApi<ProductCardRead[]>(`product_card/?color_id=${colorId}`)
+    if (error) {
+      return errorHandler(error)
+    }
+    setCards(data)
+  }
+  const [cards, setCards] = useState<ProductCardRead[]>([])
   if (colors === "loading") {
     return null
   }
@@ -32,13 +45,13 @@ export default function Color() {
         </ModalContainer>
       }
       <div>
-        <div onClick={handleCreate} className="btn inline-block mp2">
+        <button onClick={handleCreate} className="btn inline-block mp2">
           新增顏色
-        </div>
+        </button>
       </div>
       <div>
         {
-          colors.map(c => <div className="mp2 border inline-block w-1/13" key={c.id}>
+          colors.map(c => <div onClick={() => getProductCards(c.id)} className="mp2 btn inline-block w-1/10" key={c.id}>
             <div className="text-center">
               <div>
                 <img className="inline-block" style={{
@@ -47,6 +60,7 @@ export default function Color() {
                 }} src={getImgUrl(c.img_url)} alt={c.name} />
               </div>
               <div>{c.name}</div>
+              <div>被使用次數{c.sub_product_count}</div>
               <div>
                 <IconBtnGroup
                   onEdit={() => handleEdit(c)}
@@ -56,22 +70,24 @@ export default function Color() {
           </div>)
         }
       </div>
-      {/* <Grid container sx={{ margin: 1 }} spacing={2}>
-        <Grid size={{ xs: 12 }}>
-          <Button variant="contained" onClick={() => setProductCards([])}>
+      <div className="">
+        <div className="mp2 border inline-block">
+          下列為使用此顏色的產品
+        </div>
+        {
+          cards.length !== 0 &&
+          <button className="mp2 btn inline-block" onClick={() => setCards([])}>
             清空產品資料
-          </Button>
-        </Grid>
-        {productCards.length === 0 ?
-          <Grid size={{ xs: 12 }} >無產品資料</Grid>
-          :
-          productCards.map(pc => (
-            <Grid size={{ xs: 2 }} key={pc.id} >
-              <AdminProductCardComponent productCard={pc} />
-            </Grid>)
-          )
+          </button>
         }
-      </Grid> */}
+      </div>
+      <div>
+        {
+          cards.map(c => <div key={c.id} className="inline-block w-1/8">
+            <ProductCard pc={c} />
+          </div>)
+        }
+      </div>
     </>
   )
 }
