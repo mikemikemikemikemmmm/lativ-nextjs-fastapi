@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import select, func, update, case
-from typing import Type, TypeVar, Sequence
+from typing import Type, TypeVar, Sequence, Callable
 from pydantic import BaseModel as BasePydanticSchema
 import random
 
@@ -17,7 +17,7 @@ def generate_random_int():
     return random.randint(-99999, -1)
 
 
-def is_model_has_order(model: ModelType) :
+def is_model_has_order(model: ModelType):
     return model.__dict__.get("order") is not None
 
 
@@ -48,9 +48,11 @@ class common_service:
     def create_one(session: Session, model: ModelType, create_data: CreateSchemaType):
         if is_model_has_order(model):
             target_order = common_service.get_max_order(session, model)
-            new_data = model(**create_data.model_dump(), order=target_order)
+            new_data = model(
+                **create_data.model_dump(exclude_unset=True), order=target_order
+            )
         else:
-            new_data = model(**create_data.model_dump())
+            new_data = model(**create_data.model_dump(exclude_unset=True))
         session.add(new_data)
         session.commit()
         session.refresh(new_data)
@@ -104,3 +106,30 @@ class common_service:
         # 如果表是空的，max_order 會是 None，所以要處理
         next_order = (max_order or 0) + 1
         return next_order
+
+    @staticmethod
+    def delete_one_with_img(
+        db: Session, model: ModelType, id: int, cb: Callable[[ModelType], None] | None
+    ):
+        item = db.query(model).filter(model.id == id).first()
+        if not item:
+            return ErrorHandler.raise_404_not_found("物件不存在")
+
+        # 刪除 S3 圖片
+        try:
+            if item.img_file_name:
+                delete_img_from_s3(item.img_file_name)
+        except Exception as del_e:
+            print(f"S3 舊圖片刪除失敗: {del_e}")
+
+        try:
+            if cb:
+                cb(item)
+            # 再刪掉主表
+            db.delete(item)
+            db.commit()
+            return True
+        except Exception as e:
+            db.rollback()
+            print(e)
+            return ErrorHandler.raise_500_server_error(detail="刪除物件失敗")

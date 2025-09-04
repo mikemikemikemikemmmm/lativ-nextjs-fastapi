@@ -5,7 +5,6 @@ import { useCommonMethods } from "@/hook/useCommonMethods";
 import { SizeRead } from "@/types/size";
 import { FAKE_ID_FOR_CREATE } from "@/utils/constant";
 import { SizeModal } from "./modal";
-import { SeriesRead } from "@/types/series";
 import { IconBtnGroup } from "@/components/iconBtn";
 
 export default function () {

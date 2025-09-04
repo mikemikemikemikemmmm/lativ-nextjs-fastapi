@@ -1,6 +1,4 @@
 import Link from "next/link"
-import Button from '@mui/material/Button';
-
 export const AdminHeader = () => {
     return <nav className="m-4 text-center">
         <Link className="m-2 p-2 btn" href="/category">

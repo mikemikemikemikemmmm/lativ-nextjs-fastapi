@@ -49,11 +49,12 @@ export const ProductModal = (props: Props) => {
         formData.append("product_name", input.name);
         formData.append("gender_id", String(input.gender_id));
         formData.append("series_id", String(input.series_id));
-        const { error } = isCreate ? await baseFetch(`product`, {
-            method: "POST",
-            body: formData
-        })
-            : await baseFetch(`product/${input.id}`, {
+        const { error } = isCreate ?
+            await baseFetch(`product`, {
+                method: "POST",
+                body: formData
+            }) :
+            await baseFetch(`product/${input.id}`, {
                 method: "PUT",
                 body: formData
             })

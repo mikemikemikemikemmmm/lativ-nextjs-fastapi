@@ -6,7 +6,8 @@ import os
 class Settings(BaseSettings):
     sql_url: str = os.getenv("SQL_URL", "")
     environment: str = os.getenv("ENVIRONMENT", "")
-    frontend_origin: str = os.getenv("ORIGIN", "")
+    frontend_admin_origin: str = os.getenv("FRONETEND_ADMIN_ORIGIN", "")
+    frontend_guest_origin: str = os.getenv("FRONETEND_GUEST_ORIGIN", "")
     aws_access_key_id: str = os.getenv("AWS_ACCESS_KEY_ID", "")
     aws_secret_access_key: str = os.getenv("AWS_SECRET_ACCESS_KEY", "")
     aws_region: str = os.getenv("AWS_REGION", "")

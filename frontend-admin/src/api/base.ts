@@ -14,11 +14,10 @@ export async function baseFetch<Response>(
     actionName: string = "",
     needLoading: boolean = true
 ): Promise<ApiResult<Response>> {
-    const urlWithBase = `${ENV.backendUrl}/v1/${url}`
+    const urlWithBase = `${ENV.backendUrl}/v1/admin/${url}`
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), API_TIMEOUT);
     if (needLoading) {
-
         store.dispatch(increaseLoadingCount())
     }
     let _actionName = actionName

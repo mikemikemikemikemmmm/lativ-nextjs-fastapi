@@ -1,7 +1,7 @@
 import { useState } from "react"
-import {  Button,  Stack } from "@mui/material"
+import { Button, Stack } from "@mui/material"
 import { postApi, putApi } from "@/api/base"
-import {  FAKE_ID_FOR_CREATE } from "@/utils/constant"
+import { FAKE_ID_FOR_CREATE } from "@/utils/constant"
 import { dispatchError } from "@/store/method";
 import { errorHandler } from "@/utils/errorHandler";
 import { InputWrapper } from "@/components/inputWrapper";
@@ -31,10 +31,9 @@ export const SizeModal = (props: {
         if (!isInputPass()) {
             return
         }
-        const api = isCreate ?
-            postApi("size", { ...input }) :
-            putApi("size/" + input.id, { ...input })
-        const { error } = await api
+        const { error } = isCreate ?
+            await postApi("size", { ...input }) :
+            await putApi("size/" + input.id, { ...input })
         if (error) {
             return errorHandler(error)
         }
@@ -47,12 +46,12 @@ export const SizeModal = (props: {
     return (
         <Stack>
             <InputWrapper
-                sx={{m:2}}
+                sx={{ m: 2 }}
                 label="名稱"
                 value={input.name}
                 onChange={val => handleChangeName(val as string)}
             />
-            <Button   sx={{m:2}} size="small" variant="contained" onClick={() => handleSubmit()}>
+            <Button sx={{ m: 2 }} size="small" variant="contained" onClick={() => handleSubmit()}>
                 送出
             </Button>
         </Stack>

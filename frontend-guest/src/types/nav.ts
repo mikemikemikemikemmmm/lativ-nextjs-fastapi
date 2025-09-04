@@ -1,36 +1,16 @@
-export interface NavBaseCreateDto {
-    name: string
+interface BaseRead {
+    id: number,
+    name: string,
     route: string
 }
-export interface NavBaseUpdateDto { }
+export interface NavRead extends BaseRead {
+    img_file_name: string
+}
 
-export interface CategoryCreateDto extends NavBaseCreateDto {
+export interface CategoryRead extends BaseRead {
     nav_id: number
 }
-export interface CategoryUpdateDto extends CategoryCreateDto { }
 
-export interface SubCategoryCreateDto extends NavBaseCreateDto {
+export interface SubCategoryRead extends BaseRead {
     category_id: number
-}
-export interface SubCategoryUpdateDto extends SubCategoryCreateDto { }
-
-
-export interface NavResponse {
-    id: string,
-    name: string,
-    route: string,
-    categorys: CategoryResponse[]
-}
-export interface CategoryResponse {
-    nav_id: string
-    id: string,
-    name: string,
-    route: string,
-    sub_categorys: {
-        nav_route: string
-        category_route: string
-        id: string,
-        name: string,
-        route: string,
-    }[]
 }

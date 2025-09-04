@@ -23,11 +23,11 @@ class SecurityMiddleware(BaseHTTPMiddleware):
 
 def setup_global_middleware(app: FastAPI):
     setting = get_settings()
-    allow_origin = "*" if is_dev_environment() else setting.frontend_origin
+    allow_origin = [setting.frontend_admin_origin,setting.frontend_admin_origin]
     app.add_middleware(SecurityMiddleware)
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=[allow_origin],
+        allow_origins=allow_origin,
         allow_methods=["*"],
         allow_headers=["*"],
     )
