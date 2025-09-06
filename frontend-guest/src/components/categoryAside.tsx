@@ -1,7 +1,7 @@
 import { CategoryRead } from "@/types"
 import Link from "next/link"
 export const CategoryAside = (props: { categorys: CategoryRead[], navRoute: string }) => {
-return <aside className="ml-6">
+return <aside className="ml-6  px-2">
         {
             props.categorys.map(c => <ul className="mb-4" key={c.id}>
                 <li className="my-1 text-[16px]">◆ {c.name}</li>

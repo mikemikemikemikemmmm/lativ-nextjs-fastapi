@@ -17,7 +17,7 @@ export default async function Layout({
         <div style={{ width: ASIDE_WIDTH }}>
             <CategoryAside categorys={data} navRoute={nav_route} />
         </div>
-        <div className="flex-1">{children}</div>
+        <div className="flex-1 px-2">{children}</div>
 
     </section>
 }

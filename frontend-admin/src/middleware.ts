@@ -1,11 +1,5 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-
-// export function middleware(request: NextRequest) {
-//     console.log(request.url,111)
-//     return NextResponse.next();
-// }
-
 import { TOKEN_KEY } from "./utils/constant";
 import { verifyToken } from "./utils/verifyToken";
 import { isServerComponent } from './utils/env';

@@ -15,7 +15,20 @@ def get_nav_by_route(db: SessionDepend, nav_route: str):
             n.route,
             n.img_file_name
         FROM nav n
-        WHERE n.route = :nav_route
+        WHERE n.route = :nav_route AND EXISTS (
+            SELECT 1
+            FROM category c
+            INNER JOIN sub_category sc
+            ON sc.category_id = c.id
+            INNER JOIN series s
+            ON s.sub_category_id = sc.id
+            INNER JOIN product p
+            ON p.series_id = s.id
+            INNER JOIN sub_product sp
+            ON sp.product_id = p.id
+            WHERE c.nav_id = n.id
+        )
+        ORDER BY n."order"
         """
     ).bindparams(nav_route=nav_route)
     result = db.execute(stmt).mappings().first()
@@ -36,11 +49,13 @@ def get_navs(db: SessionDepend):
             SELECT 1
             FROM category c
             INNER JOIN sub_category sc
-                ON sc.category_id = c.id
+            ON sc.category_id = c.id
             INNER JOIN series s
-                ON s.sub_category_id = sc.id
+            ON s.sub_category_id = sc.id
             INNER JOIN product p
-                ON p.series_id = s.id
+            ON p.series_id = s.id
+            INNER JOIN sub_product sp
+            ON sp.product_id = p.id
             WHERE c.nav_id = n.id
         )
         ORDER BY n."order"
@@ -222,6 +237,11 @@ def get_product_cards(
         INNER JOIN series s ON s.sub_category_id = sc.id
         INNER JOIN product p ON p.series_id = s.id 
         INNER JOIN gender g ON g.id = p.gender_id
+        WHERE EXISTS (
+            SELECT 1
+            FROM sub_product sp
+            WHERE sp.product_id = p.id
+        )
         GROUP BY p.id, p.name, p.img_url, g.name
         ORDER BY p."order";
         """

@@ -2,7 +2,6 @@ import { getApi } from "@/api/base"
 import { ProductCard } from "@/components/productCard"
 import { NavRead, ProductCardRead } from "@/types"
 import { getImgUrl } from "@/utils/env"
-import { NEXT_CACHE_REVALIDATED_TAGS_HEADER } from "next/dist/lib/constants"
 
 export default async ({ params }: { params: { nav_route: string } }) => {
     const { nav_route } = await params
@@ -15,6 +14,7 @@ export default async ({ params }: { params: { nav_route: string } }) => {
     if (error) {
         return null
     }
+    console.log(data,11111111)
     return <section className="w-full">
         <div className="w-full mb-10">
             <img src={getImgUrl(nav.img_file_name)} alt={nav.name} /></div>

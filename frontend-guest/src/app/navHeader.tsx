@@ -3,10 +3,9 @@ import { NavRead } from "@/types"
 import Link from "next/link"
 Link
 export const NavHeader = (props: { navs: NavRead[], navRoute?: string }) => {
-    console.log(props.navRoute,12312321321312312)
     return <section className="my-4">
         <div className="text-right"></div>
-        <div className="flex">
+        <div className="flex px-2">
             <Link className="inline-flex justify-center items-end text-center text-4xl font-extrabold text-nav-header-logo hover:cursor-pointer" href={"/"} style={{ width: ASIDE_WIDTH }}>
                 lativ
             </Link>

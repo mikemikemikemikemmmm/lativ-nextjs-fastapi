@@ -14,7 +14,6 @@ export default function ProductIdLayout({
     // const products: ProductCardRead[] = [
     const router= useRouter()
     const handleSelect = (product:ProductCardRead) => {
-        console.log("aaa")
         router.push(`/product/${product.id}`)
      }
     const handleFetch = async (queryStr: string) => {

@@ -11,7 +11,6 @@ export default async ({ params }: { params: { nav_route: string, category_route:
     if (data.length <= 0) {
         return <div>無資料</div>
     }
-    console.log("Series", data)
     return <div>
         <div className="text-[22px] my-6 font-extrabold">
             {data[0].sub_category_name}

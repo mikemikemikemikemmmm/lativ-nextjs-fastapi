@@ -6,7 +6,6 @@ import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 export const ProductClient = (props: { product: ProductDetailRead }) => {
     const { product } = props
-    console.log(product,111111)
     const searchParams = useSearchParams()
     const sub_product_id = searchParams.get('sub_product_id')
     const [subproduct, setSubproduct] = useState<SubProductRead>(() => {
