@@ -35,6 +35,7 @@ jobs:
             fi
             # 進入專案資料夾
             cd $APP_DIR/backend
+            # uv在ubuntu的path需要特別設定，如果不佳這行，uv sync會找不到uv指令
             export PATH="/home/ubuntu/.local/bin:$PATH"
             uv sync 
-            scripts/dev/run
+            bash scripts/dev/run.sh
