@@ -8,9 +8,9 @@ def load_env():
     if not environment:
         raise Exception("no environment env")
     current_file = Path(__file__).resolve()
-    parent_two = current_file.parent.parent
+    target_dir = current_file.parent.parent.parent
     dotenv_file_name = f".env.{environment}"
-    dotenv_file_path = parent_two / dotenv_file_name
+    dotenv_file_path = target_dir / dotenv_file_name
     print(dotenv_file_path)
     if not dotenv_file_path.exists():
         raise Exception("env file not exist")
