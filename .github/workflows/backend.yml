@@ -37,6 +37,8 @@ jobs:
             # 進入專案資料夾
             cd $APP_DIR
 
+            pip install uv
+            
             uv sync
 
             script/dev/run
