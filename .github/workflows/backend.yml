@@ -20,7 +20,7 @@ jobs:
           key: ${{ secrets.LIGHTSAIL_KEY }}
           script: |
             APP_DIR=/home/ubuntu/fastapi
-            REPO_URL=git@github.com:mikemikemikemikemmmm/lativ-nextjs-fastapi.git
+            REPO_URL=https://$GITHUBTOKEN@github.com/mikemikemikemikemmmm/lativ-nextjs-fastapi.git
 
             # 如果目錄不存在，先建立並 clone
             if [ ! -d "$APP_DIR" ]; then
