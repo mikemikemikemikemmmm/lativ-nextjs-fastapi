@@ -36,5 +36,5 @@ jobs:
             # 進入專案資料夾
             cd $APP_DIR/backend
             export PATH="/home/ubuntu/.local/bin:$PATH"
-            uv sync
+            uv sync 
             scripts/dev/run
