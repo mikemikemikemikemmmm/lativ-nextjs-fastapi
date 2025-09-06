@@ -19,10 +19,5 @@ jobs:
           username: ${{ secrets.LIGHTSAIL_USER }}
           key: ${{ secrets.LIGHTSAIL_KEY }}
           script: |
-            cd /home/ubuntu/your-backend-folder
+            cd /home/ubuntu/fastapi
             git pull origin main
-            # 如果用 virtualenv
-            source venv/bin/activate
-            pip install -r requirements.txt
-            # 重啟 FastAPI server (例如用 systemd)
-            sudo systemctl restart fastapi.service
