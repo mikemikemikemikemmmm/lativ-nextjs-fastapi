@@ -12,6 +12,7 @@ def load_env():
     dotenv_file_name = f".env.{environment}"
     dotenv_file_path = target_dir / dotenv_file_name
     print(dotenv_file_path)
+    print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
     if not dotenv_file_path.exists():
         raise Exception("env file not exist")
     load_dotenv(dotenv_path=dotenv_file_path)
