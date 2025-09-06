@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     aws_secret_access_key: str = os.getenv("AWS_SECRET_ACCESS_KEY", "")
     aws_region: str = os.getenv("AWS_REGION", "")
     s3_bucket_name: str = os.getenv("S3_BUCKET_NAME", "")
+    admin_password:str = os.getenv("ADMIN_PASSWORD","")
+    jwt_key:str = os.getenv("JWT_KEY","")
 
 settings = Settings()
 

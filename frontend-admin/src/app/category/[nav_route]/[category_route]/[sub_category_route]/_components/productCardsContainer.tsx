@@ -74,24 +74,26 @@ export const ProductCardContainer = (props: { seriesId: number }) => {
             <div className="text-right my-2">
                 <button onClick={handleCreate} className="btn p-2 inline-block">新增商品</button>
             </div>
-            {
-                productCards.map(pc => (
-                    <div className="w-1/6 inline-block"
-                        onDragOver={handleDragOver}
-                        onDrop={() => handleDrop(pc.id)}
-                        key={pc.id}>
-                        <ProductCard pc={pc}>
-                            <div>
-                                <IconBtnGroup
-                                    onDragStart={() => { handleDragStart(pc.id) }}
-                                    onDelete={() => handleDelete(pc)}
-                                />
-                            </div>
-                        </ProductCard>
+            <div className="grid grid-cols-5">
 
-                    </div>
-                ))
-            }
+                {
+                    productCards.map(pc => (
+                        <div className="h-full flex"
+                            onDragOver={handleDragOver}
+                            onDrop={() => handleDrop(pc.id)}
+                            key={pc.id}>
+                                    <ProductCard pc={pc}>
+                                        <div>
+                                            <IconBtnGroup
+                                                onDragStart={() => { handleDragStart(pc.id) }}
+                                                onDelete={() => handleDelete(pc)}
+                                            />
+                                        </div>
+                                    </ProductCard>
+                        </div>
+                    ))
+                }
+            </div>
         </div>
     </>
 }

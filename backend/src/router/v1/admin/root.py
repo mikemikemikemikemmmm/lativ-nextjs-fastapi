@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter,Depends
 from .nav import nav_router
 from .category import category_router
 from .sub_category import sub_category_router
@@ -10,7 +10,10 @@ from .color import color_router
 from .sub_product import sub_product_router
 from .product_card import product_card_router
 
-admin_router = APIRouter()
+from src.auth import login_guard
+admin_router = APIRouter(dependencies=[Depends(login_guard)])
+# admin_router = APIRouter()
+
 admin_router.include_router(nav_router, prefix="/nav")
 admin_router.include_router(category_router, prefix="/category")
 admin_router.include_router(sub_category_router, prefix="/sub_category")

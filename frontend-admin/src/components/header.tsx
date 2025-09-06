@@ -1,5 +1,25 @@
+import { TOKEN_KEY } from "@/utils/constant"
+import { removeToken } from "@/utils/localstorage"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useCallback, useEffect, useState } from "react"
 export const AdminHeader = () => {
+    const router = useRouter()
+    const [value, setValue] = useState<string | null>(() => localStorage.getItem(TOKEN_KEY));
+    useEffect(() => {
+        const onTokenChange=()=>{
+            setValue(localStorage.getItem(TOKEN_KEY))
+        }
+        window.addEventListener('tokenChange', onTokenChange);
+        return () => {
+            window.removeEventListener('tokenChange', onTokenChange);
+        };
+    }, []);
+    const logout = () => {
+        removeToken()
+        setValue(null)
+        router.push('/login')
+    }
     return <nav className="m-4 text-center">
         <Link className="m-2 p-2 btn" href="/category">
             種類
@@ -16,5 +36,12 @@ export const AdminHeader = () => {
         <Link className="m-2 p-2 btn" href="/size">
             尺寸
         </Link>
+        {
+            value ? <span className="mx-2 p-2 btn" onClick={logout}>
+                登出
+            </span>:<span className="mx-2 p-2 btn" onClick={()=>router.push('/login')}>
+                登入
+            </span>
+        }
     </nav>
 }

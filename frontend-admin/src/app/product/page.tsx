@@ -33,13 +33,13 @@ export default () => {
                 取消搜尋結果
             </button>
         </div>
-        <div className="text-center">
+        <div className="text-center grid grid-cols-8 justify-center">
             {cards.length === 0 &&
-                <div className="inline-block border mp2">
+                <div className="border mp2">
                     無產品
                 </div>
             }
-            {cards.map(c => <div key={c.id} className="w-1/8 inline-block">
+            {cards.map(c => <div key={c.id} className="h-full flex">
                 <ProductCard pc={c} />
             </div>)}
         </div>

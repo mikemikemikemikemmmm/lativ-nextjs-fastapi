@@ -104,7 +104,7 @@ export function Autocomplete<T extends { name: string, img_url: string, id: numb
                                 <div className="inline-block">
                                     <img src={getImgUrl(item.img_url)} style={{ width: 50 }} alt={item.name} />
                                 </div>
-                                <div className="inline-flex items-center justify-center">
+                                <div className="inline-flex ml-2 items-center justify-center">
                                     {item.name || String(item)}
                                 </div>
                             </div>

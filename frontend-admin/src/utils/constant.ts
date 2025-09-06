@@ -18,3 +18,4 @@ export const IMG_SIZE = {
     }
 }
 export const API_TIMEOUT = 10*1000 
+export const TOKEN_KEY = "access_token"

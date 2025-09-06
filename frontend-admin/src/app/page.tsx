@@ -1,3 +1,4 @@
-export default async function Home() {
+
+export default function IndexPage() {
   return null
 }

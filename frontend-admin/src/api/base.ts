@@ -1,7 +1,8 @@
 import { dispatchError, dispatchSuccess } from "@/store/method";
 import { store, increaseLoadingCount, decreaseLoadingCount } from "@/store/store";
-import { API_TIMEOUT } from "@/utils/constant";
+import { API_TIMEOUT, TOKEN_KEY } from "@/utils/constant";
 import { ENV } from "@/utils/env";
+import { removeToken } from "@/utils/localstorage";
 export interface ApiErrorObj {
     detail: string
 }
@@ -12,9 +13,10 @@ export async function baseFetch<Response>(
     url: string,
     options: RequestInit,
     actionName: string = "",
-    needLoading: boolean = true
+    needLoading: boolean = true,
+    isGuest: boolean = false
 ): Promise<ApiResult<Response>> {
-    const urlWithBase = `${ENV.backendUrl}/v1/admin/${url}`
+    const urlWithBase = `${ENV.backendUrl}v1/${isGuest ? "guest" : "admin"}/${url}`
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), API_TIMEOUT);
     if (needLoading) {
@@ -37,8 +39,28 @@ export async function baseFetch<Response>(
                 break;
         }
     }
+    const token = localStorage.getItem(TOKEN_KEY)
     try {
-        const response = await fetch(urlWithBase, { ...options, signal: controller.signal });
+        const headers = token ? {
+            ...options.headers,
+            Authorization: `Bearer ${token}`
+        } : { ...options.headers }
+        const response = await fetch(urlWithBase, {
+            ...options,
+            headers,
+            signal: controller.signal
+        });
+        if (response.status === 401) {
+            const jsonData: ApiErrorObj = await response.json()
+            removeToken()
+            if (typeof window !== "undefined") {
+                window.location.href = "/login"
+            }
+            return {
+                data: undefined,
+                error: { detail: jsonData.detail }
+            } as ErrResult
+        }
         if (!response.ok) {
             const jsonData: ApiErrorObj = await response.json()
             dispatchError(`${_actionName}失敗`)

@@ -1,8 +1,9 @@
 import { ASIDE_WIDTH } from "@/style/cssConst"
-import { NavRead } from "@/types/nav"
+import { NavRead } from "@/types"
 import Link from "next/link"
 Link
-export const NavHeader = (props: { navs: NavRead[] }) => {
+export const NavHeader = (props: { navs: NavRead[], navRoute?: string }) => {
+    console.log(props.navRoute,12312321321312312)
     return <section className="my-4">
         <div className="text-right"></div>
         <div className="flex">
@@ -14,7 +15,8 @@ export const NavHeader = (props: { navs: NavRead[] }) => {
                     props.navs.map(n => <Link
                         key={n.id}
                         href={`/home/${n.route}`}
-                        className="px-4 mx-4 text-nav-header-item hover:bg-nav-header-item-bg hover:text-nav-header-item-hover"
+                        style={{ width: 100 }}
+                        className={`${n.route === props.navRoute ? "bg-nav-header-item-bg text-nav-header-item-hover" : ""} text-center mx-4 text-nav-header-item hover:bg-nav-header-item-bg hover:text-nav-header-item-hover`}
                     >
                         {n.name}
                     </Link>)

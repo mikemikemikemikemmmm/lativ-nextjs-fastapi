@@ -79,7 +79,9 @@ export const NavModal = (props: {
         }
     }, [previewImgUrl])
     const handleCancel = () => {
-
+        setImgFile(null)
+        setPreviewImgUrl(null)
+        closeModal()
     }
     return (
         <>

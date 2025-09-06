@@ -8,3 +8,4 @@ export const ENV = {
 export const getImgUrl = (fileName: string) => {
     return ENV.imgUrlPrefix + fileName
 }
+export const isServerComponent = typeof window === "undefined";
