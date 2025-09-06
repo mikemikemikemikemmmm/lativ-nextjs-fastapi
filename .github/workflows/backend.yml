@@ -33,13 +33,8 @@ jobs:
               cd $APP_DIR
               git pull origin main
             fi
-
             # 進入專案資料夾
             cd $APP_DIR/backend
-
-            # github action 不能直接使用vps上的uv，即使你已經安裝
-            curl -LsSf https://astral.sh/uv/install.sh | sh
-
+            export PATH="/home/ubuntu/.local/bin/uv:$PATH"
             uv sync
-
             scripts/dev/run
