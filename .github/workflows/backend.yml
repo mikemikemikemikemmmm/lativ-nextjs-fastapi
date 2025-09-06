@@ -37,6 +37,9 @@ jobs:
             # 進入專案資料夾
             cd $APP_DIR/backend
 
-            uv --version
+            # github action 不能直接使用vps上的uv，即使你已經安裝
+            curl -LsSf https://astral.sh/uv/install.sh | sh
 
             uv sync
+
+            scripts/dev/run
