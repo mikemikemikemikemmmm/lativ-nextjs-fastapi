@@ -12,9 +12,12 @@ uv --version || echo "cannot run uv"
 uv sync 
 
 echo "uv sync成功"
+cd $BACKEND_DIR 
+
+echo "移動到$BACKEND_DIR"
 #啟動backend service
 if [ ! -f /etc/systemd/system/$BACKEND_SERVICE_NAME.service ]; then
-    sudo cp $BACKEND_SERVICE_NAME/deploy/$BACKEND_SERVICE_NAME.service /etc/systemd/system/$BACKEND_SERVICE_NAME.service
+    sudo cp ./deploy/$BACKEND_SERVICE_NAME.service /etc/systemd/system/$BACKEND_SERVICE_NAME.service
     sudo systemctl daemon-reload
     sudo systemctl enable $BACKEND_SERVICE_NAME
 fi
@@ -23,7 +26,7 @@ sudo systemctl restart $BACKEND_SERVICE_NAME
 echo "啟動backend service成功"
 #啟動backend service
 if [ ! -f /etc/systemd/system/$MONITOR_SERVICE_NAME.service ]; then
-    sudo cp $MONITOR_SERVICE_NAME/deploy/$MONITOR_SERVICE_NAME.service /etc/systemd/system/$MONITOR_SERVICE_NAME.service
+    sudo cp ./deploy/$MONITOR_SERVICE_NAME.service /etc/systemd/system/$MONITOR_SERVICE_NAME.service
     sudo systemctl daemon-reload
     sudo systemctl enable $MONITOR_SERVICE_NAME
 fi
