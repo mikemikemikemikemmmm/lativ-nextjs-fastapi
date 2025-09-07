@@ -9,6 +9,8 @@ WorkingDirectory=/home/ubuntu/fastapi/backend
 ExecStart=/home/ubuntu/.local/bin/uv run ./scripts/prod/monitor.py
 Restart=no
 Environment="PYTHONUNBUFFERED=1"
+StandardOutput=file:/home/ubuntu/fastapi/backend/logs/monitor-out.log
+StandardError=file:/home/ubuntu/fastapi/backend/logs/monitor-err.log
 
 [Install]
 WantedBy=multi-user.target

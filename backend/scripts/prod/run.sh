@@ -19,6 +19,8 @@ uv sync
 echo "uv sync成功"
 
 
+#=================================
+
 if systemctl is-active --quiet "$BACKEND_SERVICE_NAME"; then
     echo "$BACKEND_SERVICE_NAME 服務正在運行，準備停止..."
     sudo systemctl stop "$BACKEND_SERVICE_NAME"
@@ -68,5 +70,7 @@ sudo systemctl start "$MONITOR_SERVICE_NAME"
 echo "檢查 $MONITOR_SERVICE_NAME 服務..."
 sudo systemctl status "$MONITOR_SERVICE_NAME"
 
+
+#=================================
 
 echo "部署成功"
