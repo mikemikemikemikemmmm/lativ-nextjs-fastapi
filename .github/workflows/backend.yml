@@ -47,5 +47,5 @@ jobs:
             EOF
             echo "生成.env"
 
-            # echo "開始跑run.sh"
-            # bash ./scripts/$ENVIRONMENT/run.sh
+            echo "開始跑run.sh"
+            bash ./scripts/$ENVIRONMENT/run.sh
