@@ -5,9 +5,11 @@ export ENVIRONMENT=prod
 BACKEND_DIR=/home/ubuntu/fastapi/backend
 BACKEND_SERVICE_NAME=backend
 MONITOR_SERVICE_NAME=monitor
+echo "ENVIRONMENT=$ENVIRONMENT"
+echo "BACKEND_DIR=$BACKEND_DIR"
+
 cd $BACKEND_DIR 
 echo "移動到$BACKEND_DIR"
-
 uv --version || echo "cannot run uv"
 uv sync 
 echo "uv sync成功"
