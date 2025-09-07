@@ -2,6 +2,7 @@
 set -e  # 發生錯誤時停止
 # 設定環境變數
 export ENVIRONMENT=prod
+BACKEND_DIR=/home/ubuntu/fastapi/backend
 BACKEND_SERVICE_NAME=backend
 MONITOR_SERVICE_NAME=monitor
 cd $BACKEND_DIR 
@@ -12,7 +13,7 @@ uv sync
 echo "uv sync成功"
 #啟動backend service
 if [ ! -f /etc/systemd/system/$BACKEND_SERVICE_NAME.service ]; then
-    sudo cp ./deploy/$BACKEND_SERVICE_NAME.service /etc/systemd/system/$BACKEND_SERVICE_NAME.service
+    sudo cp $BACKEND_DIR/scripts/prod/$BACKEND_SERVICE_NAME.service /etc/systemd/system/$BACKEND_SERVICE_NAME.service
     sudo systemctl daemon-reload
     sudo systemctl enable $BACKEND_SERVICE_NAME
 fi
@@ -28,7 +29,7 @@ fi
 echo "啟動backend service成功"
 #啟動MONITOR_SERVICE_NAME
 if [ ! -f /etc/systemd/system/$MONITOR_SERVICE_NAME.service ]; then
-    sudo cp ./deploy/$MONITOR_SERVICE_NAME.service /etc/systemd/system/$MONITOR_SERVICE_NAME.service
+    sudo cp $BACKEND_DIR/scripts/prod/$MONITOR_SERVICE_NAME.service /etc/systemd/system/$MONITOR_SERVICE_NAME.service
     sudo systemctl daemon-reload
     sudo systemctl enable $MONITOR_SERVICE_NAME
 fi
