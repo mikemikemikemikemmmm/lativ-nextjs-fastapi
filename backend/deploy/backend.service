@@ -5,9 +5,8 @@ After=network.target
 [Service]
 User=ubuntu
 Group=ubuntu
-WorkingDirectory=/home/youruser/fastapi/backend
+WorkingDirectory=/home/ubuntu/fastapi/backend
 Environment="ENVIRONMENT=prod"
-EnvironmentFile=/home/ubuntu/fastapi/backend/.env.prod
 ExecStart=uv run uvicorn src.main:app --host 0.0.0.0 --port 8000
 Restart=no
 
