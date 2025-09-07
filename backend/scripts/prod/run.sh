@@ -5,8 +5,12 @@ export ENVIRONMENT=prod
 BACKEND_DIR=/home/ubuntu/fastapi/backend
 BACKEND_SERVICE_NAME=backend
 MONITOR_SERVICE_NAME=monitor
+echo ""
 echo "ENVIRONMENT=$ENVIRONMENT"
 echo "BACKEND_DIR=$BACKEND_DIR"
+echo "BACKEND_SERVICE_NAME=$BACKEND_SERVICE_NAME"
+echo "MONITOR_SERVICE_NAME=$MONITOR_SERVICE_NAME"
+echo ""
 
 cd $BACKEND_DIR 
 echo "移動到$BACKEND_DIR"
@@ -15,9 +19,11 @@ uv sync
 echo "uv sync成功"
 #啟動backend service
 if [ ! -f /etc/systemd/system/$BACKEND_SERVICE_NAME.service ]; then
+    echo "/etc/systemd/system/$BACKEND_SERVICE_NAME.service 不存在，開始複製"
     sudo cp $BACKEND_DIR/scripts/prod/$BACKEND_SERVICE_NAME.service /etc/systemd/system/$BACKEND_SERVICE_NAME.service
     sudo systemctl daemon-reload
     sudo systemctl enable $BACKEND_SERVICE_NAME
+    echo "複製成功"
 fi
 sudo systemctl restart $BACKEND_SERVICE_NAME
 if systemctl is-active --quiet "$BACKEND_SERVICE_NAME"; then
