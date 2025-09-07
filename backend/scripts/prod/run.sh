@@ -17,38 +17,56 @@ echo "移動到$BACKEND_DIR"
 uv --version || echo "cannot run uv"
 uv sync 
 echo "uv sync成功"
-#啟動backend service
-echo "開始複製 $BACKEND_SERVICE_NAME.service 到 /etc/systemd/system/"
-sudo cp $BACKEND_DIR/scripts/prod/$BACKEND_SERVICE_NAME.service /etc/systemd/system/$BACKEND_SERVICE_NAME.service
-sudo systemctl daemon-reload
-sudo systemctl enable $BACKEND_SERVICE_NAME
-echo "複製與啟用完成"
 
-sudo systemctl restart $BACKEND_SERVICE_NAME
 
 if systemctl is-active --quiet "$BACKEND_SERVICE_NAME"; then
-    echo "$BACKEND_SERVICE_NAME 服務啟動成功 ✅"
+    echo "$BACKEND_SERVICE_NAME 服務正在運行，準備停止..."
+    sudo systemctl stop "$BACKEND_SERVICE_NAME"
 else
-    echo "$BACKEND_SERVICE_NAME 服務啟動失敗 ❌"
-    exit 1
+    echo "$BACKEND_SERVICE_NAME 服務未在運行，直接更新..."
 fi
 
-echo "啟動backend service成功"
-echo "開始複製 $MONITOR_SERVICE_NAME.service 到 /etc/systemd/system/"
-sudo cp $BACKEND_DIR/scripts/prod/$MONITOR_SERVICE_NAME.service /etc/systemd/system/$MONITOR_SERVICE_NAME.service
-sudo systemctl daemon-reload
-sudo systemctl enable $MONITOR_SERVICE_NAME
-echo "複製與啟用完成"
+# 複製新的 service 檔案
+echo "更新 $BACKEND_SERVICE_NAME 的 service 檔案..."
+sudo cp "$BACKEND_DIR/scripts/prod/$BACKEND_SERVICE_NAME.service" "/etc/systemd/system/$BACKEND_SERVICE_NAME.service"
 
-sudo systemctl restart $MONITOR_SERVICE_NAME
+# 重新載入 systemd
+echo "重新載入 systemd..."
+sudo systemctl daemon-reload
+
+# 啟動服務
+echo "啟動 $BACKEND_SERVICE_NAME 服務..."
+sudo systemctl start "$BACKEND_SERVICE_NAME"
+
+# 檢查服務狀態
+echo "檢查 $BACKEND_SERVICE_NAME 服務..."
+sudo systemctl status "$BACKEND_SERVICE_NAME"
+
+
+#=================================
 
 if systemctl is-active --quiet "$MONITOR_SERVICE_NAME"; then
-    echo "$MONITOR_SERVICE_NAME 服務啟動成功 ✅"
+    echo "$MONITOR_SERVICE_NAME 服務正在運行，準備停止..."
+    sudo systemctl stop "$MONITOR_SERVICE_NAME"
 else
-    echo "$MONITOR_SERVICE_NAME 服務啟動失敗 ❌"
-    exit 1
+    echo "$MONITOR_SERVICE_NAME 服務未在運行，直接更新..."
 fi
 
-echo "啟動monitor service成功"
+# 複製新的 service 檔案
+echo "更新 $MONITOR_SERVICE_NAME 的 service 檔案..."
+sudo cp "$BACKEND_DIR/scripts/prod/$MONITOR_SERVICE_NAME.service" "/etc/systemd/system/$MONITOR_SERVICE_NAME.service"
+
+# 重新載入 systemd
+echo "重新載入 systemd..."
+sudo systemctl daemon-reload
+
+# 啟動服務
+echo "啟動 $MONITOR_SERVICE_NAME 服務..."
+sudo systemctl start "$MONITOR_SERVICE_NAME"
+
+# 檢查服務狀態
+echo "檢查 $MONITOR_SERVICE_NAME 服務..."
+sudo systemctl status "$MONITOR_SERVICE_NAME"
+
 
 echo "部署成功"
