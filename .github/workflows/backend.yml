@@ -19,11 +19,13 @@ jobs:
           username: ${{ secrets.LIGHTSAIL_USER }}
           key: ${{ secrets.LIGHTSAIL_KEY }}
           script: |
-            APP_DIR=/home/ubuntu/fastapi
-            REPO_URL=https://$GITHUBTOKEN@github.com/mikemikemikemikemmmm/lativ-nextjs-fastapi.git
-
-            # 把vps的PATH注入到shell環境
             export PATH="/home/ubuntu/.local/bin:$PATH"
+            export APP_DIR=/home/ubuntu/fastapi
+            export BACKEND_DIR=/home/ubuntu/fastapi/backend
+            export ENVIRONMENT=prod
+
+            REPO_URL=https://${{ secrets.GITHUB_TOKEN }}@github.com/mikemikemikemikemmmm/lativ-nextjs-fastapi.git
+            # 把vps的PATH注入到shell環境
 
             # 如果目錄不存在，先建立並 clone
             if [ ! -d "$APP_DIR" ]; then
@@ -34,15 +36,11 @@ jobs:
               git clone $REPO_URL $APP_DIR
             else
               cd $APP_DIR
-              git pull origin main
+              git fetch --all
+              git reset --hard origin/main
             fi
             # 進入專案資料夾
-            cd $APP_DIR/backend
-
-            # 生成 .env 文件
-            echo '${{ secrets.ENV_FILE_CONTENT }}' > ./.env.dev
-
-            uv --version || echo "cannot run uv"
-            uv sync 
-
-            bash scripts/dev/run.sh
+            cd $BACKEND_DIR
+            
+            echo "開始跑run.sh"
+            bash ./scripts/$ENVIRONMENT/run.sh
