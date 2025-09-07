@@ -1,0 +1,14 @@
+[Unit]
+Description=Monitor Service
+After=network.target
+
+[Service]
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/fastapi/backend
+ExecStart=uv run ./deploy/monitor.py
+Restart=no
+Environment="PYTHONUNBUFFERED=1"
+
+[Install]
+WantedBy=multi-user.target
