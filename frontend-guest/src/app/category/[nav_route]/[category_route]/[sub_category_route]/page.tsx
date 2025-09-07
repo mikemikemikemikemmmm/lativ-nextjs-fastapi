@@ -2,7 +2,7 @@ import { getApi } from "@/api/base"
 import { ProductCard } from "@/components/productCard"
 import { SeriesRead } from "@/types"
 
-export default async ({ params }: { params: { nav_route: string, category_route: string, sub_category_route: string } }) => {
+async function SubCategoryPage({ params }: { params: { nav_route: string, category_route: string, sub_category_route: string } }) {
     const { nav_route, category_route, sub_category_route } = await params
     const { data, error } = await getApi<SeriesRead[]>(`series?nav_route=${nav_route}&category_route=${category_route}&sub_category_route=${sub_category_route}`)
     if (error) {
@@ -37,3 +37,4 @@ export default async ({ params }: { params: { nav_route: string, category_route:
 
     </div>
 }
+export default SubCategoryPage

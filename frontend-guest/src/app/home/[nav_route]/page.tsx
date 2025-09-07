@@ -3,7 +3,7 @@ import { ProductCard } from "@/components/productCard"
 import { NavRead, ProductCardRead } from "@/types"
 import { getImgUrl } from "@/utils/env"
 
-export default async ({ params }: { params: { nav_route: string } }) => {
+async function NavIndexPage ({ params }: { params: { nav_route: string } })  {
     const { nav_route } = await params
     const getNav = await getApi<NavRead>(`navs/${nav_route}`)
     if (getNav.error) {
@@ -14,7 +14,6 @@ export default async ({ params }: { params: { nav_route: string } }) => {
     if (error) {
         return null
     }
-    console.log(data,11111111)
     return <section className="w-full">
         <div className="w-full mb-10">
             <img src={getImgUrl(nav.img_file_name)} alt={nav.name} /></div>
@@ -27,3 +26,4 @@ export default async ({ params }: { params: { nav_route: string } }) => {
         </div>
     </section >
 }
+export default NavIndexPage

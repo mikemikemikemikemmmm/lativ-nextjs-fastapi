@@ -14,11 +14,9 @@ export interface CategoryRead {
     nav_route: string,
     name: string,
     route: string
-    sub_categorys: SubCategoryRead[]
+    sub_categorys: BaseRead[]
 }
 
-export interface SubCategoryRead extends BaseRead {
-}
 export interface SeriesRead {
     id: number,
     name: string,

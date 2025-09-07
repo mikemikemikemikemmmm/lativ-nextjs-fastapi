@@ -2,11 +2,11 @@ import { getApi } from "@/api/base"
 import { ProductClient } from "./client"
 import { ProductDetailRead } from "@/types"
 
-export default async ({
+async function ProductPage({
     params
 }: {
     params: { product_id: string }
-}) => {
+}) {
     const { product_id } = await params
     const { data, error } = await getApi<ProductDetailRead>(`products?product_id=${product_id}`)
     if (error) {
@@ -14,3 +14,5 @@ export default async ({
     }
     return <ProductClient product={data} />
 }
+
+export default ProductPage

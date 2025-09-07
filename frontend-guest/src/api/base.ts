@@ -29,9 +29,9 @@ export async function baseFetch<Response>(
             data: jsonData as Response,
             error: undefined
         } as SuccessResult<Response>
-    } catch (error: any) {
+    } catch (error) {
         console.error("fetch error", error)
-        if (error.name === "AbortError") {
+        if ( typeof error === "object" && error !== null && 'name' in error && (error).name === "AbortError") {
             return {
                 data: undefined,
                 error: {

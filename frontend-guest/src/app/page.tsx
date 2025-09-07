@@ -24,8 +24,7 @@ import 'swiper/css/navigation';
 
 // import required modules
 import { Navigation } from 'swiper/modules';
-const A = () => <div className='bg-amber-300 h-[222px]'>asddddddddddddddddddddddddddddd</div>
-export default () => {
+ function IndexPage()  {
   return (
     <>
       <div className="w-full">
@@ -74,3 +73,4 @@ export default () => {
     </>
   )
 }
+export default IndexPage
