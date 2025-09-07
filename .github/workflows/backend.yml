@@ -22,6 +22,9 @@ jobs:
             APP_DIR=/home/ubuntu/fastapi
             REPO_URL=https://$GITHUBTOKEN@github.com/mikemikemikemikemmmm/lativ-nextjs-fastapi.git
 
+            # 把vps的PATH注入到shell環境
+            export PATH="/home/ubuntu/.local/bin:$PATH"
+
             # 如果目錄不存在，先建立並 clone
             if [ ! -d "$APP_DIR" ]; then
               mkdir -p $APP_DIR
@@ -35,7 +38,11 @@ jobs:
             fi
             # 進入專案資料夾
             cd $APP_DIR/backend
-            # uv在ubuntu的path需要特別設定，如果不佳這行，uv sync會找不到uv指令
-            export PATH="/home/ubuntu/.local/bin:$PATH"
+
+            # 生成 .env 文件
+            echo '${{ secrets.ENV_FILE_CONTENT }}' > ./.env.dev
+
+            uv --version || echo "cannot run uv"
             uv sync 
+
             bash scripts/dev/run.sh
