@@ -6,7 +6,7 @@ import { CategoryRead } from '@/types';
 export default async function Layout({
     children, params
 }: {
-    children: React.ReactNode, params: { nav_route: string }
+    children: React.ReactNode, params: { nav_route: string, category_route: string, sub_category_route: string }
 }) {
     const { nav_route } = await params
     const { data, error } = await getApi<CategoryRead[]>(`categorys?nav_route=${nav_route}`)
