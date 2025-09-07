@@ -7,11 +7,6 @@ MONITOR_SERVICE_NAME=monitor
 cd $BACKEND_DIR 
 echo "移動到$BACKEND_DIR"
 
-# 生成 .env 文件
-echo 
-echo "${{ secrets.ENV_FILE_CONTENT }}"  > ./.env.$ENVIRONMENT
-echo "生成.env"
-
 uv --version || echo "cannot run uv"
 uv sync 
 echo "uv sync成功"
