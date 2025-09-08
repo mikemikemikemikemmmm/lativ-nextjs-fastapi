@@ -1,3 +1,6 @@
-export default () => {
-    return <div></div>
+
+const CategoryPage = () => {
+  return null
 }
+
+export default CategoryPage

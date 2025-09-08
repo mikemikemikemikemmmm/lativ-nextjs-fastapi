@@ -1,7 +1,7 @@
 import { dispatchError, dispatchSuccess } from "@/store/method";
 import { store, increaseLoadingCount, decreaseLoadingCount } from "@/store/store";
 import { API_TIMEOUT, TOKEN_KEY } from "@/utils/constant";
-import { ENV } from "@/utils/env";
+import { ENV, isServerComponent } from "@/utils/env";
 import { removeToken } from "@/utils/localstorage";
 export interface ApiErrorObj {
     detail: string
@@ -39,7 +39,7 @@ export async function baseFetch<Response>(
                 break;
         }
     }
-    const token = localStorage.getItem(TOKEN_KEY)
+    const token = isServerComponent || localStorage.getItem(TOKEN_KEY)
     try {
         const headers = token ? {
             ...options.headers,
@@ -79,10 +79,10 @@ export async function baseFetch<Response>(
             data: jsonData as Response,
             error: undefined
         } as SuccessResult<Response>
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("fetch error", error)
         dispatchError(`${_actionName}失敗`)
-        if (error.name === "AbortError") {
+        if ((error as { name: string }).name === "AbortError") {
             return {
                 data: undefined,
                 error: {

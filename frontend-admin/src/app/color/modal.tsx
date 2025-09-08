@@ -1,14 +1,12 @@
-import { useDispatch } from "react-redux"
 import { useState } from "react"
 // import { setIsLoading } from "../../store/store"
-import { Box, Button, IconButton, TextField } from "@mui/material"
+import { IconButton } from "@mui/material"
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import { ColorRead } from "@/types/color"
-import { baseFetch, postApi, putApi } from "@/api/base"
+import { baseFetch} from "@/api/base"
 import { IMG_SIZE, FAKE_ID_FOR_CREATE } from "@/utils/constant"
 import { dispatchError } from "@/store/method";
 import { errorHandler } from "@/utils/errorHandler";
-import { InputWrapper } from "@/components/inputWrapper";
 import { useUploadImg } from "@/hook/useUploadImg";
 export const ColorModal = (props: {
     modalProps: ColorRead,
@@ -84,6 +82,7 @@ export const ColorModal = (props: {
                         width: previewImgUrl ? IMG_SIZE.color.w : 0,
                         height: previewImgUrl ? IMG_SIZE.color.h : 0
                     }}
+                    alt={"color"}
                     src={getImagePreviewUrl()} />
                 <IconButton color="primary" component="label">
                     <AddPhotoAlternateIcon />
@@ -104,29 +103,4 @@ export const ColorModal = (props: {
             <button className="btn mp2 inline-block" onClick={handleSubmit}>送出</button>
         </div>
     </div>
-    // return (
-    //     <>
-    //         <InputWrapper
-    //             label="名稱"
-    //             value={input.name}
-    //             onChange={val => handleChangeName(val as string)}
-    //         />
-    //         <Box sx={{ margin: 1, padding: 1, display: 'flex', justifyContent: 'center' }}>
-    //             <img
-    //                 style={{
-    //                     width: previewImgUrl ?  IMG_SIZE.color.w : 0,
-    //                     height: previewImgUrl ?  IMG_SIZE.color.h : 0
-    //                 }}
-    //                 src={getImagePreviewUrl()} />
-    //             <IconButton color="primary" component="label">
-    //                 <AddPhotoAlternateIcon />
-    //                 <input hidden accept=".jpg" type="file" onChange={e => handleUploadImg(e)} />
-    //             </IconButton>
-    //             <div>上傳圖片 僅限 { IMG_SIZE.color.w}px x { IMG_SIZE.color.h}px jpg檔案</div>
-    //         </Box>
-    //         <Button size="small" variant="contained" onClick={() => handleSubmit()}>
-    //             送出
-    //         </Button>
-    //     </>
-    // )
 }

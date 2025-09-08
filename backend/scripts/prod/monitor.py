@@ -57,13 +57,19 @@ def check_url():
                 "fake-lativ系統已崩潰",
                 f"Status code: {response.status_code}",
             )
+        else:
+            send_email(
+                "fake-lativ正常運作",
+                "",
+            )
+
     except Exception as e:
         send_email("fake-lativ監控系統出錯", str(e))
 
 
 def run():
     scheduler = BlockingScheduler()
-    scheduler.add_job(check_url, "interval", hours=24)
+    scheduler.add_job(check_url, "interval", hours=12)
     scheduler.start()
 
 

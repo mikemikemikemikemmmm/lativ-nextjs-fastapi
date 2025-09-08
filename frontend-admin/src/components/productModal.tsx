@@ -1,7 +1,7 @@
 import { baseFetch } from "@/api/base"
 import { dispatchError } from "@/store/method"
 import { GenderRead } from "@/types/gender"
-import { ProductCardRead, ProductRead } from "@/types/product"
+import { ProductCardRead } from "@/types/product"
 import { FAKE_ID_FOR_CREATE, IMG_SIZE } from "@/utils/constant"
 import { errorHandler } from "@/utils/errorHandler"
 import { useEffect, useRef, useState } from "react"
@@ -69,7 +69,7 @@ export const ProductModal = (props: Props) => {
     const handleChangeName = (val: string) => {
         setInput({ ...input, name: val })
     }
-    const [getGenders, genders] = useGetData<GenderRead>(`gender`)
+    const [_, genders] = useGetData<GenderRead>(`gender`)
     const handleGender = (genderid: string) => {
         setInput({ ...input, gender_id: Number(genderid) })
     }
@@ -88,7 +88,7 @@ export const ProductModal = (props: Props) => {
         else {
             setImgUrl(getImgUrl(modalProps.img_url))
         }
-    }, [previewImgUrl])
+    }, [previewImgUrl,isCreate,modalProps.img_url])
     if (genders === "loading") {
         return null
     }
@@ -101,7 +101,7 @@ export const ProductModal = (props: Props) => {
                             imgUrl ?
                                 <img className="inline-block"
                                     style={{ width: 100, height: 150 }}
-                                    src={imgUrl} />
+                                    src={imgUrl} alt="product" />
                                 :
                                 <div className="inline-block border flex-center"
                                     style={{ width: 100, height: 150 }}>

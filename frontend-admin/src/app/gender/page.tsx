@@ -7,7 +7,7 @@ import { GenderModal } from "./modal";
 import { IconBtnGroup } from "@/components/iconBtn";
 import { GenderRead } from "@/types/gender";
 
-export default function () {
+ function GenderPage() {
   const [getGenders, genders] = useGetData<GenderRead>("gender")
   const { handleCreate, handleEdit, isModalOpen, modalProps, closeModal, handleDelete } = useCommonMethods({
     id: FAKE_ID_FOR_CREATE, name: ""
@@ -55,3 +55,4 @@ export default function () {
     </>
   );
 }
+export default GenderPage

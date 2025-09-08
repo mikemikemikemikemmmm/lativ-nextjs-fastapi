@@ -1,13 +1,17 @@
 import { TOKEN_KEY } from "@/utils/constant"
+import { isServerComponent } from "@/utils/env"
 import { removeToken } from "@/utils/localstorage"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useCallback, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 export const AdminHeader = () => {
     const router = useRouter()
-    const [value, setValue] = useState<string | null>(() => localStorage.getItem(TOKEN_KEY));
+    const [value, setValue] = useState<string | null>(() => isServerComponent ? null : localStorage.getItem(TOKEN_KEY));
     useEffect(() => {
-        const onTokenChange=()=>{
+        if (isServerComponent) {
+            return
+        }
+        const onTokenChange = () => {
             setValue(localStorage.getItem(TOKEN_KEY))
         }
         window.addEventListener('tokenChange', onTokenChange);
@@ -39,7 +43,7 @@ export const AdminHeader = () => {
         {
             value ? <span className="mx-2 p-2 btn" onClick={logout}>
                 登出
-            </span>:<span className="mx-2 p-2 btn" onClick={()=>router.push('/login')}>
+            </span> : <span className="mx-2 p-2 btn" onClick={() => router.push('/login')}>
                 登入
             </span>
         }

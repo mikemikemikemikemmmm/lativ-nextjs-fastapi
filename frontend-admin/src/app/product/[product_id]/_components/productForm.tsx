@@ -5,8 +5,6 @@ import { getImgUrl } from "@/utils/env"
 import { ModalContainer } from "@/components/modalContainer"
 import { ProductModal } from "@/components/productModal"
 import { IconBtnGroup } from "@/components/iconBtn"
-import { GenderRead } from "@/types/gender"
-import { useGetData } from "@/hook/useGetData"
 
 interface Props {
     product: ProductRead
@@ -39,7 +37,7 @@ export const ProductForm = (props: Props) => {
                     <div className="inline-block">
                         <img
                             style={{ width: 100, height: 150 }}
-                            src={getImgUrl(product.img_url)} />
+                            src={getImgUrl(product.img_url)}  alt={"product"}/>
                     </div >
                     <div className="flex-1 inline-block text-left ml-2">
                         <div className="text-right mb-2">

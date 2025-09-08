@@ -7,7 +7,7 @@ import { FAKE_ID_FOR_CREATE } from "@/utils/constant";
 import { SizeModal } from "./modal";
 import { IconBtnGroup } from "@/components/iconBtn";
 
-export default function () {
+function SizePage () {
   const [getSizes, sizes] = useGetData<SizeRead>("size")
   const { handleCreate, handleEdit, handleDragOver, handleDragStart, handleDelete,handleDrop, isModalOpen, modalProps, closeModal } = useCommonMethods({
     id: FAKE_ID_FOR_CREATE, name: ""
@@ -59,3 +59,6 @@ export default function () {
     </>
   );
 }
+
+
+export default SizePage

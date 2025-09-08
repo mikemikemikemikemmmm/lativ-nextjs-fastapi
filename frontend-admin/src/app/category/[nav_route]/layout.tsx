@@ -5,7 +5,6 @@ import { useParams } from "next/navigation";
 import { NavRead } from "@/types/nav";
 import { getApi } from "@/api/base";
 import { errorHandler } from "@/utils/errorHandler";
-import { getImgUrl } from "@/utils/env";
 export default function NavLayout({
     children,
 }: Readonly<{

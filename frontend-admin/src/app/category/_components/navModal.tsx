@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react"
-import { baseFetch, postApi, putApi } from "@/api/base"
+import { baseFetch} from "@/api/base"
 import { FAKE_ID_FOR_CREATE, IMG_SIZE } from "@/utils/constant"
 import { dispatchError } from "@/store/method";
 import { errorHandler } from "@/utils/errorHandler";
@@ -77,7 +77,7 @@ export const NavModal = (props: {
         else {
             setImgUrl(getImgUrl(modalProps.img_file_name))
         }
-    }, [previewImgUrl])
+    }, [previewImgUrl,isCreate,modalProps.img_file_name])
     const handleCancel = () => {
         setImgFile(null)
         setPreviewImgUrl(null)
@@ -92,7 +92,9 @@ export const NavModal = (props: {
                             imgUrl ?
                                 <img className="inline-block"
                                     style={{ width: 505, height: 200 }}
-                                    src={imgUrl} />
+                                    src={imgUrl} 
+                                    alt={"nav"}
+                                    />
                                 :
                                 <div className="inline-block border flex-center"
                                     style={{ width: 505, height: 200 }}>

@@ -17,7 +17,7 @@ import { FAKE_ID_FOR_CREATE } from "@/utils/constant"
 import { SubproductModal } from "./_components/subProductModal"
 import { dispatchError } from "@/store/method"
 
-export default () => {
+const ProductDetailPage =() => {
     const params = useParams();
     const router = useRouter()
     const { product_id } = params
@@ -166,3 +166,4 @@ export default () => {
         </section >
     </>
 }
+export default ProductDetailPage

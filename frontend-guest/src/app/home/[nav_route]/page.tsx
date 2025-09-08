@@ -1,17 +1,34 @@
+'use client'
 import { getApi } from "@/api/base"
 import { ProductCard } from "@/components/productCard"
 import { NavRead, ProductCardRead } from "@/types"
 import { getImgUrl } from "@/utils/env"
-
-async function NavIndexPage ({ params }: { params: { nav_route: string } })  {
-    const { nav_route } = await params
-    const getNav = await getApi<NavRead>(`navs/${nav_route}`)
-    if (getNav.error) {
-        return null
+import { errorHandler } from "@/utils/errorHandler"
+import { useParams } from "next/navigation"
+import { useEffect, useState } from "react"
+function NavIndexPage() {
+    const { nav_route } = useParams()
+    const [nav, setNav] = useState<NavRead| "loading">("loading")
+    const getData = async () => {
+        const { data, error } = await getApi<NavRead>(`navs/${nav_route}`)
+        if (error) {
+            return errorHandler(error)
+        }
+        setNav(data)
     }
-    const nav = getNav.data
-    const { data, error } = await getApi<ProductCardRead[]>(`products/nav_index?nav_route=${nav_route}`)
-    if (error) {
+    useEffect(() => { getData() }, [])
+
+    
+    const [cards, setCards] = useState<ProductCardRead[]| "loading">("loading")
+    const getCards = async () => {
+        const { data, error } = await getApi<ProductCardRead[]>(`products/nav_index?nav_route=${nav_route}`)
+        if (error) {
+            return errorHandler(error)
+        }
+        setCards(data)
+    }
+    useEffect(() => { getCards() }, [nav_route])
+    if(nav === "loading"||cards ==="loading"){
         return null
     }
     return <section className="w-full">
@@ -19,7 +36,7 @@ async function NavIndexPage ({ params }: { params: { nav_route: string } })  {
             <img src={getImgUrl(nav.img_file_name)} alt={nav.name} /></div>
         <div className="grid grid-cols-4 gap-8">
             {
-                data.map(pc => <div key={pc.id}>
+                cards.map(pc => <div key={pc.id}>
                     <ProductCard pc={pc} />
                 </div>)
             }

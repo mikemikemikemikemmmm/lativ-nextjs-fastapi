@@ -11,9 +11,8 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SeriesModal } from "./_components/seriesModal";
 import { ProductCardContainer } from "./_components/productCardsContainer";
-import { dispatchSuccess } from "@/store/method";
 
-export default () => {
+const SubCategoryPage=() => {
     const params = useParams();
     const { nav_route, category_route, sub_category_route } = params
     const [subCategory, setSubCategory] = useState<SubCategoryRead | "loading" | "noSubcategory">("loading")
@@ -29,7 +28,7 @@ export default () => {
     }
     useEffect(() => {
         getSubCategoryByRoute()
-    }, [nav_route])
+    }, [nav_route, category_route, sub_category_route])
     // ----------------------------
     const [series, setSeries] = useState<SeriesRead[]>([])
     const getSeries = async () => {
@@ -110,3 +109,4 @@ export default () => {
         </section >
     </>
 }
+export default SubCategoryPage

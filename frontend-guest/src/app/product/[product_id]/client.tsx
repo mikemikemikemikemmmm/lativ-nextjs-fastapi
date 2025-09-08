@@ -1,7 +1,6 @@
 'use client'
 import { ProductDetailRead, SizeRead, SubProductRead } from "@/types";
 import { getImgUrl } from "@/utils/env";
-import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 export const ProductClient = (props: { product: ProductDetailRead }) => {
@@ -19,7 +18,7 @@ export const ProductClient = (props: { product: ProductDetailRead }) => {
 
     })
     const [size, setSize] = useState<SizeRead>(() => {
-        return subproduct.sizes[0] ||null
+        return subproduct.sizes[0] || null
     })
     const handleColor = (c: SubProductRead) => {
         setSubproduct(c)

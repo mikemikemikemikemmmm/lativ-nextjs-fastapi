@@ -91,10 +91,9 @@ export const SubproductModal = (props: Props) => {
         else {
             setImgUrl(getImgUrl(modalProps.img_file_name))
         }
-    }, [previewImgUrl])
-    const handlePrice = (val: string) => {
-        //@ts-ignore
-        setInput({ ...input, price: val })
+    }, [previewImgUrl,isCreate,modalProps.img_file_name])
+    const handlePrice = (val: unknown) => {
+        setInput({ ...input, price: val as number })
     }
     const handleColor = (val: string) => {
         const num = Number(val)

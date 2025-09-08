@@ -1,22 +1,23 @@
-import { getApi } from '@/api/base';
+'use client'
 import { CategoryAside } from '@/components/categoryAside';
-import { ASIDE_WIDTH, WIDTH } from '@/style/cssConst';
+import { useGetData } from '@/hook/useGetData';
+import { ASIDE_WIDTH } from '@/style/cssConst';
 import { CategoryRead } from '@/types';
-
-export default async function Layout({
-    children, params
+import { useParams } from 'next/navigation';
+export default function Layout({
+    children
 }: {
-    children: React.ReactNode, params: { product_id: string }
+    children: React.ReactNode
 }) {
-    const { product_id } = await params
-    const { data, error } = await getApi<CategoryRead[]>(`categorys?product_id=${product_id}`)
-    if (error) {
+    const { product_id } = useParams()
+    const [_, categorys] = useGetData<CategoryRead>(`categorys?product_id=${product_id}`)
+    if (categorys === "loading" || categorys.length === 0) {
         return null
     }
-    
+
     return <section className='flex'>
         <div style={{ width: ASIDE_WIDTH }}>
-            <CategoryAside categorys={data} navRoute={data[0].nav_route} />
+            <CategoryAside categorys={categorys} navRoute={categorys[0].nav_route} />
         </div>
         <div className='flex-1'>{children}</div>
 

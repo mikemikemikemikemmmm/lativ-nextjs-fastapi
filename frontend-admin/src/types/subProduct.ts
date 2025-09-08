@@ -1,4 +1,3 @@
-import { SizeRead } from "./size"
 
 export interface SubProductRead {
     id: number

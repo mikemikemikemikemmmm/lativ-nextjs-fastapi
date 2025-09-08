@@ -1,5 +1,6 @@
-'use client'
-export default () => {
 
-    return null
+const NavIndexPage = () => {
+  return null
 }
+
+export default NavIndexPage

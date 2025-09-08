@@ -1,6 +1,6 @@
 import { Theme } from "@emotion/react";
 import { SxProps, TextField, TextFieldProps } from "@mui/material";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 interface Props<T> {
   label: string;
@@ -25,7 +25,7 @@ export const InputWrapper = <T extends string | number>(props: Props<T>) => {
     if (typeof value === "number") {
       if (val === "") {
         // 清空情況，交給外部處理（這裡我先傳空字串）
-        onChange("" as any as T);
+        onChange("" as T);
         setError(false);
         setHelperText("");
         return;

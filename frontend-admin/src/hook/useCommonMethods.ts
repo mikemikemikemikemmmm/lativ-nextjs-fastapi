@@ -2,7 +2,6 @@ import { errorHandler } from "@/utils/errorHandler"
 import { useState } from "react"
 import { useDrag } from "./useDrag"
 import { deleteApi, putApi } from "@/api/base"
-import { dispatchSuccess } from "@/store/method"
 
 export function useCommonMethods<T>(emptyData: T, apiPrefix: string, refresh: () => void) {
     const [modalProps, setModalProps] = useState<T | null>(null)

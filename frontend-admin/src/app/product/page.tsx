@@ -5,7 +5,7 @@ import { ProductCardRead } from "@/types/product"
 import { errorHandler } from "@/utils/errorHandler"
 import { useEffect, useState } from "react"
 
-export default () => {
+const ProductListPage =() => {
     const [searchStr, setSearchStr] = useState("")
     const handleSearch = async (query: string) => {
         const api = query === "" ? getApi<ProductCardRead[]>(`product_card/`) : getApi<ProductCardRead[]>(`product_card/?product_name=${query}`)
@@ -46,3 +46,4 @@ export default () => {
 
     </section >
 }
+export default ProductListPage

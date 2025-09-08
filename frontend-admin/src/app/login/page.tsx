@@ -1,13 +1,13 @@
-"use client"; // 如果用 App Router
-
+"use client";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation"; // App Router
+import { useRouter } from "next/navigation";
 import { baseFetch } from "@/api/base";
 import { errorHandler } from "@/utils/errorHandler";
 import { dispatchError } from "@/store/method";
 import { TOKEN_KEY } from "@/utils/constant";
 import { verifyToken } from "@/utils/verifyToken";
 import { setToken } from "@/utils/localstorage";
+import { isServerComponent } from "@/utils/env";
 interface Token { "access_token": string, "token_type": string }
 export default function LoginPage() {
   const [password, setPassword] = useState("");
@@ -31,7 +31,7 @@ export default function LoginPage() {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
-      body:formData
+      body: formData
     },
       "登入",
       true,
@@ -65,7 +65,7 @@ export default function LoginPage() {
     router.push("/");
   }
   const checkToken = async () => {
-    const token = localStorage.getItem(TOKEN_KEY)
+    const token = isServerComponent || localStorage.getItem(TOKEN_KEY)
     if (!token) {
       return
     }

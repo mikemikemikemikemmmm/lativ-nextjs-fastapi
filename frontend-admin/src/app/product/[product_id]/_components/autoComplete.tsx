@@ -1,5 +1,4 @@
 import { getImgUrl } from "@/utils/env";
-import Link from "next/link";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 
 
@@ -12,7 +11,7 @@ const debounceMS = 500
 export function Autocomplete<T extends { name: string, img_url: string, id: number }>({ fetchData, onSelect }: AutocompleteProps<T>) {
     const [inputValue, setInputValue] = useState<string>("");
     const [results, setResults] = useState<T[]>([]);
-    const [loading, setLoading] = useState<boolean>(false);
+    // const [loading, setLoading] = useState<boolean>(false);
     const [highlightIndex, setHighlightIndex] = useState<number>(-1);
     const [showDropdown, setShowDropdown] = useState<boolean>(false);
     const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -26,14 +25,14 @@ export function Autocomplete<T extends { name: string, img_url: string, id: numb
                 setResults([]);
                 return;
             }
-            setLoading(true);
+            // setLoading(true);
             try {
                 const data = await fetchData(value);
                 setResults(data);
             } catch (err) {
                 console.error(err);
             } finally {
-                setLoading(false);
+                // setLoading(false);
             }
         }, debounceMS);
     }, [fetchData]);
@@ -66,7 +65,7 @@ export function Autocomplete<T extends { name: string, img_url: string, id: numb
     };
 
     return (
-        <div className="relative inline-block w-64" tabIndex={0} onBlur={e => {
+        <div className="relative inline-block w-64" tabIndex={0} onBlur={()=> {
             setShowDropdown(false)
         }}>
             <input
