@@ -1,72 +1,9 @@
 from fastapi import APIRouter
 from src.db import SessionDepend
-from sqlalchemy import text, func, and_
-from src.models.product import ProductModel
-from src.models.subProduct import SubProductModel
-from src.models.gender import GenderModel
-from typing import Optional
+from sqlalchemy import text
 
 product_card_router = APIRouter()
 
-
-# @product_card_router.get("/")
-# def get_cards(
-#     db: SessionDepend,
-#     color_id: int | None = None,
-#     series_id: int | None = None,
-#     product_name: str | None = None,
-# ):
-#     query = db.query(
-#         ProductModel.id,
-#         ProductModel.name,
-#         ProductModel.series_id,
-#         ProductModel.img_url,
-#         GenderModel.id.label("gender_id"),
-#         GenderModel.name.label("gender_name"),
-#         func.count(SubProductModel.id).label("sub_product_count"),
-#     ).join(GenderModel, ProductModel.gender_id == GenderModel.id)
-
-#     # LEFT JOIN sub_ProductModel
-#     if color_id:
-#         subq = (
-#             db.query(ProductModel.id)
-#             .join(
-#                 SubProductModel,
-#                 and_(
-#                     SubProductModel.color_id == color_id,
-#                     SubProductModel.product_id == ProductModel.id,
-#                 ),
-#             )
-#             .subquery()  # <- 這裡變成子查詢
-#         )
-#         query.join(subq, subq.c.id == ProductModel.id)
-#     elif series_id:
-#         query.outerjoin(SubProductModel, SubProductModel.product_id == ProductModel.id)
-#         query = query.filter(ProductModel.series_id == series_id)
-#     elif product_name:
-#         query.outerjoin(SubProductModel, SubProductModel.product_id == ProductModel.id)
-#         query = query.filter(ProductModel.name.ilike(f"%{product_name}%"))
-
-#     # 分組與排序
-#     query = query.group_by(ProductModel.id, GenderModel.id, GenderModel.name).order_by(
-#         ProductModel.order
-#     )
-#     print(str(query))
-#     result = query.all()
-
-#     # 轉成 dict
-#     return [
-#         {
-#             "id": r.id,
-#             "name": r.name,
-#             "series_id": r.series_id,
-#             "img_url": r.img_url,
-#             "gender_id": r.gender_id,
-#             "gender_name": r.gender_name,
-#             "sub_product_count": r.sub_product_count,
-#         }
-#         for r in result
-#     ]
 
 
 def add_common_query(query_str: str):

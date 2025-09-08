@@ -7,14 +7,15 @@ import { errorHandler } from "@/utils/errorHandler"
 import Image from "next/image"
 import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
-Image
+import { NotFoundUI } from "@/components/notFound"
 function NavIndexPage() {
     const { nav_route } = useParams()
-    const [nav, setNav] = useState<NavRead| "loading">("loading")
+    const [nav, setNav] = useState<NavRead| "loading"|"notFound">("loading")
     const getData = async () => {
         const { data, error } = await getApi<NavRead>(`navs/${nav_route}`)
         if (error) {
-            return errorHandler(error)
+            setNav("notFound")
+            return
         }
         setNav(data)
     }
@@ -32,6 +33,9 @@ function NavIndexPage() {
     useEffect(() => { getCards() }, [nav_route])
     if(nav === "loading"||cards ==="loading"){
         return null
+    }
+    if(nav === "notFound"){
+        return <NotFoundUI/>
     }
     return <section className="w-full">
         <div className="w-full mb-10">

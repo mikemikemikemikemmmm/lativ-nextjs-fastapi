@@ -5,19 +5,24 @@ import { ProductDetailRead } from "@/types"
 import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { errorHandler } from "@/utils/errorHandler"
+import { NotFoundUI } from "@/components/notFound"
 function ProductPage() {
     const { product_id } = useParams()
-    const [pd, setPd] = useState<ProductDetailRead | "loading">("loading")
+    const [pd, setPd] = useState<ProductDetailRead | "loading"|"notFound">("loading")
     const getPd = async () => {
         const { data, error } = await getApi<ProductDetailRead>(`products?product_id=${product_id}`)
         if (error) {
-            return errorHandler(error)
+            setPd("notFound")
+            return
         }
         setPd(data)
     }
     useEffect(() => { getPd() }, [product_id])
     if (pd === 'loading') {
         return null
+    }
+    if(pd === "notFound"){
+        return <NotFoundUI/>
     }
     return <ProductClient product={pd} />
 }

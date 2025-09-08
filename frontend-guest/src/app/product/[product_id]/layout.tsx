@@ -1,5 +1,6 @@
 'use client'
 import { CategoryAside } from '@/components/categoryAside';
+import { NotFoundUI } from '@/components/notFound';
 import { useGetData } from '@/hook/useGetData';
 import { ASIDE_WIDTH } from '@/style/cssConst';
 import { CategoryRead } from '@/types';
@@ -11,10 +12,12 @@ export default function Layout({
 }) {
     const { product_id } = useParams()
     const [_, categorys] = useGetData<CategoryRead>(`categorys?product_id=${product_id}`)
-    if (categorys === "loading" || categorys.length === 0) {
+    if (categorys === "loading") {
         return null
     }
-
+    if(categorys.length === 0){
+        return <NotFoundUI/>
+    }
     return <section className='flex'>
         <div style={{ width: ASIDE_WIDTH }}>
             <CategoryAside categorys={categorys} navRoute={categorys[0].nav_route} />

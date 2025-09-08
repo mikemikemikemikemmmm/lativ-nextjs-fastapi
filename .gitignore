@@ -1,5 +1,6 @@
 *.env*
 *.aws*
+*logs*
 .vscode
 .ruff_cache
 # =========================

@@ -1,4 +1,5 @@
 'use client'
+import { NotFoundUI } from "@/components/notFound"
 import { ProductCard } from "@/components/productCard"
 import { useGetData } from "@/hook/useGetData"
 import { SeriesRead } from "@/types"
@@ -12,7 +13,7 @@ function SubCategoryPage() {
         return null
     }
     if (series.length <= 0) {
-        return <div>無資料</div>
+            return <NotFoundUI/>
     }
     return <div>
         <div className="text-[22px] my-6 font-extrabold">

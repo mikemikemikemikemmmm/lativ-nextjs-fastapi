@@ -1,10 +1,6 @@
 import "../style/globals.css";
 import { WIDTH } from "@/style/cssConst";
 import { NavHeader } from "./navHeader";
-import { getApi } from "@/api/base";
-import { errorHandler } from "@/utils/errorHandler";
-import { NavRead } from "@/types";
-import { ENV } from "@/utils/env";
 
 export default function RootLayout({
   children

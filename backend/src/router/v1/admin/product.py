@@ -152,4 +152,6 @@ def get_all(db: SessionDepend, productId: int):
     """)
 
     result = db.execute(stmt, {"productId": productId}).mappings().first()
+    if not result:
+        return ErrorHandler.raise_404_not_found()
     return result
