@@ -1,6 +1,7 @@
 'use client'
 import { ProductDetailRead, SizeRead, SubProductRead } from "@/types";
 import { getImgUrl } from "@/utils/env";
+import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 export const ProductClient = (props: { product: ProductDetailRead }) => {
@@ -29,7 +30,7 @@ export const ProductClient = (props: { product: ProductDetailRead }) => {
     return <div>
         <div className="flex">
             <div>
-                <img width={500} height={500} src={getImgUrl(subproduct.img_file_name)} alt={product.name} />
+                <Image width={500} height={500} src={getImgUrl(subproduct.img_file_name)} alt={product.name} />
             </div>
             <div className="flex-1">
                 <div>
@@ -42,7 +43,7 @@ export const ProductClient = (props: { product: ProductDetailRead }) => {
                 <div className="mb-3">
                     {
                         product.sub_products.map(sp => <div onClick={() => handleColor(sp)} className={`${sp.id === subproduct.id ? "border-black" : "border-white"} border mr-2 hover:cursor-pointer inline-block`} key={sp.id}>
-                            <img src={getImgUrl(sp.color_img_file_name)} alt={sp.color_name} width={24} height={24} />
+                            <Image src={getImgUrl(sp.color_img_file_name)} alt={sp.color_name} width={24} height={24} />
                         </div>)
                     }
                 </div>

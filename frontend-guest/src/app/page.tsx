@@ -1,17 +1,4 @@
 'use client'
-// import carouselImg0 from "/indexPage/carousel/0.jpg"
-// import carouselImg1 from "/indexPage/carousel/1.jpg"
-// import carouselImg2 from "/indexPage/carousel/2.jpg"
-// import carouselImg3 from "/indexPage/carousel/3.jpg"
-// import commentImg1 from "/indexPage/comment1.gif"
-// import commentImg2 from "/indexPage/comment2.gif"
-// import commentImg3 from "/indexPage/comment3.gif"
-// import commentImg4 from "/indexPage/comment4.gif"
-// import commentImg5 from "/indexPage/comment5.gif"
-// import streamImg1 from "/indexPage/stream1.jpg"
-// import streamImg2 from "/indexPage/stream2.jpg"
-// import streamImg3 from "/indexPage/stream3.jpg"
-// import streamImg4 from "/indexPage/stream4.jpg"
 import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import React from 'react';

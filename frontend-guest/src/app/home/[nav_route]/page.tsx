@@ -4,8 +4,10 @@ import { ProductCard } from "@/components/productCard"
 import { NavRead, ProductCardRead } from "@/types"
 import { getImgUrl } from "@/utils/env"
 import { errorHandler } from "@/utils/errorHandler"
+import Image from "next/image"
 import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
+Image
 function NavIndexPage() {
     const { nav_route } = useParams()
     const [nav, setNav] = useState<NavRead| "loading">("loading")
@@ -33,7 +35,7 @@ function NavIndexPage() {
     }
     return <section className="w-full">
         <div className="w-full mb-10">
-            <img src={getImgUrl(nav.img_file_name)} alt={nav.name} /></div>
+            <Image height={400} width={1010} src={getImgUrl(nav.img_file_name)} alt={nav.name} /></div>
         <div className="grid grid-cols-4 gap-8">
             {
                 cards.map(pc => <div key={pc.id}>
