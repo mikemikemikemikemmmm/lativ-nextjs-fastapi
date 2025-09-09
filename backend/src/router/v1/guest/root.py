@@ -320,7 +320,6 @@ def get_product_detail(db: SessionDepend, product_id: int):
         .mappings()
         .first()
     )
-    print(result,11)
     if not result:
         return ErrorHandler.raise_404_not_found()
     return result

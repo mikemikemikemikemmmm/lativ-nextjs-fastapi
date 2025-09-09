@@ -6,16 +6,7 @@ from src.setting import is_dev_environment
 from src.router.root import root_router
 from src.middleware._global import setup_global_middleware
 from src.errorHandler._global import setup_global_error_handler
-import sys
-from src.log import logger
-
-def handle_exception(exc_type, exc_value, exc_traceback):
-    if issubclass(exc_type, KeyboardInterrupt):
-        sys.__excepthook__(exc_type, exc_value, exc_traceback)
-        return
-    logger.critical("Unhandled exception", exc_info=(exc_type, exc_value, exc_traceback))
-
-sys.excepthook = handle_exception
+from src.log import setup_logger
 
 
 is_dev = is_dev_environment()
@@ -29,3 +20,4 @@ app = FastAPI(
 app.include_router(root_router)
 setup_global_error_handler(app)
 setup_global_middleware(app)
+setup_logger()
