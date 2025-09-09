@@ -15,6 +15,8 @@ class Settings(BaseSettings):
     admin_password:str = os.getenv("ADMIN_PASSWORD","")
     jwt_key:str = os.getenv("JWT_KEY","")
     monitor_origin:str = os.getenv("MONITOR_ORIGIN","")
+    log_dir:str = os.getenv("LOG_DIR","")
+    monitor_check_url:str = os.getenv("MONITOR_CHECK_URL","")
 
 settings = Settings()
 
