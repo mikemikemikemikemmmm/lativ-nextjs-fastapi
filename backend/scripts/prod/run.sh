@@ -65,7 +65,7 @@ sudo systemctl daemon-reload
 # 啟動服務
 echo "啟動 $MONITOR_SERVICE_NAME 服務..."
 sudo systemctl start "$MONITOR_SERVICE_NAME"
-
+ 
 # 檢查服務狀態
 echo "檢查 $MONITOR_SERVICE_NAME 服務..."
 sudo systemctl status "$MONITOR_SERVICE_NAME"
