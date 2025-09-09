@@ -2,7 +2,6 @@ import os
 from dotenv import load_dotenv
 from pathlib import Path
 
-
 def load_env():
     environment = os.getenv("ENVIRONMENT")
     if not environment:

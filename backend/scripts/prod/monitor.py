@@ -38,24 +38,23 @@ if "" in [EMAIL_FROM, EMAIL_PASSWORD, EMAIL_TO, MONITOR_CHECK_URL,LOG_DIR]:
     raise EnvironmentError("環境變數有空值")
 
 # ---------- 日誌設定 ----------
-logger = logging.getLogger("monitor")
 
+class LoggerWriter:
+    def __init__(self, level):
+        self.level = level
+    def write(self, message):
+        if message.strip():  # 避免空行
+            self.level(message.strip())
+    def flush(self):
+        pass
 
-def set_log():
-    logger.setLevel(logging.INFO)
-    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-
-    # 控制台輸出
-    console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setFormatter(formatter)
-    logger.addHandler(console_handler)
-
-    # 檔案輸出
-    os.makedirs(LOG_DIR, exist_ok=True)
-    file_handler = logging.FileHandler(os.path.join(LOG_DIR, "monitor.log"))
-    file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
-
+def setup_logging():
+    sys.stdout = LoggerWriter(logging.info)
+    sys.stderr = LoggerWriter(logging.error)
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s'
+    )
 
 # ---------- 郵件發送 ----------
 def send_email(subject: str, content: str):
@@ -72,7 +71,7 @@ def send_email(subject: str, content: str):
             server.login(EMAIL_FROM, EMAIL_PASSWORD)
             server.send_message(msg)
     except Exception as e:
-        logger.error(f"無法發送郵件: {e}")
+        print(f"無法發送郵件: {e}")
 
 
 # ---------- URL 健康檢查 ----------
@@ -81,7 +80,7 @@ def check_url():
         response = requests.get(MONITOR_CHECK_URL, timeout=10)
         if response.status_code != 200:
             msg = f"Status code: {response.status_code}"
-            logger.error(msg)
+            print(msg)
             send_email("fake-lativ系統已崩潰", msg)
     except Exception as e:
         send_email("fake-lativ監控系統出錯", f"{e}")
@@ -91,16 +90,16 @@ def check_url():
 def run():
     scheduler = BlockingScheduler()
     scheduler.add_job(check_url, "interval", minutes=1, id="check_health")
-    logger.info("Scheduler started")
+    print("Scheduler started")
     scheduler.start()
 
 
 # ---------- 主程式 ----------
 if __name__ == "__main__":
     print("Monitor service started")
-    set_log()
+    setup_logging()
     try:
         send_email("fake-lativ監控系統已重啟", "")
         run()
     except Exception:
-        logger.exception("Monitor service stopped unexpectedly")
+        print("Monitor service stopped unexpectedly")
