@@ -84,7 +84,7 @@ if __name__ == "__main__":
     if not dotenv_file_path.exists():
         raise FileNotFoundError(f"Env file not exist: {dotenv_file_path} , time :{now}")
     load_dotenv(dotenv_file_path)
-
+ 
     EMAIL_FROM = os.getenv("EMAIL_FROM", "")
     EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD", "")
     EMAIL_TO = os.getenv("EMAIL_TO", "")
