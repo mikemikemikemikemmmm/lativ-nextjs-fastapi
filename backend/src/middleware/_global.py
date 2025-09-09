@@ -26,9 +26,10 @@ def setup_global_middleware(app: FastAPI):
     setting = get_settings()
     allow_origin = [
         setting.frontend_admin_origin,
-        setting.frontend_admin_origin,
+        setting.frontend_guest_origin,
         setting.monitor_origin,
     ]
+    print("allow_origin",allow_origin)
     app.add_middleware(SecurityMiddleware)
     app.add_middleware(
         CORSMiddleware,
