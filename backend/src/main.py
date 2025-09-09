@@ -7,7 +7,8 @@ from src.router.root import root_router
 from src.middleware._global import setup_global_middleware
 from src.errorHandler._global import setup_global_error_handler
 from datetime import datetime
-
+now = datetime.now()
+print(f"app start，current time :{now}")
 is_dev = is_dev_environment()
 app = FastAPI(
     lifespan=lifespan,
@@ -15,8 +16,6 @@ app = FastAPI(
     redoc_url="/redoc" if is_dev else None,
     openapi_url="/openapi" if is_dev else None,
 )
-now = datetime.now()
-print(f"APP啟動，現在時間 :{now}")
 
 app.include_router(root_router)
 setup_global_error_handler(app)

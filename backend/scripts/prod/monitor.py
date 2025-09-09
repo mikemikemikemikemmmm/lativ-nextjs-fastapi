@@ -73,16 +73,19 @@ def run():
 # ---------- 主程式 ----------
 if __name__ == "__main__":
     now = datetime.now()
-    print(f"現在時間：{now}")
+    print(f"current time：{now}")
     environment = os.getenv("ENVIRONMENT")
     if not environment:
         raise EnvironmentError(f"ENVIRONMENT env not set，time :{now}")
+    print(f"now env：{environment}")
     current_file = Path(__file__).resolve()
     target_dir = current_file.parent.parent.parent
     dotenv_file_name = f".env.{environment}"
     dotenv_file_path = target_dir / dotenv_file_name
     if not dotenv_file_path.exists():
         raise FileNotFoundError(f"Env file not exist: {dotenv_file_path}，time :{now}")
+    load_dotenv(dotenv_file_path)
+
     EMAIL_FROM = os.getenv("EMAIL_FROM", "")
     EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD", "")
     EMAIL_TO = os.getenv("EMAIL_TO", "")
@@ -90,8 +93,7 @@ if __name__ == "__main__":
     LOG_DIR = os.getenv("LOG_DIR", "")
     if "" in [EMAIL_FROM, EMAIL_PASSWORD, EMAIL_TO, MONITOR_CHECK_URL,LOG_DIR]:
         raise EnvironmentError("環境變數有空值")
-    load_dotenv(dotenv_file_path)
-    print(f"環境變數載入成功，現在環境{environment}")
+    print("success load .env file")
     print("Monitor service started")
     setup_log()
     try:
