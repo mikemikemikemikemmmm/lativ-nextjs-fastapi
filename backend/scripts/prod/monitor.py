@@ -16,9 +16,7 @@ logger = logging.getLogger("monitor")
 def setup_log(console_level=logging.INFO, file_level=logging.DEBUG, max_bytes=10*1024*1024, backup_count=5):
     """設定 logger"""
     logger.setLevel(logging.DEBUG)  # 設定 logger 最低等級為 DEBUG，handler 可過濾
-
     formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-
     # 避免重複加入 handler
     if not logger.hasHandlers():
         os.makedirs(LOG_DIR, exist_ok=True)
@@ -73,17 +71,17 @@ def run():
 # ---------- 主程式 ----------
 if __name__ == "__main__":
     now = datetime.now()
-    print(f"current time：{now}")
+    print(f"current time , {now}")
     environment = os.getenv("ENVIRONMENT")
     if not environment:
-        raise EnvironmentError(f"ENVIRONMENT env not set，time :{now}")
-    print(f"now env：{environment}")
+        raise EnvironmentError(f"ENVIRONMENT env not set , time :{now}")
+    print(f"now env , {environment}")
     current_file = Path(__file__).resolve()
     target_dir = current_file.parent.parent.parent
     dotenv_file_name = f".env.{environment}"
     dotenv_file_path = target_dir / dotenv_file_name
     if not dotenv_file_path.exists():
-        raise FileNotFoundError(f"Env file not exist: {dotenv_file_path}，time :{now}")
+        raise FileNotFoundError(f"Env file not exist: {dotenv_file_path} , time :{now}")
     load_dotenv(dotenv_file_path)
 
     EMAIL_FROM = os.getenv("EMAIL_FROM", "")
@@ -91,11 +89,20 @@ if __name__ == "__main__":
     EMAIL_TO = os.getenv("EMAIL_TO", "")
     MONITOR_CHECK_URL = os.getenv("MONITOR_CHECK_URL", "")
     LOG_DIR = os.getenv("LOG_DIR", "")
-    if "" in [EMAIL_FROM, EMAIL_PASSWORD, EMAIL_TO, MONITOR_CHECK_URL,LOG_DIR]:
-        raise EnvironmentError("環境變數有空值")
+    env_vars = {
+        "EMAIL_FROM": EMAIL_FROM,
+        "EMAIL_PASSWORD": EMAIL_PASSWORD,
+        "EMAIL_TO": EMAIL_TO,
+        "MONITOR_CHECK_URL": MONITOR_CHECK_URL,
+        "LOG_DIR": LOG_DIR
+    }
+    empty_vars = [name for name, value in env_vars.items() if not value]
+    if empty_vars:
+        raise EnvironmentError(f"empty value in env: {', '.join(empty_vars)}")
     print("success load .env file")
-    print("Monitor service started")
     setup_log()
+    print("setup log success")
+    print("Monitor service started")
     try:
         send_email("fake-lativ監控系統已重啟", "")
         run()
