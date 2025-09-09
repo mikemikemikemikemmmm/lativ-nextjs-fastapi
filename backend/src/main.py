@@ -6,7 +6,6 @@ from src.setting import is_dev_environment
 from src.router.root import root_router
 from src.middleware._global import setup_global_middleware
 from src.errorHandler._global import setup_global_error_handler
-from src.log import setup_log
 from datetime import datetime
 
 is_dev = is_dev_environment()
@@ -22,4 +21,3 @@ print(f"APP啟動，現在時間 :{now}")
 app.include_router(root_router)
 setup_global_error_handler(app)
 setup_global_middleware(app)
-setup_log()
