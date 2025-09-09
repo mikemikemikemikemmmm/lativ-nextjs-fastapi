@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     s3_bucket_name: str = os.getenv("S3_BUCKET_NAME", "")
     admin_password:str = os.getenv("ADMIN_PASSWORD","")
     jwt_key:str = os.getenv("JWT_KEY","")
+    monitor_origin:str = os.getenv("MONITOR_ORIGIN","")
 
 settings = Settings()
 

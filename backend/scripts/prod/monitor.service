@@ -6,7 +6,7 @@ After=network.target
 User=ubuntu
 Group=ubuntu
 WorkingDirectory=/home/ubuntu/fastapi/backend
-ExecStart=/home/ubuntu/.local/bin/uv run ./scripts/prod/monitor.py
+ExecStart=/home/ubuntu/.local/bin/uv run ./scripts/prod/monitor.py --host 127.0.0.1 --port 8001 --log-level info
 Restart=no
 Environment="ENVIRONMENT=prod"
 Environment="PYTHONUNBUFFERED=1"
