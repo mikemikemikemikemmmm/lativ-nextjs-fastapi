@@ -41,14 +41,6 @@ if "" in [EMAIL_FROM, EMAIL_PASSWORD, EMAIL_TO, MONITOR_CHECK_URL,LOG_DIR]:
 # ---------- 日誌設定 ----------
 logger = logging.getLogger("monitor")
 
-def handle_exception(exc_type, exc_value, exc_traceback):
-    """全域未捕捉例外處理"""
-    if issubclass(exc_type, KeyboardInterrupt):
-        # 保持 Ctrl+C 正常退出
-        sys.__excepthook__(exc_type, exc_value, exc_traceback)
-        return
-    logger.critical("Unhandled exception", exc_info=(exc_type, exc_value, exc_traceback))
-
 def setup_log(console_level=logging.INFO, file_level=logging.DEBUG, max_bytes=10*1024*1024, backup_count=5):
     """設定 logger"""
     logger.setLevel(logging.DEBUG)  # 設定 logger 最低等級為 DEBUG，handler 可過濾
@@ -73,9 +65,6 @@ def setup_log(console_level=logging.INFO, file_level=logging.DEBUG, max_bytes=10
         file_handler.setLevel(file_level)
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
-
-    # 設定全域未捕捉例外處理
-    sys.excepthook = handle_exception
 
 
 # ---------- 郵件發送 ----------
