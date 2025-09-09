@@ -38,23 +38,35 @@ if "" in [EMAIL_FROM, EMAIL_PASSWORD, EMAIL_TO, MONITOR_CHECK_URL,LOG_DIR]:
     raise EnvironmentError("環境變數有空值")
 
 # ---------- 日誌設定 ----------
+import sys
+import logging
 
 class LoggerWriter:
-    def __init__(self, level):
-        self.level = level
+    def __init__(self, level_func):
+        self.level_func = level_func
+        self.buffer = ''
+
     def write(self, message):
-        if message.strip():  # 避免空行
-            self.level(message.strip())
+        # logging 不會自動處理換行，先暫存
+        self.buffer += message
+        while '\n' in self.buffer:
+            line, self.buffer = self.buffer.split('\n', 1)
+            if line.strip():  # 避免空行
+                self.level_func(line.strip())
+
     def flush(self):
-        pass
+        if self.buffer.strip():
+            self.level_func(self.buffer.strip())
+        self.buffer = ''
 
 def setup_logging():
-    sys.stdout = LoggerWriter(logging.info)
-    sys.stderr = LoggerWriter(logging.error)
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s - %(levelname)s - %(message)s'
     )
+    # 先建立 logger，再導向 stdout/stderr
+    sys.stdout = LoggerWriter(logging.getLogger().info)
+    sys.stderr = LoggerWriter(logging.getLogger().error)
 
 # ---------- 郵件發送 ----------
 def send_email(subject: str, content: str):
