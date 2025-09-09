@@ -57,19 +57,13 @@ def check_url():
                 "fake-lativ系統已崩潰",
                 f"Status code: {response.status_code}",
             )
-        else:
-            send_email(
-                "fake-lativ正常運作",
-                "",
-            )
-
     except Exception as e:
         send_email("fake-lativ監控系統出錯", str(e))
 
 
 def run():
     scheduler = BlockingScheduler()
-    scheduler.add_job(check_url, "interval", hours=12)
+    scheduler.add_job(check_url, "interval", hours=1)
     scheduler.start()
 
 
@@ -78,6 +72,7 @@ if __name__ == "__main__":
     print("Monitor service started")
     try:
         send_email("fake-lativ監控系統已重啟", "")
+        check_url()
         run()
     except:
         print("Monitor service stopped")
