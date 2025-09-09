@@ -8,12 +8,14 @@ import smtplib
 from email.message import EmailMessage
 from apscheduler.schedulers.blocking import BlockingScheduler
 from logging.handlers import RotatingFileHandler
+from datetime import datetime
 
 # ---------- 環境變數載入 ----------
 def load_env():
     environment = os.getenv("ENVIRONMENT")
     if not environment:
-        raise EnvironmentError("ENVIRONMENT env not set")
+        now = datetime.now()
+        raise EnvironmentError(f"ENVIRONMENT env not set.time :{now}")
 
     current_file = Path(__file__).resolve()
     target_dir = current_file.parent.parent.parent
