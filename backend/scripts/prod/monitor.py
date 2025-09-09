@@ -51,13 +51,6 @@ def setup_log(console_level=logging.INFO, file_level=logging.DEBUG, max_bytes=10
 
     # 避免重複加入 handler
     if not logger.hasHandlers():
-        # Console handler
-        console_handler = logging.StreamHandler(sys.stdout)
-        console_handler.setLevel(console_level)
-        console_handler.setFormatter(formatter)
-        logger.addHandler(console_handler)
-
-        # File handler with rotation
         os.makedirs(LOG_DIR, exist_ok=True)
         log_file_path = os.path.join(LOG_DIR, "monitor.log")
         
