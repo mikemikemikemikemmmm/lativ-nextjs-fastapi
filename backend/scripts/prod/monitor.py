@@ -72,8 +72,9 @@ def run():
 
 # ---------- 主程式 ----------
 if __name__ == "__main__":
-    environment = os.getenv("ENVIRONMENT")
     now = datetime.now()
+    print(f"現在時間：{now}")
+    environment = os.getenv("ENVIRONMENT")
     if not environment:
         raise EnvironmentError(f"ENVIRONMENT env not set，time :{now}")
     current_file = Path(__file__).resolve()
