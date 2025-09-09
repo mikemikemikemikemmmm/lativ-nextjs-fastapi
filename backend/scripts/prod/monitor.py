@@ -80,6 +80,7 @@ if __name__ == "__main__":
     target_dir = current_file.parent.parent.parent
     dotenv_file_name = f".env.{environment}"
     dotenv_file_path = target_dir / dotenv_file_name
+    print("dotenv_file_path", dotenv_file_path)
     if not dotenv_file_path.exists():
         raise FileNotFoundError(f"Env file not exist: {dotenv_file_path} , time :{now}")
     load_dotenv(dotenv_file_path)
