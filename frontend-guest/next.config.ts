@@ -11,6 +11,7 @@ const nextConfig: NextConfig = {
         search: '',
       },
     ],
+    minimumCacheTTL: 31536000
   },
 };
 

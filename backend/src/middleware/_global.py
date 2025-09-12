@@ -16,9 +16,11 @@ class SecurityMiddleware(BaseHTTPMiddleware):
         response.headers["Permissions-Policy"] = (
             "camera=(), geolocation=(), microphone=()"
         )
-        # https://cdn.jsdelivr.net https://fastapi.tiangolo.com for /docs
-        # csp_str = "default-src 'self'; style-src 'self' https://cdn.jsdelivr.net; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' https://fastapi.tiangolo.com data:;"
-        # response.headers["Content-Security-Policy"] = csp_str
+        # 快取一天
+        response.headers["Cache-Control"] = "public, max-age=86400, s-maxage=86400, stale-while-revalidate=3600"
+        # max-age=86400: 瀏覽器快取 1 天
+        # s-maxage=86400: CDN 或代理快取 1 天
+        # stale-while-revalidate=3600: 過期後仍可在背景更新 1 小時
         return response
 
 
