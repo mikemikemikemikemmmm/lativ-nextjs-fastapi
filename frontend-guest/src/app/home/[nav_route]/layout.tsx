@@ -10,14 +10,10 @@ export default function Layout({
     children: React.ReactNode,
 
 }) {
-    const { nav_route } =  useParams()
-    const [_, categorys] = useGetData<CategoryRead>(`categorys?nav_route=${nav_route}`)
-    if (categorys === "loading") {
-        return null
-    }
+    const { nav_route } = useParams()
     return <section className='flex'>
         <div style={{ width: ASIDE_WIDTH }}>
-            <CategoryAside categorys={categorys} navRoute={nav_route as string} />
+            <CategoryAside navRoute={nav_route as string} />
         </div>
         <div className="flex-1 px-2">{children}</div>
 

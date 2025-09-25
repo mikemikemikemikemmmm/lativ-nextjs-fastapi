@@ -11,16 +11,9 @@ export default function Layout({
     children: React.ReactNode
 }) {
     const { product_id } = useParams()
-    const [_, categorys] = useGetData<CategoryRead>(`categorys?product_id=${product_id}`)
-    if (categorys === "loading") {
-        return null
-    }
-    if(categorys.length === 0){
-        return <NotFoundUI/>
-    }
     return <section className='flex'>
         <div style={{ width: ASIDE_WIDTH }}>
-            <CategoryAside categorys={categorys} navRoute={categorys[0].nav_route} />
+            <CategoryAside productId={product_id as string} />
         </div>
         <div className='flex-1'>{children}</div>
 
