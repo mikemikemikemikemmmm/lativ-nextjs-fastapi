@@ -1,7 +1,6 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends
 from fastapi.security import (
     OAuth2PasswordRequestForm,
-    HTTPBearer,
     HTTPAuthorizationCredentials,
 )
 from src.setting import get_settings

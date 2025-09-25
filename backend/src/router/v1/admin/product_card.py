@@ -5,7 +5,6 @@ from sqlalchemy import text
 product_card_router = APIRouter()
 
 
-
 def add_common_query(query_str: str):
     return (
         """
@@ -30,7 +29,7 @@ def add_common_query(query_str: str):
 
 
 @product_card_router.get("/by_color_id/{color_id}")
-def get_card_by_color_id(db: SessionDepend, color_id: int):
+async def get_card_by_color_id(db: SessionDepend, color_id: int):
     stmt = text(
         add_common_query("""
             INNER JOIN (
@@ -44,13 +43,13 @@ def get_card_by_color_id(db: SessionDepend, color_id: int):
             ON sp.product_id = p.id
         """)
     ).bindparams(color_id=color_id)
-    print(str(stmt))
-    result = db.execute(stmt).mappings().all()
-    return result
+    
+    result = await db.execute(stmt)
+    return result.mappings().all()
 
 
 @product_card_router.get("/by_series_id/{series_id}")
-def get_card_by_series_id(db: SessionDepend, series_id: int):
+async def get_card_by_series_id(db: SessionDepend, series_id: int):
     stmt = text(
         add_common_query("""
         LEFT JOIN sub_product  sp
@@ -59,12 +58,12 @@ def get_card_by_series_id(db: SessionDepend, series_id: int):
         """)
     ).bindparams(series_id=series_id)
 
-    result = db.execute(stmt).mappings().all()
-    return result
+    result = await db.execute(stmt)
+    return result.mappings().all()
 
 
 @product_card_router.get("/by_product_name/{product_name}")
-def get_by_product_name(db: SessionDepend, product_name: str):
+async def get_by_product_name(db: SessionDepend, product_name: str):
     stmt = text(
         add_common_query("""
         LEFT JOIN sub_product sp
@@ -72,12 +71,13 @@ def get_by_product_name(db: SessionDepend, product_name: str):
         WHERE p.name LIKE :product_name
         """)
     ).bindparams(product_name=f"%{product_name}%")
-    result = db.execute(stmt).mappings().all()
-    return result
+
+    result = await db.execute(stmt)
+    return result.mappings().all()
 
 
 @product_card_router.get("/")
-def get_cards(
+async def get_cards(
     db: SessionDepend,
     series_id: int | None = None,
     color_id: int | None = None,
@@ -121,5 +121,5 @@ def get_cards(
          """) + " LIMIT 5"
         )
 
-    result = db.execute(stmt).mappings().all()
-    return result
+    result = await db.execute(stmt)
+    return result.mappings().all()

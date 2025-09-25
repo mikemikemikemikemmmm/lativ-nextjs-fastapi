@@ -81,9 +81,16 @@ export default function Color() {
           </button>
         }
       </div>
-      <div>
+      {
+        cards.length === 0 &&
+        <div className="mp2 border inline-block">
+          尚無使用此顏色之產品
+        </div>
+
+      }
+      <div className=" grid grid-cols-8">
         {
-          cards.map(c => <div key={c.id} className="inline-block w-1/8">
+          cards.map(c => <div key={c.id} className="inline-flex">
             <ProductCard pc={c} />
           </div>)
         }

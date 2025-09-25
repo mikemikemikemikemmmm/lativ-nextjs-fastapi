@@ -1,17 +1,16 @@
 from fastapi import APIRouter, File, Form, UploadFile
 from src.db import SessionDepend
-from src.models.color import ColorModel, UpdateSchema
-from src.service.common import common_service
+from src.models.color import ColorModel
 from src.errorHandler._global import ErrorHandler
 from src.service.img import upload_img_to_s3, delete_img_from_s3
 from sqlalchemy import text
 from typing import Optional
-
+from sqlalchemy import select
 color_router = APIRouter()
 
 
 @color_router.get("/")
-def get_all(db: SessionDepend):
+async def get_all(db: SessionDepend):
     stmt = text("""
         SELECT 
             c.id,
@@ -23,12 +22,12 @@ def get_all(db: SessionDepend):
             ON sp.color_id = c.id 
         GROUP BY c.id,c.name,c.img_url
     """)
-    return db.execute(stmt).mappings().all()
+    return (await db.execute(stmt)).mappings().all()
     # return common_service.get_all(db, ColorModel)
 
 
 @color_router.post("/")
-def create_one(
+async def create_one(
     db: SessionDepend,
     color_name: str = Form(...),
     file: UploadFile = File(None),
@@ -40,8 +39,8 @@ def create_one(
     try:
         new_data = ColorModel(name=color_name, img_url=obj_file_name)
         db.add(new_data)
-        db.commit()
-        db.refresh(new_data)
+        await db.commit()
+        await db.refresh(new_data)
         return new_data
     except Exception as e:
         print(e)
@@ -53,7 +52,7 @@ def create_one(
 
 
 @color_router.put("/{id}")
-def update_one(
+async def update_one(
     id: int,
     db: SessionDepend,
     color_name: str = Form(...),
@@ -61,7 +60,9 @@ def update_one(
 ):
     try:
         # 先查找既有資料
-        item = db.query(ColorModel).filter(ColorModel.id == id).first()
+        stmt = select(ColorModel).where(ColorModel.id == id)
+        result = await db.execute(stmt)
+        item = result.scalars().first()
         if not item:
             return ErrorHandler.raise_404_not_found("物件不存在")
 
@@ -84,8 +85,8 @@ def update_one(
         # 更新欄位
         item.name = color_name
 
-        db.commit()
-        db.refresh(item)
+        await db.commit()
+        await db.refresh(item)
         return item
 
     except Exception as e:
@@ -94,8 +95,10 @@ def update_one(
 
 
 @color_router.delete("/{id}")
-def delete_one(db: SessionDepend, id: int):
-    item = db.query(ColorModel).filter(ColorModel.id == id).first()
+async def delete_one(db: SessionDepend, id: int):
+    stmt = select(ColorModel).where(ColorModel.id == id)
+    result = await db.execute(stmt)
+    item = result.scalars().first()
     if not item:
         return ErrorHandler.raise_404_not_found("物件不存在")
     # 刪除 S3 圖片
@@ -107,10 +110,10 @@ def delete_one(db: SessionDepend, id: int):
 
     # 刪除資料庫記錄
     try:
-        db.delete(item)
-        db.commit()
+        await db.delete(item)
+        await db.commit()
         return True
     except Exception as e:
-        db.rollback()
+        await db.rollback()
         print(e)
         return ErrorHandler.raise_500_server_error(detail="刪除失敗")

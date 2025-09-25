@@ -1,11 +1,12 @@
-from sqlalchemy.orm import Session
-from sqlalchemy import select, func, update, case
+from sqlalchemy.orm import selectinload
+from sqlalchemy import select, func
 from typing import Type, TypeVar, Sequence, Callable
 from pydantic import BaseModel as BasePydanticSchema
 import random
 
 from src.models.base import BaseSQLModel
 from src.errorHandler._global import ErrorHandler
+from sqlalchemy.ext.asyncio import AsyncSession
 
 BaseSQLModelType = Type[BaseSQLModel]
 ModelType = TypeVar("ModelType", bound=BaseSQLModelType)
@@ -23,61 +24,71 @@ def is_model_has_order(model: ModelType):
 
 class common_service:
     @staticmethod
-    def get_all(session: Session, model: ModelType) -> Sequence[ModelType]:
+    async def get_all(session: AsyncSession, model: ModelType) -> Sequence[ModelType]:
         if is_model_has_order(model):
-            return session.execute(select(model).order_by(model.order)).scalars().all()
-        return session.execute(select(model)).scalars().all()
+            result = await session.execute(select(model).order_by(model.order))
+        else:
+            result = await session.execute(select(model))
+        return result.scalars().all()
 
     @staticmethod
-    def get_by_id(session: Session, model: ModelType, id: int) -> ModelType:
-        item = session.execute(select(model).where(model.id == id)).scalar()
+    async def get_by_id(session: AsyncSession, model: ModelType, id: int) -> ModelType:
+        result = await session.execute(select(model).where(model.id == id))
+        item = result.scalar()
         if not item:
             return ErrorHandler.raise_404_not_found()
         return item
 
     @staticmethod
-    def delete_one_by_id(session: Session, model: ModelType, id: int):  # type: ignore
-        item = session.execute(select(model).where(model.id == id)).scalar()
+    async def delete_one_by_id(session: AsyncSession, model: ModelType, id: int):  # type: ignore
+        result = await session.execute(select(model).where(model.id == id))
+        item = result.scalar()
         if not item:
             return ErrorHandler.raise_404_not_found()
-        session.delete(item)
-        session.commit()
+        await session.delete(item)
+        await session.commit()
         return id
 
     @staticmethod
-    def create_one(session: Session, model: ModelType, create_data: CreateSchemaType):
+    async def create_one(session: AsyncSession, model: ModelType, create_data: CreateSchemaType):
         if is_model_has_order(model):
-            target_order = common_service.get_max_order(session, model)
+            target_order = await common_service.get_max_order(session, model)
             new_data = model(
                 **create_data.model_dump(exclude_unset=True), order=target_order
             )
         else:
             new_data = model(**create_data.model_dump(exclude_unset=True))
         session.add(new_data)
-        session.commit()
-        session.refresh(new_data)
+        await session.commit()
+        await session.refresh(new_data)
         return new_data
 
     @staticmethod
-    def update_one_by_id(
-        session: Session, model: ModelType, updated_data: UpdateSchemaType, id: int
+    async def update_one_by_id(
+        session: AsyncSession, model: ModelType, updated_data: UpdateSchemaType, id: int
     ):
-        item = session.execute(select(model).where(model.id == id)).scalar()
+        result = await session.execute(select(model).where(model.id == id))
+        item = result.scalar()
         if not item:
             return ErrorHandler.raise_404_not_found()
         updated_data_dict = updated_data.model_dump(exclude_unset=True)
         for key, value in updated_data_dict.items():
             if hasattr(item, key):
                 setattr(item, key, value)
-        session.commit()
-        session.refresh(item)
+        await session.commit()
+        await session.refresh(item)
         return item
 
     @staticmethod
-    def switch_order(db: Session, model: ModelType, id1: int, id2: int):
+    async def switch_order(db: AsyncSession, model: ModelType, id1: int, id2: int):
         try:
-            item1 = db.query(model).filter_by(id=id1).one()
-            item2 = db.query(model).filter_by(id=id2).one()
+            result1 = await db.execute(select(model).where(model.id == id1))
+            item1 = result1.scalar_one_or_none()
+            result2 = await db.execute(select(model).where(model.id == id2))
+            item2 = result2.scalar_one_or_none()
+
+            if not item1 or not item2:
+                return ErrorHandler.raise_500_server_error("Items not found")
         except Exception:
             return ErrorHandler.raise_500_server_error("Items not found")
         try:
@@ -88,30 +99,31 @@ class common_service:
             while random_int == item1.order:
                 random_int = generate_random_int()
             item2.order = random_int
-            db.flush()
+            await db.flush()
             item1.order = item2_temp_order
             item2.order = item1_temp_order
-            db.commit()
+            await db.commit()
         except Exception:
-            db.rollback()
+            await db.rollback()
             return ErrorHandler.raise_500_server_error("Failed to switch order")
         return True
 
     @staticmethod
-    def get_max_order(db: Session, model: ModelType):
-        if not model.order:
+    async def get_max_order(db: AsyncSession, model: ModelType):
+        if not getattr(model, "order", None):
             return ErrorHandler.raise_500_server_error("Items not found")
-        max_order = db.query(func.max(model.order)).scalar()
+        result = await db.execute(select(func.max(model.order)))
+        max_order = result.scalar()
 
-        # 如果表是空的，max_order 會是 None，所以要處理
         next_order = (max_order or 0) + 1
         return next_order
 
     @staticmethod
-    def delete_one_with_img(
-        db: Session, model: ModelType, id: int, cb: Callable[[ModelType], None] | None
+    async def delete_one_with_img(
+        db: AsyncSession, model: ModelType, id: int, cb: Callable[[ModelType], None] | None
     ):
-        item = db.query(model).filter(model.id == id).first()
+        result = await db.execute(select(model).where(model.id == id))
+        item = result.scalar_one_or_none()
         if not item:
             return ErrorHandler.raise_404_not_found("物件不存在")
 
@@ -125,11 +137,10 @@ class common_service:
         try:
             if cb:
                 cb(item)
-            # 再刪掉主表
-            db.delete(item)
-            db.commit()
+            await db.delete(item)
+            await db.commit()
             return True
         except Exception as e:
-            db.rollback()
+            await db.rollback()
             print(e)
             return ErrorHandler.raise_500_server_error(detail="刪除物件失敗")
