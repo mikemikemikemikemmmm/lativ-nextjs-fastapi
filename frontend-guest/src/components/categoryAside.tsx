@@ -3,9 +3,6 @@ import { CategoryRead } from "@/types"
 import Link from "next/link"
 export const CategoryAside = (props: { navRoute?: string, productId?: string }) => {
     const { navRoute, productId } = props
-    if (!navRoute && !productId) {
-        return null
-    }
     const getApiUrl = navRoute ? `categorys?nav_route=${navRoute}` : `categorys?product_id=${productId}`
     const [_, categorys] = useGetData<CategoryRead>(getApiUrl)
     if (categorys === 'loading') {
