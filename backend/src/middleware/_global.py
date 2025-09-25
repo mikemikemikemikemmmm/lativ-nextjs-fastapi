@@ -3,8 +3,7 @@ from starlette.middleware.base import RequestResponseEndpoint
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 from src.setting import get_settings
-from src.utils.env import is_dev_environment
-
+import time
 
 class SecurityMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint):
@@ -17,10 +16,20 @@ class SecurityMiddleware(BaseHTTPMiddleware):
             "camera=(), geolocation=(), microphone=()"
         )
         # 快取一天
-        # response.headers["Cache-Control"] = "public, max-age=86400, s-maxage=86400, stale-while-revalidate=3600"
+        response.headers["Cache-Control"] = "public, max-age=86400, s-maxage=86400, stale-while-revalidate=3600"
         # max-age=86400: 瀏覽器快取 1 天
         # s-maxage=86400: CDN 或代理快取 1 天
         # stale-while-revalidate=3600: 過期後仍可在背景更新 1 小時
+        return response
+
+
+class TimerMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint):
+        start_time = time.time()  # 記錄開始時間
+        response = await call_next(request)  # 執行路由
+        end_time = time.time()  # 記錄結束時間
+        duration = end_time - start_time  # 計算時間差
+        response.headers["X-Process-Time"] = str(duration)  # 可選，將時間加入 header
         return response
 
 
@@ -33,6 +42,7 @@ def setup_global_middleware(app: FastAPI):
     ]
     print("allow_origin",allow_origin)
     app.add_middleware(SecurityMiddleware)
+    app.add_middleware(TimerMiddleware)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=allow_origin,
