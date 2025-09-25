@@ -48,16 +48,25 @@ def send_email(subject: str, content: str):
         print(f"無法發送郵件: {e}")
 
 
-# ---------- URL 健康檢查 ----------
+# ---------- URL 健康檢查 ----------# ---------- 錯誤計數 ----------
+error_count = 0
+MAX_EMAILS = 3  # 最多發三封
+
 def check_url():
+    global error_count
     try:
         response = requests.get(MONITOR_CHECK_URL, timeout=10)
         if response.status_code != 200:
             msg = f"Status code: {response.status_code}"
             print(msg)
-            send_email("fake-lativ系統已崩潰", msg)
+            if error_count < MAX_EMAILS:
+                send_email("fake-lativ系統已崩潰", msg)
+                error_count += 1
     except Exception as e:
-        send_email("fake-lativ監控系統出錯", f"{e}")
+        print(f"Exception: {e}")
+        if error_count < MAX_EMAILS:
+            send_email("fake-lativ監控系統出錯", f"{e}")
+            error_count += 1
 
 
 # ---------- 排程 ----------
