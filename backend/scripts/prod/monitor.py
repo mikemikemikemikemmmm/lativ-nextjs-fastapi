@@ -72,7 +72,7 @@ def check_url():
 # ---------- 排程 ----------
 def run():
     scheduler = BlockingScheduler()
-    scheduler.add_job(check_url, "interval", minutes=1, id="check_health")
+    scheduler.add_job(check_url, "interval", seconds=3, id="check_health")
     print("Scheduler started")
     scheduler.start()
 

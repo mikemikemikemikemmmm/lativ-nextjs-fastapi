@@ -9,8 +9,8 @@ WorkingDirectory=/home/ubuntu/fastapi/backend
 Environment="ENVIRONMENT=prod"
 ExecStart=/home/ubuntu/.local/bin/uv run uvicorn src.main:app --host 127.0.0.1 --port 8000 --log-level info
 Restart=no
-StandardOutput=file:/home/ubuntu/fastapi/backend/logs/backend-out.log
-StandardError=file:/home/ubuntu/fastapi/backend/logs/backend-err.log
+StandardOutput=file:/home/ubuntu/fastapi/systemctl-logs/backend-out.log
+StandardError=file:/home/ubuntu/fastapi/systemctl-logs/backend-err.log
 
 [Install]
 WantedBy=multi-user.target
