@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from src.lifespan import lifespan
 from src.setting import is_dev_environment
 from src.router.root import root_router
-from backend.src.middleware.setup import setup_global_middleware
+from src.middleware.setup import setup_global_middleware
 from src.errorHandler._global import setup_global_error_handler
 from datetime import datetime
 now = datetime.now()
