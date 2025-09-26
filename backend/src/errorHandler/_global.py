@@ -3,7 +3,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError, ResponseValidationError
 from psycopg2.errors import ForeignKeyViolation
-
+from src.log import logger
 class ErrorHandler:
     @staticmethod
     def raise_404_not_found(detail: str = "物件找不到"):
@@ -48,6 +48,7 @@ def setup_global_error_handler(app: FastAPI):
             detail = "此物件被其他物件使用中"
         elif "NotNullViolation" in exc_str:
             detail = "此物件被其他物件使用中"
+        logger.error(f"sql err,detail={detail}", exc_info=True)
         return JSONResponse(
             status_code=409,
             content={"detail": detail},
@@ -87,4 +88,5 @@ def setup_global_error_handler(app: FastAPI):
             status_code = 500
             detail = "伺服器錯誤"
         print(str(exc))
+        logger.error(f"global err,detail={detail}", exc_info=True)
         return JSONResponse(status_code=status_code, content={"detail": detail})

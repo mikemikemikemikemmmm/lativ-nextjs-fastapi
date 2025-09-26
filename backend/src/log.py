@@ -10,7 +10,7 @@ formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 setting = get_settings()
 log_dir = setting.log_dir
 os.makedirs(log_dir, exist_ok=True)
-log_file_path = os.path.join(log_dir, "backend.log")
+log_file_path = os.path.join(log_dir, "backend-app.log")
 
 file_handler = logging.FileHandler(log_file_path, encoding="utf-8")
 file_handler.setFormatter(formatter)
