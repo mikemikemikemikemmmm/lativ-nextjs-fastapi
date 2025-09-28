@@ -19,6 +19,7 @@ jobs:
           username: ${{ secrets.LIGHTSAIL_USER }}
           key: ${{ secrets.LIGHTSAIL_KEY }}
           script: |
+            set -e  # 發生錯誤時停止
             export PATH="/home/ubuntu/.local/bin:$PATH"
             export APP_DIR=/home/ubuntu/fastapi
             export BACKEND_ADMIN_DIR=/home/ubuntu/fastapi/backend-admin

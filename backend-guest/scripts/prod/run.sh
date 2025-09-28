@@ -12,7 +12,9 @@ echo ""
 
 cd $DIR 
 echo "移動到$DIR"
+
 cargo build --release
+
 echo "build完成"
 
 
