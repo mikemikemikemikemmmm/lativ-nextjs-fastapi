@@ -15,6 +15,7 @@ app = FastAPI(
     openapi_url="/openapi" if is_dev else None,
 )
 
+app.router.redirect_slashes = False
 app.include_router(root_router)
 setup_global_error_handler(app)
 setup_global_middleware(app)
