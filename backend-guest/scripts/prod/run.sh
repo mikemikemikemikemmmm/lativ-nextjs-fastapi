@@ -9,10 +9,10 @@ echo "ENVIRONMENT=$ENVIRONMENT"
 echo "DIR=$DIR"
 echo "SERVICE_NAME=$SERVICE_NAME"
 echo ""
-echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 cd $DIR 
 echo "移動到$DIR"
 
+export PATH="$HOME/.cargo/bin:$PATH"
 cargo build --release
 
 echo "build完成"
