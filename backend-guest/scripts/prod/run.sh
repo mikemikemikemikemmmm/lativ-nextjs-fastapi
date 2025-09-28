@@ -9,7 +9,7 @@ echo "ENVIRONMENT=$ENVIRONMENT"
 echo "DIR=$DIR"
 echo "SERVICE_NAME=$SERVICE_NAME"
 echo ""
-
+echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 cd $DIR 
 echo "移動到$DIR"
 
