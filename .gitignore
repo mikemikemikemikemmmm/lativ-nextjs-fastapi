@@ -1,5 +1,6 @@
 *.env*
 *.aws*
+backend-guest/target
 .vscode
 .ruff_cache
 # =========================

@@ -1,0 +1,17 @@
+[Unit]
+Description=Backend Admin Service
+After=network.target
+
+[Service]
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/fastapi/backend-admin
+Environment="ENVIRONMENT=prod"
+Environment="PYTHONPATH=."
+ExecStart=/home/ubuntu/.local/bin/uv run /home/ubuntu/fastapi/backend-admin/src/main.py
+Restart=no
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -1,13 +1,14 @@
 [Unit]
-Description=FastAPI Service
+Description=Backend Guest Service
 After=network.target
 
 [Service]
 User=ubuntu
 Group=ubuntu
-WorkingDirectory=/home/ubuntu/fastapi/backend
+WorkingDirectory=/home/ubuntu/fastapi/backend-guest
 Environment="ENVIRONMENT=prod"
-ExecStart=/home/ubuntu/.local/bin/uv run uvicorn src.main:app --host 127.0.0.1 --port 8000 --log-level info
+Environment="RUST_LOG=info"
+ExecStart=/home/ubuntu/fastapi/backend-guest/target/release/backend-guest
 Restart=no
 StandardOutput=journal
 StandardError=journal

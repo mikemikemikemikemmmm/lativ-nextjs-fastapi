@@ -10,12 +10,12 @@ function ProductPage() {
     const { product_id } = useParams()
     const [pd, setPd] = useState<ProductDetailRead | "loading"|"notFound">("loading")
     const getPd = async () => {
-        const { data, error } = await getApi<ProductDetailRead>(`products?product_id=${product_id}`)
+        const { data, error } = await getApi<ProductDetailRead[]>(`products?product_id=${product_id}`)
         if (error) {
             setPd("notFound")
             return
         }
-        setPd(data)
+        setPd(data[0])
     }
     useEffect(() => { getPd() }, [product_id])
     if (pd === 'loading') {

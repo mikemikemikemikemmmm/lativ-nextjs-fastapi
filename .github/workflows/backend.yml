@@ -21,12 +21,12 @@ jobs:
           script: |
             export PATH="/home/ubuntu/.local/bin:$PATH"
             export APP_DIR=/home/ubuntu/fastapi
-            export BACKEND_DIR=/home/ubuntu/fastapi/backend
+            export BACKEND_ADMIN_DIR=/home/ubuntu/fastapi/backend-admin
+            export BACKEND_GUEST_DIR=/home/ubuntu/fastapi/backend-guest
+            export MONITOR_DIR=/home/ubuntu/fastapi/monitor
             export ENVIRONMENT=prod
 
             REPO_URL=https://${{ secrets.GITHUB_TOKEN }}@github.com/mikemikemikemikemmmm/lativ-nextjs-fastapi.git
-            # 把vps的PATH注入到shell環境
-
             # 如果目錄不存在，先建立並 clone
             if [ ! -d "$APP_DIR" ]; then
               mkdir -p $APP_DIR
@@ -39,13 +39,31 @@ jobs:
               git fetch --all
               git reset --hard origin/main
             fi
-            # 進入專案資料夾
-            cd $BACKEND_DIR
+
+            #------------------------------------------------------------
+            # 進入專案backend guest資料夾
+            cd $BACKEND_GUEST_DIR
             
             cat <<EOF > ./.env.$ENVIRONMENT
-            ${{ secrets.ENV_FILE_CONTENT }}
+            ${{ secrets.BACKEND_GUEST_ENV_FILE_CONTENT }}
             EOF
             echo "生成.env"
 
             echo "開始跑run.sh"
             bash ./scripts/$ENVIRONMENT/run.sh
+            #------------------------------------------------------------
+            # 進入專案backend admin資料夾
+            cd $BACKEND_ADMIN_DIR
+            
+            cat <<EOF > ./.env.$ENVIRONMENT
+            ${{ secrets.BACKEND_ADMIN_ENV_FILE_CONTENT }}
+            EOF
+            echo "生成.env"
+
+            echo "開始跑run.sh"
+            bash ./scripts/$ENVIRONMENT/run.sh
+            #------------------------------------------------------------
+            # 進入專案monitor資料夾
+            cd $MONITOR_DIR
+            echo "開始跑run.sh"
+            bash ./run.sh

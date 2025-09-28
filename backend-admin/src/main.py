@@ -1,8 +1,9 @@
 from src.utils.env import load_env
 load_env()
+import uvicorn
 from fastapi import FastAPI
 from src.lifespan import lifespan
-from src.setting import is_dev_environment
+from src.setting import is_dev_environment,get_settings
 from src.router.root import root_router
 from src.middleware.setup import setup_global_middleware
 from src.errorHandler._global import setup_global_error_handler
@@ -20,3 +21,7 @@ app = FastAPI(
 app.include_router(root_router)
 setup_global_error_handler(app)
 setup_global_middleware(app)
+
+setting = get_settings()
+if __name__ == "__main__":
+    uvicorn.run("main:app", port=int(setting.port), host="127.0.0.1", log_level="info",reload=True if is_dev else False)

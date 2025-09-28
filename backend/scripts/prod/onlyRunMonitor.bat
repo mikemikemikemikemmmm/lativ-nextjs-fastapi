@@ -1,1 +1,0 @@
-set ENVIRONMENT=prod&&uv run ./scripts/prod/monitor.py

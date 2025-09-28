@@ -1,12 +1,12 @@
 [Unit]
 Description=Monitor Service
-After=network.target
+After=backend-admin.service backend-guest.service
 
 [Service]
 User=ubuntu
 Group=ubuntu
-WorkingDirectory=/home/ubuntu/fastapi/backend
-ExecStart=/home/ubuntu/.local/bin/uv run ./scripts/prod/monitor.py --host 127.0.0.1 --port 8001 --log-level info
+WorkingDirectory=/home/ubuntu/fastapi/monitor
+ExecStart=/home/ubuntu/.local/bin/uv run main.py --host 127.0.0.1 --port 8000
 Restart=no
 Environment="ENVIRONMENT=prod"
 Environment="PYTHONUNBUFFERED=1"

@@ -10,7 +10,7 @@ export async function baseFetch<Response>(
     url: string,
     options: RequestInit
 ): Promise<ApiResult<Response>> {
-    const urlWithBase = `${ENV.backendUrl}v1/guest/${url}`
+    const urlWithBase = `${ENV.backendUrl}v1/${url}`
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), API_TIMEOUT);
     try {

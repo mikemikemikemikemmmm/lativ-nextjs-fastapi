@@ -1,0 +1,1 @@
+set ENVIRONMENT=dev&&cargo run

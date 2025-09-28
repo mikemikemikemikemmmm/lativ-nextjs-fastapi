@@ -20,8 +20,6 @@ function NavIndexPage() {
         setNav(data)
     }
     useEffect(() => { getData() }, [])
-
-    
     const [cards, setCards] = useState<ProductCardRead[]| "loading">("loading")
     const getCards = async () => {
         const { data, error } = await getApi<ProductCardRead[]>(`products/nav_index?nav_route=${nav_route}`)
