@@ -36,11 +36,11 @@ echo "重新載入 systemd..."
 sudo systemctl daemon-reload
 
 # 啟動服務
-echo "啟動 $BACKEND_SERVICE_NAME 服務..."
-sudo systemctl start "$BACKEND_SERVICE_NAME"
+echo "啟動 $SERVICE_NAME 服務..."
+sudo systemctl start "$SERVICE_NAME"
 
 # 檢查服務狀態
-echo "檢查 $BACKEND_SERVICE_NAME 服務..."
-sudo systemctl status "$BACKEND_SERVICE_NAME"
+echo "檢查 $SERVICE_NAME 服務..."
+sudo systemctl status "$SERVICE_NAME"
 
 echo "BACKEND_ADMIN部署成功"
