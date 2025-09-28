@@ -24,4 +24,7 @@ setup_global_middleware(app)
 
 setting = get_settings()
 if __name__ == "__main__":
+    print("try to start")
+    print(f"port = {int(setting.port)}")
+    print(f"reload = {True if is_dev else False}")
     uvicorn.run("main:app", port=int(setting.port), host="127.0.0.1", log_level="info",reload=True if is_dev else False)
