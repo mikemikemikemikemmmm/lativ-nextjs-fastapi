@@ -14,6 +14,10 @@ app = FastAPI(
     redoc_url="/redoc" if is_dev else None,
     openapi_url="/openapi" if is_dev else None,
 )
+@app.get("/health_check")
+def get_health():
+    return "health"
+
 app.include_router(root_router)
 setup_global_error_handler(app)
 setup_global_middleware(app)
