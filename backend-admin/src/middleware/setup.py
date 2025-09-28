@@ -3,7 +3,7 @@ from starlette.middleware.cors import CORSMiddleware
 from src.setting import get_settings
 from .security import SecurityMiddleware
 from .timer import TimerMiddleware
-
+from .slash import RedirectMiddleware
 
 def setup_global_middleware(app: FastAPI):
     setting = get_settings()
@@ -13,6 +13,7 @@ def setup_global_middleware(app: FastAPI):
         setting.monitor_origin,
     ]
     print("allow_origin",allow_origin)
+    app.add_middleware(RedirectMiddleware)
     app.add_middleware(TimerMiddleware)
     app.add_middleware(SecurityMiddleware)
     app.add_middleware(
