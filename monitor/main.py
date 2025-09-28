@@ -7,7 +7,7 @@ from datetime import datetime
 EMAIL_FROM="mikespiderman1992@gmail.com"
 EMAIL_PASSWORD="mgdi patq pbyi cvfs"
 EMAIL_TO="mikem40099@gmail.com"
-BACKEND_ADMIN_URL="http://127.0.0.1:8001/health_check"
+BACKEND_ADMIN_URL="http://127.0.0.1:8001/admin/health_check"
 BACKEND_GUEST_URL="http://127.0.0.1:8002/health_check"
 PORT=8000
 
