@@ -13,8 +13,8 @@ app = FastAPI(
     docs_url="/docs" if is_dev else None,
     redoc_url="/redoc" if is_dev else None,
     openapi_url="/openapi" if is_dev else None,
+    root_path="" if is_dev else "/admin"
 )
-
 app.include_router(root_router)
 setup_global_error_handler(app)
 setup_global_middleware(app)
