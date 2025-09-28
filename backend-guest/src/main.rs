@@ -16,9 +16,9 @@ async fn health_check() -> impl Responder {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     print!("1");
-    env_logger::init_from_env(Env::default().default_filter_or("info"));
+    env_logger::init_from_env(Env::default().default_filter_or("debug"));
 
-    log::info!("server start.");
+    log::debug!("server start.");
     let _setting = setting::get_settings();
     let pool = PgPoolOptions::new()
         .connect(&_setting.sql_url)
@@ -28,6 +28,7 @@ async fn main() -> std::io::Result<()> {
             std::io::Error::new(std::io::ErrorKind::Other, e)
         })?;
 
+    log::debug!("listen 127.0.0.1:{}", &_setting.port);
     HttpServer::new(move || {
         App::new()
             .wrap(Logger::default())
