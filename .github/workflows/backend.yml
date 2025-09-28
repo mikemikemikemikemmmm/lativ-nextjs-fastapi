@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main  # 或你要自動部署的分支
-
+ 
 jobs:
   deploy:
     runs-on: ubuntu-latest
