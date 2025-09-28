@@ -13,6 +13,7 @@ cd $DIR
 echo "移動到$DIR"
 
 export PATH="$HOME/.cargo/bin:$PATH"
+cargo clean
 cargo build --release
  
 echo "build完成"
