@@ -41,6 +41,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(
                 Cors::default()
                     .allowed_origin(&_setting.frontend_guest_origin.as_str())
+                    .allowed_origin(&_setting.monitor_origin.as_str())
                     .allowed_methods(vec!["*"])
                     .allowed_headers(vec!["*"]),
             )
