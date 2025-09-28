@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from src.lifespan import lifespan
-from src.setting import is_dev_environment,get_settings
+from src.setting import is_dev_environment
 from src.router.root import root_router
 from src.middleware.setup import setup_global_middleware
 from src.errorHandler._global import setup_global_error_handler

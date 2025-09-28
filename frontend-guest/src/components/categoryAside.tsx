@@ -5,6 +5,7 @@ export const CategoryAside = (props: { navRoute?: string, productId?: string }) 
     const { navRoute, productId } = props
     const getApiUrl = navRoute ? `categorys?nav_route=${navRoute}` : `categorys?product_id=${productId}`
     const [_, categorys] = useGetData<CategoryRead>(getApiUrl)
+    
     if (categorys === 'loading') {
         return null
     }
@@ -14,7 +15,7 @@ export const CategoryAside = (props: { navRoute?: string, productId?: string }) 
                 <li className="my-1 text-[16px]">◆ {c.name}</li>
                 {
                     c.sub_categorys.map(sc => <li className="my-1  text-[14px]" key={sc.id}>
-                        <Link href={`/category/${props.navRoute}/${c.route}/${sc.route}`}>{`> ${sc.name}`}</Link>
+                        <Link href={`/category/${navRoute||c.nav_route}/${c.route}/${sc.route}`}>{`> ${sc.name}`}</Link>
                     </li>)
                 }
             </ul>)
