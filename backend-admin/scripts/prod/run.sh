@@ -28,6 +28,7 @@ fi
 
 # 複製新的 service 檔案
 echo "更新 $SERVICE_NAME 的 service 檔案..."
+cd "./scripts/prod"
 sudo cp "$SERVICE_NAME.service" "/etc/systemd/system/$SERVICE_NAME.service"
 
 # 重新載入 systemd
