@@ -13,7 +13,7 @@ app = FastAPI(
     docs_url="/docs" if is_dev else None,
     redoc_url="/redoc" if is_dev else None,
     openapi_url="/openapi" if is_dev else None,
-    root_path="" if is_dev_environment() else "/admin"
+    root_path="/admin"
 )
 @app.get("/health_check")
 def get_health():
