@@ -14,7 +14,7 @@ echo "移動到$DIR"
 
 export PATH="$HOME/.cargo/bin:$PATH"
 cargo build --release
-
+ 
 echo "build完成"
 
 
