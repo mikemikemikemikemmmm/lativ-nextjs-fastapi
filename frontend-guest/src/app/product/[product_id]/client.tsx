@@ -1,12 +1,11 @@
 'use client'
 import { ProductDetailRead, SizeRead, SubProductRead } from "@/types";
 import { getImgUrl } from "@/utils/env";
-import Image from "next/image";
+import * as NextImage from "next/image";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 export const ProductClient = (props: { product: ProductDetailRead }) => {
     const { product } = props
-    console.log(product.sub_products,product)
     const searchParams = useSearchParams()
     const sub_product_id = searchParams.get('sub_product_id')
     const [subproduct, setSubproduct] = useState<SubProductRead>(() => {
@@ -28,10 +27,24 @@ export const ProductClient = (props: { product: ProductDetailRead }) => {
     const handleSize = (s: SizeRead) => {
         setSize(s)
     }
+    useEffect(() => {
+        const preloadImages = async () => {
+            const promises = product.sub_products.map(sp => {
+                return new Promise<void>((resolve) => {
+                    const img = new Image();
+                    img.src = getImgUrl(sp.img_file_name);
+                    img.onload = () => resolve();
+                    img.onerror = () => resolve(); // 錯誤也算完成
+                });
+            });
+            await Promise.all(promises);
+        }
+        preloadImages()
+    }, []);
     return <div>
         <div className="flex">
             <div>
-                <Image width={500} height={500} src={getImgUrl(subproduct.img_file_name)} alt={product.name} />
+                <NextImage.default priority width={500} height={500} src={getImgUrl(subproduct.img_file_name)} alt={product.name} />
             </div>
             <div className="flex-1">
                 <div>
@@ -44,7 +57,7 @@ export const ProductClient = (props: { product: ProductDetailRead }) => {
                 <div className="mb-3">
                     {
                         product.sub_products.map(sp => <div onClick={() => handleColor(sp)} className={`${sp.id === subproduct.id ? "border-black" : "border-white"} border mr-2 hover:cursor-pointer inline-block`} key={sp.id}>
-                            <Image src={getImgUrl(sp.color_img_file_name)} alt={sp.color_name} width={24} height={24} />
+                            <NextImage.default priority src={getImgUrl(sp.color_img_file_name)} alt={sp.color_name} width={24} height={24} />
                         </div>)
                     }
                 </div>
