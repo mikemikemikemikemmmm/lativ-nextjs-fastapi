@@ -36,7 +36,7 @@ def send_email(subject: str, content: str):
             server.login(EMAIL_FROM, EMAIL_PASSWORD)
             server.send_message(msg)
     except Exception as e:
-        print(f"無法發送郵件: {e}")
+        print(f"can't send email: {e}")
 
 # ---------- 健康檢查函數 ----------
 def check_backend(url: str, name: str, error_counter: str, scheduler: BlockingScheduler, job_id: str):
@@ -52,13 +52,13 @@ def check_backend(url: str, name: str, error_counter: str, scheduler: BlockingSc
                 if consecutive_fail_admin >= 3:  # 出錯三次
                     send_email(f"{name} 系統已崩潰", f"Status code: {response.status_code}")
                     scheduler.remove_job(job_id)
-                    print(f"{name} job 已取消")
+                    print(f"{name} job cancel")
             else:
                 consecutive_fail_guest += 1
                 if consecutive_fail_guest >= 3:  # 出錯三次
                     send_email(f"{name} 系統已崩潰", f"Status code: {response.status_code}")
                     scheduler.remove_job(job_id)
-                    print(f"{name} job 已取消")
+                    print(f"{name} job cancel")
         else:
             # 成功回應，重置連續失敗計數器
             if error_counter == "admin":
@@ -73,13 +73,13 @@ def check_backend(url: str, name: str, error_counter: str, scheduler: BlockingSc
             if consecutive_fail_admin >= 3:  # 出錯三次
                 send_email(f"{name} 監控系統出錯", f"{e}")
                 scheduler.remove_job(job_id)
-                print(f"{name} job 已取消")
+                print(f"{name} job cancel")
         else:
             consecutive_fail_guest += 1
             if consecutive_fail_guest >= 3:  # 出錯三次
                 send_email(f"{name} 監控系統出錯", f"{e}")
                 scheduler.remove_job(job_id)
-                print(f"{name} job 已取消")
+                print(f"{name} job cancel")
 
 # ---------- 排程 ----------
 def run_scheduler():
