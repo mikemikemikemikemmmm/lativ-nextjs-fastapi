@@ -5,8 +5,8 @@ import type { SeriesRead } from "@/types"
 import { redirectTo404 } from "@/utils/errorHandler"
 import { useLoaderData } from "react-router"
 
-export const SubCategoryLoader = async ({ params }) => {
-    const { nav_route, category_route, sub_category_route } = params
+export const SubCategoryLoader = async (p: { params: { nav_route: string, category_route: string, sub_category_route: string } }) => {
+    const { nav_route, category_route, sub_category_route } = p.params
     if (!nav_route || !category_route || !sub_category_route) {
         return redirectTo404()
     }

@@ -6,8 +6,8 @@ import { getImgUrl } from "@/utils/env"
 import { Image } from "@/components/image";
 import { redirect, useLoaderData } from "react-router"
 
-export const NavIndexLoader = async ({ params }) => {
-    const { nav_route } = params
+export const NavIndexLoader = async (p: { params: { nav_route: string } }) => {
+    const { nav_route } = p.params
     const getNav = getApi<NavRead>(`navs/${nav_route}`)
     const getCards = getApi<ProductCardRead[]>(`products/nav_index?nav_route=${nav_route}`)
     const asyncFn = [getNav, getCards]

@@ -11,12 +11,9 @@ export const routeData = createBrowserRouter([
     path: "/",
     Component: RootLayout,
     loader: rootLoader,
+    ErrorBoundary: NotFoundUI,
     children: [
       { index: true, Component: IndexPage },
-      {
-        path: "404",
-        Component: NotFoundUI
-      },
       {
         path: "category",
         Component: CategoryAsideLayout,

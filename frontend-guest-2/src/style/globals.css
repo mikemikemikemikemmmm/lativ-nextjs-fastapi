@@ -1,5 +1,6 @@
 @import 'tailwindcss';
-
+@import "swiper/css/navigation";
+@import "swiper/css";
 @theme {
   /* global */
   --color-divider: #eee;

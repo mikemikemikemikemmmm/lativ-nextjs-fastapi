@@ -4,9 +4,8 @@ import { useLoaderData, redirect, useLocation } from "react-router"
 import { useEffect, useState } from "react"
 import { getImgUrl } from "@/utils/env"
 import * as ImageComponent from "@/components/image"
-export const ProductPageLoader = async ({ params }) => {
-
-    const { product_id } = params
+export const ProductPageLoader = async (p: { params: { product_id: string } }) => {
+    const { product_id } = p.params
     const { data, error } = await getApi<ProductDetailRead[]>(`products?product_id=${product_id}`)
     if (error) {
         throw redirect("/404")
