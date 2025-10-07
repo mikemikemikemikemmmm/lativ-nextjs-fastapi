@@ -1,5 +1,6 @@
 mod router;
 mod setting;
+mod middleware;
 use actix_web::middleware::{DefaultHeaders, Logger};
 use log;
 
@@ -7,6 +8,7 @@ use actix_cors::Cors;
 use actix_web::{App, HttpServer, Responder, get, web};
 use env_logger::Env;
 use sqlx::postgres::PgPoolOptions;
+
 
 #[get("/health_check")]
 async fn health_check() -> impl Responder {
@@ -31,6 +33,7 @@ async fn main() -> std::io::Result<()> {
     log::debug!("listen 127.0.0.1:{}", &_setting.port);
     HttpServer::new(move || {
         App::new()
+            .wrap(middleware::timer::Timing)
             .wrap(Logger::default())
             .wrap(
                 DefaultHeaders::new()
