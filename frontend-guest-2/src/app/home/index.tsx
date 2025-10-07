@@ -4,10 +4,10 @@ import { ProductCard } from "@/components/productCard"
 import type { NavRead, ProductCardRead } from "@/types"
 import { getImgUrl } from "@/utils/env"
 import { Image } from "@/components/image";
-import { redirect, useLoaderData } from "react-router"
+import { redirect, useLoaderData, type LoaderFunctionArgs } from "react-router"
 
-export const NavIndexLoader = async (p: { params: { nav_route: string } }) => {
-    const { nav_route } = p.params
+export const NavIndexLoader = async ({ params }: LoaderFunctionArgs) => {
+    const { nav_route } = params
     const getNav = getApi<NavRead>(`navs/${nav_route}`)
     const getCards = getApi<ProductCardRead[]>(`products/nav_index?nav_route=${nav_route}`)
     const asyncFn = [getNav, getCards]

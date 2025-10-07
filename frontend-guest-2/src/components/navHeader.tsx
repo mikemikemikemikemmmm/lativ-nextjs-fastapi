@@ -1,4 +1,3 @@
-import { useGetData } from "@/hook/useGetData"
 import { ASIDE_WIDTH } from "@/style/cssConst"
 import type { NavRead } from "@/types"
 import { getImgUrl } from "@/utils/env";

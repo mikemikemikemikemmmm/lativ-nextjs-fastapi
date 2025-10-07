@@ -4,9 +4,9 @@ import { ProductCard } from "@/components/productCard"
 import type { SeriesRead } from "@/types"
 import { redirectTo404 } from "@/utils/errorHandler"
 import { useLoaderData } from "react-router"
-
-export const SubCategoryLoader = async (p: { params: { nav_route: string, category_route: string, sub_category_route: string } }) => {
-    const { nav_route, category_route, sub_category_route } = p.params
+import type { LoaderFunctionArgs } from "react-router";
+export const SubCategoryLoader = async ({ params }: LoaderFunctionArgs) => {
+    const { nav_route, category_route, sub_category_route } = params
     if (!nav_route || !category_route || !sub_category_route) {
         return redirectTo404()
     }

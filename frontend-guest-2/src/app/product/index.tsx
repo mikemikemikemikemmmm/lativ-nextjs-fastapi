@@ -1,11 +1,11 @@
 import { getApi } from "@/api/base"
 import type { ProductDetailRead, SizeRead, SubProductRead } from "@/types"
-import { useLoaderData, redirect, useLocation } from "react-router"
+import { useLoaderData, redirect, useLocation, type LoaderFunctionArgs } from "react-router"
 import { useEffect, useState } from "react"
 import { getImgUrl } from "@/utils/env"
 import * as ImageComponent from "@/components/image"
-export const ProductPageLoader = async (p: { params: { product_id: string } }) => {
-    const { product_id } = p.params
+export const ProductPageLoader = async ({ params }: LoaderFunctionArgs) => {
+    const { product_id } = params
     const { data, error } = await getApi<ProductDetailRead[]>(`products?product_id=${product_id}`)
     if (error) {
         throw redirect("/404")
