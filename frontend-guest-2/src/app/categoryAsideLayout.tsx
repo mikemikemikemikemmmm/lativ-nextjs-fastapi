@@ -1,10 +1,6 @@
-import { getApi } from '@/api/base';
 import { CategoryAside } from '@/components/categoryAside';
 import { ASIDE_WIDTH } from '@/style/cssConst';
-import type { CategoryRead } from '@/types';
-import { redirectTo404 } from '@/utils/errorHandler';
-import { useLayoutEffect, useState } from 'react';
-import { Outlet, useParams } from 'react-router';
+import { Outlet } from 'react-router';
 export default function CategoryAsideLayout() {
     // const { nav_route, product_id } = useParams();
     // const [c, setC] = useState<CategoryRead[] | "loading">("loading")

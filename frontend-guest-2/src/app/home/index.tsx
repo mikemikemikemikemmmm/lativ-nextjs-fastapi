@@ -1,4 +1,3 @@
-'use client'
 import { getApi } from "@/api/base"
 import { ProductCard } from "@/components/productCard"
 import type { NavRead, ProductCardRead } from "@/types"
@@ -24,7 +23,6 @@ export const NavIndexLoader = async ({ params }: LoaderFunctionArgs) => {
 }
 
 export function NavIndexPage() {
-    console.log("nav")
     const { nav, cards } = useLoaderData<{ nav: NavRead, cards: ProductCardRead[] }>();
     return <section className="w-full">
         <div className="w-full mb-10">
