@@ -24,6 +24,7 @@ export const NavIndexLoader = async ({ params }: LoaderFunctionArgs) => {
 }
 
 export function NavIndexPage() {
+    console.log("nav")
     const { nav, cards } = useLoaderData<{ nav: NavRead, cards: ProductCardRead[] }>();
     return <section className="w-full">
         <div className="w-full mb-10">
