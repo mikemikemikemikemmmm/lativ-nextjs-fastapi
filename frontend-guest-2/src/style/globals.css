@@ -1,0 +1,35 @@
+@import 'tailwindcss';
+
+@theme {
+  /* global */
+  --color-divider: #eee;
+}
+
+@theme {
+  /* nav header */
+  --color-nav-header-logo: #4D3125;
+  --color-nav-header-item-hover: #685345;
+  --color-nav-header-item-bg: #EFEDE4;
+  --color-nav-header-item: #999;
+}
+
+@theme {
+  /* category aside */
+  --color-aside-category: #4D494A;
+  --color-aside-sub-category: #4d494a;
+  --color-aside-sub-category-hover: #685345;
+}
+
+@theme {
+  /* product card */
+  --color-aside-category: #4D494A;
+  --color-aside-sub-category: #4d494a;
+  --color-aside-sub-category-hover: #685345;
+}
+
+@theme {
+  /* product detail */
+  --color-aside-category: #4D494A;
+  --color-aside-sub-category: #4d494a;
+  --color-aside-sub-category-hover: #685345;
+}
