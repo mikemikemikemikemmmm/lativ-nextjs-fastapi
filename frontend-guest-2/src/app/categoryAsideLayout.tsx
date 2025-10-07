@@ -3,12 +3,13 @@ import { CategoryAside } from '@/components/categoryAside';
 import { ASIDE_WIDTH } from '@/style/cssConst';
 import type { CategoryRead } from '@/types';
 import { redirectTo404 } from '@/utils/errorHandler';
-import { useLayoutEffect , useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import { Outlet, useParams } from 'react-router';
 export default function CategoryAsideLayout() {
     const { nav_route, product_id } = useParams();
     const [c, setC] = useState<CategoryRead[] | "loading">("loading")
-    useLayoutEffect (() => {
+    useLayoutEffect(() => {
+        setC("loading")
         const get = async () => {
             if (!nav_route && !product_id) {
                 return redirectTo404()
