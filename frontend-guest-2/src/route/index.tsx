@@ -49,4 +49,6 @@ export const routeData = createBrowserRouter([
       }
     ],
   },
-]);
+],{
+  basename:"/lativ-nextjs-fastapi"
+});
