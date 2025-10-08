@@ -1,19 +1,25 @@
 import { getApi } from "@/api/base"
-import type { ProductDetailRead, SizeRead, SubProductRead } from "@/types"
+import type { CategoryRead, ProductDetailRead, SizeRead, SubProductRead } from "@/types"
 import { useLoaderData, redirect, useLocation, type LoaderFunctionArgs } from "react-router"
 import { useEffect, useState } from "react"
 import { getImgUrl } from "@/utils/env"
 import * as ImageComponent from "@/components/image"
+import CategoryAsideLayout from "@/components/categoryAsideLayout"
+
 export const ProductPageLoader = async ({ params }: LoaderFunctionArgs) => {
     const { product_id } = params
-    const { data, error } = await getApi<ProductDetailRead[]>(`products?product_id=${product_id}`)
-    if (error) {
+    const get = [
+        getApi<ProductDetailRead[]>(`products?product_id=${product_id}`),
+        getApi<CategoryRead[]>(`categorys?product_id=${product_id}`),
+    ]
+    const [p, c] = await Promise.all(get)
+    if (p.error || c.error) {
         throw redirect("/404")
     }
-    return { detail: data[0] }
+    return { detail: p.data[0], categorys: c.data }
 }
 export function ProductPage() {
-    const { detail } = useLoaderData<{ detail: ProductDetailRead }>();
+    const { detail, categorys } = useLoaderData<{ detail: ProductDetailRead, categorys: CategoryRead[] }>();
     const location = useLocation()
     const queryParams = new URLSearchParams(location.search); // 將 query string 解析成 URLSearchParams
     const sub_product_id = queryParams.get('sub_product_id')
@@ -50,35 +56,37 @@ export function ProductPage() {
         }
         preloadImages()
     }, []);
-    return <div>
-        <div className="flex">
-            <div>
-                <ImageComponent.Image width={500} height={500} src={getImgUrl(subproduct.img_file_name)} alt={detail.name} />
-            </div>
-            <div className="flex-1">
+    return <CategoryAsideLayout categorys={categorys}>
+        <div>
+            <div className="flex">
                 <div>
-                    {detail.name}-{detail.gender_name}（{subproduct.color_name}－{size?.name || ""}）
+                    <ImageComponent.Image width={500} height={500} src={getImgUrl(subproduct.img_file_name)} alt={detail.name} />
                 </div>
-                <div>
-                    NT${subproduct.price}
-                </div>
-                <hr className="my-7" />
-                <div className="mb-3">
-                    {
-                        detail.sub_products.map(sp => <div onClick={() => handleColor(sp)} className={`${sp.id === subproduct.id ? "border-black" : "border-white"} border mr-2 hover:cursor-pointer inline-block`} key={sp.id}>
-                            <ImageComponent.Image src={getImgUrl(sp.color_img_file_name)} alt={sp.color_name} width={24} height={24} />
-                        </div>)
-                    }
-                </div>
-                <div>
-                    {
-                        subproduct.sizes.map(s => <div onClick={() => handleSize(s)} className={`${size?.id === s.id ? "border-black" : "border-white"} hover:cursor-pointer border  bg-[#EEEEEE] w-[60px] h-[30px] inline-flex items-center justify-center mr-2`} key={s.id}>
-                            {s.name}
-                        </div>)
-                    }
+                <div className="flex-1">
+                    <div>
+                        {detail.name}-{detail.gender_name}（{subproduct.color_name}－{size?.name || ""}）
+                    </div>
+                    <div>
+                        NT${subproduct.price}
+                    </div>
+                    <hr className="my-7" />
+                    <div className="mb-3">
+                        {
+                            detail.sub_products.map(sp => <div onClick={() => handleColor(sp)} className={`${sp.id === subproduct.id ? "border-black" : "border-white"} border mr-2 hover:cursor-pointer inline-block`} key={sp.id}>
+                                <ImageComponent.Image src={getImgUrl(sp.color_img_file_name)} alt={sp.color_name} width={24} height={24} />
+                            </div>)
+                        }
+                    </div>
+                    <div>
+                        {
+                            subproduct.sizes.map(s => <div onClick={() => handleSize(s)} className={`${size?.id === s.id ? "border-black" : "border-white"} hover:cursor-pointer border  bg-[#EEEEEE] w-[60px] h-[30px] inline-flex items-center justify-center mr-2`} key={s.id}>
+                                {s.name}
+                            </div>)
+                        }
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </CategoryAsideLayout>
 }
 export default ProductPage
