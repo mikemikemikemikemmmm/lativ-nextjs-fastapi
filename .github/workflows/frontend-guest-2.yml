@@ -39,8 +39,7 @@ jobs:
         working-directory: ./frontend-guest-2
       - name: Inject environment variables
         run: |
-            export ENVIRONMENT=prod
-            cat <<EOF > ./.env.$ENVIRONMENT
+            cat <<EOF > ./.env.production
             ${{ secrets.FRONTEND_GUEST_ENV_FILE_CONTENT }}
             EOF
             echo "生成.env"
