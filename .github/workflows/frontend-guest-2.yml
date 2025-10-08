@@ -43,4 +43,5 @@ jobs:
       - name: Deploy to gh-pages branch
         run: |
           npm install -g gh-pages
-          gh-pages -d ./frontend-guest-2/dist -b gh-pages
+          gh-pages -d ./dist -b gh-pages
+        working-directory: ./frontend-guest-2
