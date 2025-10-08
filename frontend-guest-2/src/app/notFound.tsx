@@ -1,5 +1,5 @@
 import { Image } from "@/components/image";
-import { ENV } from "@/utils/env";
+// import { ENV } from "@/utils/env";
 
 export const NotFoundUI = () => {
     return <div className="flex justify-center items-center w-dvw h-dvh">
