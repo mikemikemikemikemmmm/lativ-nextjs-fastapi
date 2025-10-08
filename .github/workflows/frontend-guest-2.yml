@@ -13,7 +13,6 @@ permissions:
   pages: write
   id-token: write
  
-# 允许一个并发部署
 concurrency:
   group: 'pages'
   cancel-in-progress: true
