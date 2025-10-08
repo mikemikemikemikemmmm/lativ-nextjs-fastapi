@@ -32,6 +32,7 @@ jobs:
         with:
           node-version: lts/*
           cache: 'npm'
+          cache-dependency-path: ./frontend-guest-2/package-lock.json
       - name: Install dependencies
         run: npm ci
         working-directory: ./frontend-guest-2
