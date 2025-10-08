@@ -2,7 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 import tailwindcss from '@tailwindcss/vite'
-export default defineConfig(({ mode }) => {
+export default defineConfig(() => {
   const common = {
     plugins: [react(), tailwindcss()],
     resolve: {
@@ -15,9 +15,6 @@ export default defineConfig(({ mode }) => {
       open: true, // 啟動時自動開啟瀏覽器（可選）
     },
   }
-  if (mode === "production") {
-    return { ...common, base: "/lativ-nextjs-fastapi/" }
-  } else {
-    return common
-  }
+  return common
+
 })
