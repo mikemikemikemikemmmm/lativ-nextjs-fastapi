@@ -3,7 +3,8 @@ export const isDevEnvironment = () => {
 }
 export const ENV = {
     backendUrl: import.meta.env.VITE_BACKEND_BASE_URL,
-    imgUrlPrefix: import.meta.env.VITE_S3_URL_PREFIX
+    imgUrlPrefix: import.meta.env.VITE_S3_URL_PREFIX,
+    baseUrl:import.meta.env.VITE_BASE_URL
 }
 export const getImgUrl = (fileName: string) => {
     return ENV.imgUrlPrefix + fileName
