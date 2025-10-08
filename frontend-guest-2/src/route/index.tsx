@@ -14,22 +14,20 @@ export const routeData = createBrowserRouter([
     children: [
       { index: true, Component: IndexPage },
       {
-        path: "category/:nav_route/:category_route/:sub_category_route",
+        path: "/category/:nav_route/:category_route/:sub_category_route",
         Component: SubCategoryPage,
         loader: SubCategoryLoader
       },
       {
-        path: "home/:nav_route",
+        path: "/home/:nav_route",
         Component: NavIndexPage,
         loader: NavIndexLoader
       },
       {
-        path: "product/:product_id",
+        path: "/product/:product_id",
         Component: ProductPage,
         loader: ProductPageLoader
       }
     ],
   },
-], {
-  basename: "/lativ-nextjs-fastapi"
-});
+]);
