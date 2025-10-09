@@ -104,7 +104,7 @@ export const NavModal = (props: {
                         <input
                             ref={fileInputRef}
                             style={{ display: "none" }}
-                            accept=".jpg"
+                            accept=".jpg, .avif"
                             type="file"
                             onChange={e => handleUploadImg(e)}
                         />
@@ -121,7 +121,7 @@ export const NavModal = (props: {
                                     {IMG_SIZE.navBanner.w}px寬
                                 </div>
                                 <div className="">{IMG_SIZE.navBanner.h}px高</div>
-                                <div className="">jpg file</div>
+                                <div className="">jpg or avif</div>
                             </div>
                         </div>
                     </div>

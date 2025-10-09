@@ -1,6 +1,4 @@
-use std::{
-    str::FromStr,
-};
+use std::str::FromStr;
 
 use actix_web::{
     Error,
