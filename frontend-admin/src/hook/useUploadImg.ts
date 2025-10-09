@@ -10,8 +10,10 @@ export const useUploadImg = (imgSize: { w: number, h: number }, maxSizeKB: numbe
             dispatchError('上傳圖片失敗')
             return
         }
-        if (!uploadedImageFile.name.endsWith(".jpg")) {
-            dispatchError('僅接受jpg檔案')
+        if (!uploadedImageFile.name.endsWith(".jpg") ||
+            !uploadedImageFile.name.endsWith(".avif")
+        ) {
+            dispatchError('僅接受jpg or avif')
             return
         }
         const transToBytes = maxSizeKB * 1024
