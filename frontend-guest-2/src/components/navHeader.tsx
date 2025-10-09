@@ -30,7 +30,6 @@ export const NavHeader = () => {
             });
         });
         Promise.all(promises);
-        console.log(1)
     }, [navs]);
     return <section className="my-4 h-[40px]">
         <>
