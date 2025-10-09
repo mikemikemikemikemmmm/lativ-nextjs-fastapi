@@ -1,11 +1,26 @@
+import { getApi } from "@/api/base";
 import { ASIDE_WIDTH } from "@/style/cssConst"
 import type { NavRead } from "@/types"
 import { getImgUrl } from "@/utils/env";
-import { useEffect } from "react";
+import { redirectTo404 } from "@/utils/errorHandler";
+import { useEffect, useState } from "react";
 import { NavLink } from "react-router";
-export const NavHeader = (props: { navs: NavRead[] }) => {
-    const { navs } = props
+export const NavHeader = () => {
+    const [navs, setNavs] = useState<NavRead[]>([])
     useEffect(() => {
+        const getN = async () => {
+            const { data, error } = await getApi<NavRead[]>("navs")
+            if (error) {
+                return redirectTo404()
+            }
+            setNavs(data)
+        }
+        getN()
+    }, []);
+    useEffect(() => {
+        if (navs.length === 0) {
+            return
+        }
         const preloadImages = async () => {
             const promises = navs.map(n => {
                 return new Promise<void>((resolve) => {
