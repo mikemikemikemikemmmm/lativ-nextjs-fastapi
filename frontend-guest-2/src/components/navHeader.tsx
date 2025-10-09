@@ -21,18 +21,16 @@ export const NavHeader = () => {
         if (navs.length === 0) {
             return
         }
-        const preloadImages = async () => {
-            const promises = navs.map(n => {
-                return new Promise<void>((resolve) => {
-                    const img = new Image();
-                    img.src = getImgUrl(n.img_file_name);
-                    img.onload = () => resolve();
-                    img.onerror = () => resolve(); // 錯誤也算完成
-                });
+        const promises = navs.map(n => {
+            return new Promise<void>((resolve) => {
+                const img = new Image();
+                img.src = getImgUrl(n.img_file_name);
+                img.onload = () => resolve();
+                img.onerror = () => resolve(); // 錯誤也算完成
             });
-            await Promise.all(promises);
-        }
-        preloadImages()
+        });
+        Promise.all(promises);
+        console.log(1)
     }, [navs]);
     return <section className="my-4 h-[40px]">
         <>
