@@ -5,18 +5,8 @@ import { getImgUrl } from "@/utils/env";
 import { redirectTo404 } from "@/utils/errorHandler";
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router";
-export const NavHeader = () => {
-    const [navs, setNavs] = useState<NavRead[]>([])
-    useEffect(() => {
-        const getN = async () => {
-            const { data, error } = await getApi<NavRead[]>("navs")
-            if (error) {
-                return redirectTo404()
-            }
-            setNavs(data)
-        }
-        getN()
-    }, []);
+export const NavHeader = (props: { navs: NavRead[] }) => {
+    const {navs} = props
     useEffect(() => {
         if (navs.length === 0) {
             return
