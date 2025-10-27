@@ -115,7 +115,7 @@ async fn get_categorys(
     let mut query_str = "";
     if q.nav_route.is_some() {
         query_str = r#"
-            SELECT 
+           SELECT 
                 c.id,
                 c.route,
                 c.name,
@@ -131,19 +131,20 @@ async fn get_categorys(
             FROM nav n
             INNER JOIN category c 
                 ON c.nav_id = n.id AND n.route = $1
-            INNER JOIN sub_category sc
-                ON sc.category_id = c.id
-            INNER JOIN series s
-                ON s.sub_category_id = sc.id
-            WHERE EXISTS (
-                SELECT 1
-                FROM product p
-                INNER JOIN sub_product sp
-                    ON sp.product_id = p.id
-                WHERE p.series_id = s.id
-            )
+            INNER JOIN (
+                SELECT DISTINCT sc.id, sc.route, sc.name, sc.category_id, sc."order"
+                FROM sub_category sc
+                INNER JOIN series s ON s.sub_category_id = sc.id
+                WHERE EXISTS (
+                    SELECT 1
+                    FROM product p
+                    INNER JOIN sub_product sp
+                        ON sp.product_id = p.id
+                    WHERE p.series_id = s.id
+                )
+            ) sc ON sc.category_id = c.id
             GROUP BY c.id, c.name, c.route, c."order", n.route
-            ORDER BY c."order"
+            ORDER BY c."order";
         "#;
     } else if q.product_id.is_some() {
         query_str = r#"
