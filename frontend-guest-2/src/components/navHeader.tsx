@@ -1,9 +1,7 @@
-import { getApi } from "@/api/base";
 import { ASIDE_WIDTH } from "@/style/cssConst"
 import type { NavRead } from "@/types"
 import { getImgUrl } from "@/utils/env";
-import { redirectTo404 } from "@/utils/errorHandler";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { NavLink } from "react-router";
 export const NavHeader = (props: { navs: NavRead[] }) => {
     const {navs} = props
