@@ -1,7 +1,7 @@
 import { API_TIMEOUT } from "@/utils/constant";
 import { ENV } from "@/utils/env";
 export interface ApiErrorObj {
-    detail: string
+    detail: string 
 }
 type ErrResult = { data: undefined; error: ApiErrorObj }
 type SuccessResult<T> = { data: T; error: undefined }
