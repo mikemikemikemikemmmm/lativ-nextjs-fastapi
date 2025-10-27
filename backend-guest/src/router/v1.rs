@@ -251,7 +251,8 @@ async fn get_series(
         INNER JOIN series s ON s.sub_category_id = sc.id
         INNER JOIN product p ON p.series_id = s.id
         INNER JOIN gender g ON g.id = p.gender_id
-        LEFT JOIN LATERAL (
+        -- 改為 INNER JOIN LATERAL，確保 product 一定有 sub_products
+        INNER JOIN LATERAL (
             SELECT json_agg(
                     jsonb_build_object(
                         'id', sp.id,
@@ -264,7 +265,7 @@ async fn get_series(
             FROM sub_product sp
             INNER JOIN color col ON col.id = sp.color_id
             WHERE sp.product_id = p.id
-        ) sp_json ON TRUE
+        ) sp_json ON sp_json.sub_products IS NOT NULL  -- 確保至少有一個 sub_product
         GROUP BY s.id, sc.name
         ORDER BY s."order";
         "#;
