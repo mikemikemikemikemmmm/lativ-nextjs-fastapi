@@ -23,7 +23,6 @@ jobs:
             export PATH="/home/ubuntu/.local/bin:$PATH"
             export APP_DIR=/home/ubuntu/fastapi
             export BACKEND_ADMIN_DIR=/home/ubuntu/fastapi/backend-admin
-            export BACKEND_GUEST_DIR=/home/ubuntu/fastapi/backend-guest
             export MONITOR_DIR=/home/ubuntu/fastapi/monitor
             export ENVIRONMENT=prod
 
@@ -41,17 +40,6 @@ jobs:
               git reset --hard origin/main
             fi
 
-            #------------------------------------------------------------
-            # 進入專案backend guest資料夾
-            cd $BACKEND_GUEST_DIR
-            
-            cat <<EOF > ./.env.$ENVIRONMENT
-            ${{ secrets.BACKEND_GUEST_ENV_FILE_CONTENT }}
-            EOF
-            echo "生成.env"
-
-            echo "開始跑run.sh"
-            bash ./scripts/$ENVIRONMENT/run.sh
             #------------------------------------------------------------
             # 進入專案backend admin資料夾
             cd $BACKEND_ADMIN_DIR

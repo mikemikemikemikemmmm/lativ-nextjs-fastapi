@@ -1,4 +1,3 @@
-from sqlalchemy.orm import selectinload
 from sqlalchemy import select, func
 from typing import Type, TypeVar, Sequence, Callable
 from pydantic import BaseModel as BasePydanticSchema
@@ -6,6 +5,7 @@ import random
 
 from src.models.base import BaseSQLModel
 from src.errorHandler._global import ErrorHandler
+from src.service.img import delete_img
 from sqlalchemy.ext.asyncio import AsyncSession
 
 BaseSQLModelType = Type[BaseSQLModel]
@@ -127,12 +127,12 @@ class common_service:
         if not item:
             return ErrorHandler.raise_404_not_found("物件不存在")
 
-        # 刪除 S3 圖片
+        # 刪除本地圖片
         try:
             if item.img_file_name:
-                delete_img_from_s3(item.img_file_name)
+                delete_img(item.img_file_name)
         except Exception as del_e:
-            print(f"S3 舊圖片刪除失敗: {del_e}")
+            print(f"本地圖片刪除失敗: {del_e}")
 
         try:
             if cb:

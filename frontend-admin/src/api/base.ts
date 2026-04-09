@@ -16,7 +16,7 @@ export async function baseFetch<Response>(
     needLoading: boolean = true,
     isGuest: boolean = false
 ): Promise<ApiResult<Response>> {
-    const urlWithBase = `${ENV.backendUrl}v1/${isGuest ? "guest" : "admin"}/${url}`
+    const urlWithBase = `${ENV.backendUrl}/v1/${isGuest ? "" : "admin/"}${url}`
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), API_TIMEOUT);
     if (needLoading) {

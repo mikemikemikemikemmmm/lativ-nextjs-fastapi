@@ -1,11 +1,4 @@
 from fastapi import APIRouter
-from sqlalchemy import text, select, func
-from src.db import SessionDepend
-from src.models.series import CreateSchema, SeriesModel, UpdateSchema
-from src.service.common import common_service
-series_router = APIRouter()
-
-from fastapi import APIRouter
 from sqlalchemy import text
 from src.db import SessionDepend
 from src.models.series import SeriesModel, CreateSchema, UpdateSchema

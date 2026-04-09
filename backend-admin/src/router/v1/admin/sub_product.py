@@ -3,7 +3,7 @@ from src.db import SessionDepend
 from src.models.subProduct import SubProductModel
 from src.service.common import common_service
 from sqlalchemy import select, delete
-from src.service.img import upload_img_to_s3, delete_img_from_s3
+from src.service.img import save_img, delete_img
 from src.errorHandler._global import ErrorHandler
 from src.models.size import SizeModel
 from src.models.sizeSubproduct import SizeSubProductModel
@@ -35,7 +35,7 @@ async def create_one(
     if len(sizes) != len(json_size_ids):
         return ErrorHandler.raise_500_server_error("新增副產品失敗，尺寸有誤")
 
-    obj_file_name, error = upload_img_to_s3(file, "sub_product")
+    obj_file_name, error = save_img(file, "sub_product")
     if not obj_file_name:
         return ErrorHandler.raise_500_server_error("新增副產品失敗，上傳圖片有誤")
 
@@ -65,9 +65,9 @@ async def create_one(
         print(e)
         await db.rollback()
         try:
-            delete_img_from_s3(obj_file_name)
+            delete_img(obj_file_name)
         except Exception as del_e:
-            print(f"S3 rollback 失敗: {del_e}")
+            print(f"rollback 失敗: {del_e}")
         return ErrorHandler.raise_500_server_error("新增副產品失敗")
 
 
@@ -108,7 +108,7 @@ async def update_one(
     obj_file_name: Optional[str] = None
 
     if file:
-        obj_file_name, error = upload_img_to_s3(file, "sub_product")
+        obj_file_name, error = save_img(file, "sub_product")
         if not obj_file_name:
             return ErrorHandler.raise_500_server_error("更新副產品失敗，上傳圖片有誤")
         sub_product.img_file_name = obj_file_name
@@ -129,9 +129,9 @@ async def update_one(
 
         if file and old_file_name:
             try:
-                delete_img_from_s3(old_file_name)
+                delete_img(old_file_name)
             except Exception as del_e:
-                print(f"S3 刪除舊圖片失敗: {del_e}")
+                print(f"刪除舊圖片失敗: {del_e}")
 
         return sub_product
     except Exception as e:
@@ -139,9 +139,9 @@ async def update_one(
         await db.rollback()
         if file and obj_file_name:
             try:
-                delete_img_from_s3(obj_file_name)
+                delete_img(obj_file_name)
             except Exception as del_e:
-                print(f"S3 rollback 失敗: {del_e}")
+                print(f"rollback 失敗: {del_e}")
         return ErrorHandler.raise_500_server_error("更新副產品失敗")
 
 
@@ -155,9 +155,9 @@ async def delete_one(db: SessionDepend, id: int):
 
     if sub_product.img_file_name:
         try:
-            delete_img_from_s3(sub_product.img_file_name)
+            delete_img(sub_product.img_file_name)
         except Exception as del_e:
-            print(f"S3 舊圖片刪除失敗: {del_e}")
+            print(f"舊圖片刪除失敗: {del_e}")
 
     stmt = delete(SizeSubProductModel).where(SizeSubProductModel.sub_product_id == sub_product.id)
     await db.execute(stmt)

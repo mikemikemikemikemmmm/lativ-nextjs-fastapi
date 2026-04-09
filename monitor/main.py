@@ -8,7 +8,6 @@ EMAIL_FROM="mikespiderman1992@gmail.com"
 EMAIL_PASSWORD="mgdi patq pbyi cvfs"
 EMAIL_TO="mikem40099@gmail.com"
 BACKEND_ADMIN_URL="http://127.0.0.1:8001/admin/health_check"
-BACKEND_GUEST_URL="http://127.0.0.1:8002/health_check"
 PORT=8000
 
 MAX_EMAILS = 3           # 每個服務最多發送三封錯誤郵件
@@ -16,10 +15,7 @@ FAILURE_THRESHOLD = 3    # 連續失敗次數達到閾值才發郵件
 
 # ---------- 錯誤計數 ----------
 error_count_admin = 0
-error_count_guest = 0
-
 consecutive_fail_admin = 0
-consecutive_fail_guest = 0
 
 # ---------- 發送郵件 ----------
 def send_email(subject: str, content: str):
@@ -39,55 +35,34 @@ def send_email(subject: str, content: str):
         print(f"can't send email: {e}")
 
 # ---------- 健康檢查函數 ----------
-def check_backend(url: str, name: str, error_counter: str, scheduler: BlockingScheduler, job_id: str):
-    global error_count_admin, error_count_guest
-    global consecutive_fail_admin, consecutive_fail_guest
+def check_backend(url: str, name: str, scheduler: BlockingScheduler, job_id: str):
+    global error_count_admin, consecutive_fail_admin
 
     try:
         response = requests.get(url, timeout=10)
         if response.status_code != 200:
             print(f"{name} Status code: {response.status_code}")
-            if error_counter == "admin":
-                consecutive_fail_admin += 1
-                if consecutive_fail_admin >= 3:  # 出錯三次
-                    send_email(f"{name} 系統已崩潰", f"Status code: {response.status_code}")
-                    scheduler.remove_job(job_id)
-                    print(f"{name} job cancel")
-            else:
-                consecutive_fail_guest += 1
-                if consecutive_fail_guest >= 3:  # 出錯三次
-                    send_email(f"{name} 系統已崩潰", f"Status code: {response.status_code}")
-                    scheduler.remove_job(job_id)
-                    print(f"{name} job cancel")
+            consecutive_fail_admin += 1
+            if consecutive_fail_admin >= FAILURE_THRESHOLD:
+                send_email(f"{name} 系統已崩潰", f"Status code: {response.status_code}")
+                scheduler.remove_job(job_id)
+                print(f"{name} job cancel")
         else:
-            # 成功回應，重置連續失敗計數器
-            if error_counter == "admin":
-                consecutive_fail_admin = 0
-            else:
-                consecutive_fail_guest = 0
+            consecutive_fail_admin = 0
 
     except Exception as e:
         print(f"Exception: {e}")
-        if error_counter == "admin":
-            consecutive_fail_admin += 1
-            if consecutive_fail_admin >= 3:  # 出錯三次
-                send_email(f"{name} 監控系統出錯", f"{e}")
-                scheduler.remove_job(job_id)
-                print(f"{name} job cancel")
-        else:
-            consecutive_fail_guest += 1
-            if consecutive_fail_guest >= 3:  # 出錯三次
-                send_email(f"{name} 監控系統出錯", f"{e}")
-                scheduler.remove_job(job_id)
-                print(f"{name} job cancel")
+        consecutive_fail_admin += 1
+        if consecutive_fail_admin >= FAILURE_THRESHOLD:
+            send_email(f"{name} 監控系統出錯", f"{e}")
+            scheduler.remove_job(job_id)
+            print(f"{name} job cancel")
 
 # ---------- 排程 ----------
 def run_scheduler():
     scheduler = BlockingScheduler()
-    scheduler.add_job(lambda: check_backend(BACKEND_ADMIN_URL, "Admin", "admin", scheduler, "check_admin"),
+    scheduler.add_job(lambda: check_backend(BACKEND_ADMIN_URL, "Admin", scheduler, "check_admin"),
                       "interval", seconds=5, id="check_admin")
-    scheduler.add_job(lambda: check_backend(BACKEND_GUEST_URL, "Guest", "guest", scheduler, "check_guest"),
-                      "interval", seconds=5, id="check_guest")
     print("Scheduler started")
     scheduler.start()
 

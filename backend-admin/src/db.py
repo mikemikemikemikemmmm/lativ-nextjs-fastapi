@@ -1,27 +1,27 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
 from typing import Annotated
 from fastapi import Depends
 from src.setting import get_settings
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+from sqlalchemy.pool import NullPool
 
-from contextlib import asynccontextmanager
 
 setting = get_settings()
+_is_sqlite = setting.sql_url.startswith("sqlite")
 
-engine = create_async_engine(url=setting.sql_url)
+if _is_sqlite:
+    engine = create_async_engine(url=setting.sql_url, poolclass=NullPool)
+else:
+    engine = create_async_engine(
+        url=setting.sql_url,
+        pool_size=10,
+        max_overflow=20,
+        pool_pre_ping=True,
+    )
+
 AsyncSessionLocal = async_sessionmaker(
     bind=engine, class_=AsyncSession, expire_on_commit=False
 )
-
-# def get_db():
-#     pass
-#     db = AsyncSessionLocal()
-#     try:
-#         yield db
-#     finally:
-#         db.close()
 
 
 async def get_db():

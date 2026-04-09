@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xxd \"/c/code/lativ-nextjs-fastapi/frontend-guest/.env.development\")",
+      "Bash(sed -i 's/\\\\r//' \"/c/code/lativ-nextjs-fastapi/backend-admin/pyproject.toml\")",
+      "Bash(sed -i '/\"boto3==/d' \"/c/code/lativ-nextjs-fastapi/backend-admin/pyproject.toml\")",
+      "Bash(sed -i '/\"mypy-boto3-builder/d' \"/c/code/lativ-nextjs-fastapi/backend-admin/pyproject.toml\")",
+      "Bash(sed -i '/\"boto3-stubs/d' \"/c/code/lativ-nextjs-fastapi/backend-admin/pyproject.toml\")"
+    ]
+  }
+}

@@ -40,7 +40,7 @@ class AppLogger:
             file_handler.setFormatter(formatter)
             self.logger.addHandler(file_handler)
 
-            self.logger.setLevel(logging.DEBUG)  # 生產環境設定 DEBUG 級別
+            self.logger.setLevel(logging.INFO)
 
         self._initialized = True  # 標記初始化完成
 

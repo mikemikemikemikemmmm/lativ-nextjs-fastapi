@@ -3,7 +3,7 @@ export const isDevEnvironment = () => {
 }
 export const ENV = {
     backendUrl: process.env.NEXT_PUBLIC_BACKEND_BASE_URL,
-    imgUrlPrefix: process.env.NEXT_PUBLIC_S3_URL_PREFIX
+    imgUrlPrefix: process.env.NEXT_PUBLIC_IMG_BASE_URL
 }
 export const getImgUrl = (fileName: string) => {
     return ENV.imgUrlPrefix + fileName

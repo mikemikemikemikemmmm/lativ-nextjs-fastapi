@@ -4,7 +4,7 @@ from src.service.common import common_service
 from src.errorHandler._global import ErrorHandler
 from fastapi import APIRouter, File, Form, UploadFile
 from sqlalchemy import select
-from src.service.img import upload_img_to_s3, delete_img_from_s3
+from src.service.img import save_img, delete_img
 from typing import Optional
 
 nav_router = APIRouter()
@@ -37,7 +37,7 @@ async def create_one(
     route: str = Form(...),
     file: UploadFile = File(...),
 ):
-    obj_file_name, error = upload_img_to_s3(file, "nav_index")
+    obj_file_name, error = save_img(file, "nav_index")
     if not obj_file_name:
         print(error)
         return ErrorHandler.raise_500_server_error("新增失敗")
@@ -53,9 +53,9 @@ async def create_one(
     except Exception as e:
         print(e)
         try:
-            delete_img_from_s3(obj_file_name)
+            delete_img(obj_file_name)
         except Exception as del_e:
-            print(f"S3 rollback 失敗: {del_e}")
+            print(f"rollback 失敗: {del_e}")
         return ErrorHandler.raise_500_server_error("新增失敗")
 
 
@@ -75,16 +75,16 @@ async def update_one(
             return ErrorHandler.raise_404_not_found("物件不存在")
 
         if file:
-            obj_file_name, error = upload_img_to_s3(file, "nav_index")
+            obj_file_name, error = save_img(file, "nav_index")
             if not obj_file_name:
                 print(error)
                 return ErrorHandler.raise_500_server_error("圖片更新失敗")
 
             try:
                 if item.img_file_name:
-                    delete_img_from_s3(item.img_file_name)
+                    delete_img(item.img_file_name)
             except Exception as del_e:
-                print(f"S3 舊圖片刪除失敗: {del_e}")
+                print(f"舊圖片刪除失敗: {del_e}")
 
             item.img_file_name = obj_file_name
 
@@ -108,9 +108,9 @@ async def delete_one(db: SessionDepend, id: int):
         return ErrorHandler.raise_404_not_found("物件不存在")
 
     try:
-        delete_img_from_s3(item.img_file_name)
+        delete_img(item.img_file_name)
     except Exception as del_e:
-        print(f"S3 舊圖片刪除失敗: {del_e}")
+        print(f"舊圖片刪除失敗: {del_e}")
 
     try:
         await db.delete(item)

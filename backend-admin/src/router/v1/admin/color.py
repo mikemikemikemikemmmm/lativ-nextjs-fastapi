@@ -2,7 +2,7 @@ from fastapi import APIRouter, File, Form, UploadFile
 from src.db import SessionDepend
 from src.models.color import ColorModel
 from src.errorHandler._global import ErrorHandler
-from src.service.img import upload_img_to_s3, delete_img_from_s3
+from src.service.img import save_img, delete_img
 from sqlalchemy import text
 from typing import Optional
 from sqlalchemy import select
@@ -32,7 +32,7 @@ async def create_one(
     color_name: str = Form(...),
     file: UploadFile = File(None),
 ):
-    obj_file_name, error = upload_img_to_s3(file, "color")
+    obj_file_name, error = save_img(file, "color")
     if not obj_file_name:
         print(error)
         return ErrorHandler.raise_500_server_error("新增顏色失敗")
@@ -45,9 +45,9 @@ async def create_one(
     except Exception as e:
         print(e)
         try:
-            delete_img_from_s3(obj_file_name)
+            delete_img(obj_file_name)
         except Exception as del_e:
-            print(f"S3 rollback 失敗: {del_e}")
+            print(f"rollback 失敗: {del_e}")
         return ErrorHandler.raise_500_server_error("新增顏色失敗")
 
 
@@ -68,7 +68,7 @@ async def update_one(
 
         # 如果有上傳新圖片才更新
         if file:
-            obj_file_name, error = upload_img_to_s3(file, "color")
+            obj_file_name, error = save_img(file, "color")
             if not obj_file_name:
                 print(error)
                 return ErrorHandler.raise_500_server_error("圖片更新失敗")
@@ -76,9 +76,9 @@ async def update_one(
             # 刪除舊圖片（如果有需要）
             try:
                 if item.img_url:
-                    delete_img_from_s3(item.img_url)
+                    delete_img(item.img_url)
             except Exception as del_e:
-                print(f"S3 舊圖片刪除失敗: {del_e}")
+                print(f"舊圖片刪除失敗: {del_e}")
 
             item.img_url = obj_file_name
 
@@ -101,12 +101,12 @@ async def delete_one(db: SessionDepend, id: int):
     item = result.scalars().first()
     if not item:
         return ErrorHandler.raise_404_not_found("物件不存在")
-    # 刪除 S3 圖片
+    # 刪除圖片
     try:
-        delete_img_from_s3(item.img_url)
+        delete_img(item.img_url)
     except Exception as del_e:
         # 可以改成 logging
-        print(f"S3 舊圖片刪除失敗: {del_e}")
+        print(f"舊圖片刪除失敗: {del_e}")
 
     # 刪除資料庫記錄
     try:

@@ -67,8 +67,11 @@ def login_guard(
 ):
     auth_header = request.headers.get("authorization")
     if not auth_header:
-        return  ErrorHandler.raise_401_unauthorized()
-    token_str= auth_header.split(" ")[1]
+        return ErrorHandler.raise_401_unauthorized()
+    parts = auth_header.split(" ")
+    if len(parts) != 2 or parts[0].lower() != "bearer":
+        return ErrorHandler.raise_401_unauthorized()
+    token_str = parts[1]
     token = verify_token(token_str)
     if not token:
         return  ErrorHandler.raise_401_unauthorized()

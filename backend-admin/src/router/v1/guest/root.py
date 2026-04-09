@@ -1,11 +1,9 @@
 from fastapi import APIRouter
 from src.db import SessionDepend
 from sqlalchemy import text
-from .login import login_router
 from src.errorHandler._global import ErrorHandler
 
 guest_router = APIRouter()
-guest_router.include_router(login_router, prefix="/login")
 
 @guest_router.get("/navs/{nav_route}")
 async def get_nav_by_route(db: SessionDepend, nav_route: str):

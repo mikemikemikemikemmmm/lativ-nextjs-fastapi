@@ -39,7 +39,7 @@ export const appSlice = createSlice({
       const targetIndex = state.alertList.findIndex(a => a.id === action.payload)
       if (targetIndex !== -1) {
         const newList = [...state.alertList]
-        newList.splice(targetIndex)
+        newList.splice(targetIndex, 1)
         state.alertList = newList
       }
     }

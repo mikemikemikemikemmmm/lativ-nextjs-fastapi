@@ -1,4 +1,7 @@
+import os
+from pathlib import Path
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from src.lifespan import lifespan
 from src.setting import is_dev_environment
 from src.router.root import root_router
@@ -15,6 +18,13 @@ app = FastAPI(
     openapi_url="/openapi" if is_dev else None,
     root_path="/admin"
 )
+
+_env = os.getenv("ENVIRONMENT", "dev")
+_assets_dir = Path(__file__).resolve().parent.parent / "assets" / _env
+_assets_dir.mkdir(parents=True, exist_ok=True)
+app.mount("/assets", StaticFiles(directory=str(_assets_dir)), name="assets")
+
+
 @app.get("/health_check")
 def get_health():
     return "health"
