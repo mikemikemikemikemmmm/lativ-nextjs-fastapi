@@ -20,7 +20,7 @@ class AppLogger:
         if hasattr(self, "_initialized") and self._initialized:
             return
 
-        self.logger = logging.getLogger("backend")
+        self.logger = logging.getLogger("backend") 
         if self.logger.handlers:
             return  # 避免重複添加 handler
 
