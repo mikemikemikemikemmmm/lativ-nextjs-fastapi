@@ -64,6 +64,9 @@ jobs:
               find $TARGET_DIR -maxdepth 1 ! -name 'logs' ! -path $TARGET_DIR -exec rm -rf {} +
               tar -xzf /tmp/deploy.tar.gz -C $TARGET_DIR/
               rm /tmp/deploy.tar.gz
+              
+              echo '📝 Creating .env.prod...' 
+              echo '${{ secrets.ENV_FILE_CONTENT }}' | base64 --decode > $TARGET_DIR/.env.prod
 
               # 3. 安裝/同步依賴
               cd $TARGET_DIR
