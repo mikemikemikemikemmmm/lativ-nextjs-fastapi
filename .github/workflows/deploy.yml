@@ -36,10 +36,8 @@ jobs:
     - name: Setup gcloud
       uses: google-github-actions/setup-gcloud@v2
 
-    - name: Compress Project
-      run: |
-        # 只打包後端程式碼與必要的設定
-        tar -czf deploy.tar.gz backend-admin/
+    - name: Compress backend
+      run: tar -czf deploy.tar.gz backend-admin/
 
     - name: Upload to VM via IAP
       run: |
@@ -48,7 +46,7 @@ jobs:
           --zone="$ZONE" \
           --tunnel-through-iap
 
-    - name: Execute Remote Deployment
+    - name: Extract & install dependencies on VM
       run: |
         gcloud compute ssh "$VM_NAME" \
           --project="$PROJECT_ID" \
@@ -56,15 +54,36 @@ jobs:
           --tunnel-through-iap \
           --command="
             set -e
-            
+
             # 1. 準備目錄
             sudo mkdir -p $TARGET_DIR
             sudo chown -R \$USER:\$USER $TARGET_DIR
 
-            # 2. 解壓縮並覆蓋 (使用 --strip-components 視目錄結構調整)
+            # 2. 解壓縮
             tar -xzf /tmp/deploy.tar.gz -C $TARGET_DIR/
-            
-            # 3. 執行部署腳本
+            rm /tmp/deploy.tar.gz
+
+            # 3. 安裝 uv（若尚未安裝）
+            if ! command -v uv &> /dev/null; then
+              echo '📦 Installing uv...'
+              curl -LsSf https://astral.sh/uv/install.sh | sh
+              source \$HOME/.local/bin/env
+            fi
+
+            # 4. 同步 Python 依賴
+            echo '🛠️  Running uv sync...'
+            cd $TARGET_DIR/backend-admin
+            uv sync --frozen --no-dev
+          "
+
+    - name: Start service on VM
+      run: |
+        gcloud compute ssh "$VM_NAME" \
+          --project="$PROJECT_ID" \
+          --zone="$ZONE" \
+          --tunnel-through-iap \
+          --command="
+            set -e
             cd $TARGET_DIR/backend-admin
             chmod +x scripts/prod/run.sh
             ./scripts/prod/run.sh

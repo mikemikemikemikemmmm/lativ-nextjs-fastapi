@@ -13,19 +13,7 @@ echo "------------------------------------------"
 
 cd "$PROJECT_ROOT"
 
-# 1. 自動安裝 uv (如果尚未安裝)
-if ! command -v uv &> /dev/null; then
-    echo "📦 uv not found. Installing..."
-    curl -LsSf https://astral.sh/uv/install.sh | sh
-    source $HOME/.cargo/env
-fi
-
-# 2. 同步虛擬環境
-# --frozen 確保嚴格遵守 uv.lock
-echo "🛠️  Syncing Python environment with uv..."
-uv sync --frozen --no-dev
-
-# 3. 處理舊進程 (優雅停止)
+# 1. 處理舊進程 (優雅停止)
 echo "🛑 Checking for existing service on port $APP_PORT..."
 OLD_PID=$(lsof -t -i:$APP_PORT || true)
 
@@ -39,7 +27,7 @@ if [ -n "$OLD_PID" ]; then
     done
 fi
 
-# 4. 啟動新服務
+# 2. 啟動新服務
 echo "🔥 Starting FastAPI application..."
 # 使用 nohup 並將日誌輸出到 logs 目錄
 mkdir -p "$PROJECT_ROOT/logs"
@@ -50,7 +38,7 @@ nohup uv run uvicorn main:app \
     --forwarded-allow-ips='*' \
     > "$PROJECT_ROOT/logs/uvicorn.log" 2>&1 &
 
-# 5. 簡易健康檢查
+# 3. 簡易健康檢查
 sleep 2
 if ps -p $! > /dev/null; then
     echo "✅ Deployment successful! PID: $!"
