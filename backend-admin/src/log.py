@@ -15,7 +15,7 @@ class AppLogger:
                     cls._instance = super().__new__(cls)
         return cls._instance
 
-    def __init__(self):
+    def __init__(self): 
         # 避免 __init__ 被多次呼叫
         if hasattr(self, "_initialized") and self._initialized:
             return
