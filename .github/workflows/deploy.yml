@@ -31,7 +31,6 @@ jobs:
       run: |
             gcloud compute config-ssh --quiet
 
-            # 定義變數方便維護
             VM_NAME="${{ secrets.GCP_VM_NAME }}"
             PROJECT="${{ secrets.GCP_PROJECT_ID }}"
             ZONE="${{ secrets.GCP_ZONE }}"
@@ -45,17 +44,21 @@ jobs:
             --command="
                 set -e
                 
-                # 1. 處理目錄與權限
+                # 1. 使用 sudo 建立目錄，並確保當前使用者擁有該目錄權限
                 if [ ! -d '$TARGET_DIR' ]; then
+                echo '📁 Creating target directory...'
                 sudo mkdir -p $TARGET_DIR
-                sudo chown -R \$USER:\$USER $TARGET_DIR
                 fi
+                
+                # 關鍵：強制修正權限，確保 $USER 擁有該目錄及其父目錄的寫入權
+                sudo chown -R \$USER:\$USER $TARGET_DIR
 
                 # 2. Git Clone 或 Pull
                 if [ ! -d '$TARGET_DIR/.git' ]; then
                 echo '📦 Cloning repository...'
+                # 在 clone 之前先確保目錄是空的，避免 git 因為目錄已存在而報錯
+                rm -rf $TARGET_DIR/* $TARGET_DIR/.* 2>/dev/null || true
                 git clone $REPO_URL $TARGET_DIR
-                cd $TARGET_DIR
                 else
                 echo '⬇️ Pulling latest changes...'
                 cd $TARGET_DIR
@@ -64,6 +67,7 @@ jobs:
                 fi
 
                 # 3. 執行專案內的部署腳本
+                cd $TARGET_DIR
                 echo '🏃 Running project deployment script...'
                 chmod +x ./backend-admin/scripts/prod/run.sh
                 ./backend-admin/scripts/prod/run.sh
