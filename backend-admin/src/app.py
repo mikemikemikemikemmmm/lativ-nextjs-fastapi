@@ -31,4 +31,4 @@ def get_health():
 
 app.include_router(root_router)
 setup_global_error_handler(app)
-setup_global_middleware(app)
+setup_global_middleware(app) 
