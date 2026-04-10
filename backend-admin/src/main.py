@@ -1,6 +1,7 @@
 import os
 import uvicorn
 from src.utils.env import load_env
+
 load_env()
 
 port = os.getenv("PORT")

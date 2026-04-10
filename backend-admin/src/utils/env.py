@@ -6,6 +6,9 @@ def load_env():
     environment = os.getenv("ENVIRONMENT")
     if not environment:
         raise Exception("no environment env")
+    if environment == "prod":
+        print("current environment is prod, skip load env file")
+        return
     current_file = Path(__file__).resolve()
     target_dir = current_file.parent.parent.parent
     dotenv_file_name = f".env.{environment}"
