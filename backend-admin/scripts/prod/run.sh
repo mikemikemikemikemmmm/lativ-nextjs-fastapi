@@ -1,46 +1,55 @@
 #!/bin/bash
-set -e  # 發生錯誤時停止
-# 設定環境變數
-export ENVIRONMENT=prod
-DIR=/home/ubuntu/fastapi/backend-admin
-SERVICE_NAME=backend-admin
-echo ""
-echo "ENVIRONMENT=$ENVIRONMENT"
-echo "DIR=$DIR"
-echo "BACKEND_SERVICE_NAME=$SERVICE_NAME"
-echo ""
+# =================================================================
+# 部署腳本：Backend Admin (FastAPI)
+# =================================================================
 
-cd $DIR 
-echo "移動到$DIR"
-uv --version || echo "cannot run uv"
-uv sync 
-echo "uv sync成功"
+set -eo pipefail  # 更強大的錯誤捕捉，包含 pipeline 錯誤
 
+# 1. 設定變數 (建議使用絕對路徑並用雙引號包裹)
+readonly ENVIRONMENT="prod"
+readonly APP_DIR="/var/www/lativ-fastapi/backend-admin"
+readonly SERVICE_NAME="backend-admin"
+readonly SERVICE_FILE_SRC="$APP_DIR/scripts/prod/$SERVICE_NAME.service"
 
-#=================================
+# 印出部署資訊 (使用格式化輸出)
+echo "------------------------------------------"
+echo "🚀 開始部署: $SERVICE_NAME"
+echo "🌍 環境: $ENVIRONMENT"
+echo "📂 目錄: $APP_DIR"
+echo "------------------------------------------"
 
-if systemctl is-active --quiet "$SERVICE_NAME"; then
-    echo "$SERVICE_NAME 服務正在運行，準備停止..."
-    sudo systemctl stop "$SERVICE_NAME"
-else
-    echo "$SERVICE_NAME 服務未在運行，直接更新..."
+# 2. 移動到工作目錄
+cd "$APP_DIR" || { echo "❌ 無法進入目錄 $APP_DIR"; exit 1; }
+
+# 3. 執行 uv 同步
+echo "📦 正在更新依賴 (uv sync)..."
+if ! uv sync; then
+    echo "❌ uv sync 失敗，請檢查 python 環境或 pyproject.toml"
+    exit 1
 fi
 
-# 複製新的 service 檔案
-echo "更新 $SERVICE_NAME 的 service 檔案..."
-cd "./scripts/prod"
-sudo cp "$SERVICE_NAME.service" "/etc/systemd/system/$SERVICE_NAME.service"
+# 4. 更新 Systemd 設定 (先更新檔案，減少停機時間)
+if [ -f "$SERVICE_FILE_SRC" ]; then
+    echo "⚙️  更新 Systemd service 檔案..."
+    sudo cp "$SERVICE_FILE_SRC" "/etc/systemd/system/$SERVICE_NAME.service"
+    sudo systemctl daemon-reload
+else
+    echo "⚠️  警告: 找不到 service 檔案 $SERVICE_FILE_SRC，跳過更新..."
+fi
 
-# 重新載入 systemd
-echo "重新載入 systemd..."
-sudo systemctl daemon-reload
+# 5. 重啟服務 (使用 restart 通常比 stop + start 更快且穩定)
+echo "🔄 正在重啟服務 $SERVICE_NAME..."
+sudo systemctl restart "$SERVICE_NAME"
 
-# 啟動服務
-echo "啟動 $SERVICE_NAME 服務..."
-sudo systemctl start "$SERVICE_NAME"
+# 6. 驗證結果
+echo "🔍 檢查服務狀態..."
+# 這裡用 --no-pager 避免在自動化環境卡住，並只顯示前幾行重點
+if systemctl is-active --quiet "$SERVICE_NAME"; then
+    echo "✅ $SERVICE_NAME 部署成功且運行中！"
+    systemctl status "$SERVICE_NAME" --no-pager | grep "Active:"
+else
+    echo "❌ $SERVICE_NAME 啟動失敗！請檢查日誌: journalctl -u $SERVICE_NAME"
+    exit 1
+fi
 
-# 檢查服務狀態
-echo "檢查 $SERVICE_NAME 服務..."
-sudo systemctl status "$SERVICE_NAME"
-
-echo "BACKEND_ADMIN部署成功"
+echo "------------------------------------------"

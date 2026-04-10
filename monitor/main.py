@@ -1,12 +1,16 @@
+import os
 import requests
 import smtplib
 from email.message import EmailMessage
 from apscheduler.schedulers.blocking import BlockingScheduler
 from datetime import datetime
+from dotenv import load_dotenv
+
+load_dotenv()
 
 EMAIL_FROM="mikespiderman1992@gmail.com"
-EMAIL_PASSWORD="mgdi patq pbyi cvfs"
-EMAIL_TO="mikem40099@gmail.com"
+EMAIL_PASSWORD=os.environ["EMAIL_PASSWORD"]
+EMAIL_TO=os.environ["EMAIL_TO"]
 BACKEND_ADMIN_URL="http://127.0.0.1:8001/admin/health_check"
 PORT=8000
 

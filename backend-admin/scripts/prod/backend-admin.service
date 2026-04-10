@@ -1,17 +1,38 @@
 [Unit]
-Description=Backend Admin Service
-After=network.target
+Description=Backend Admin Service (FastAPI)
+# 確保網路與日誌服務就緒後再啟動
+After=network.target syslog.target
 
 [Service]
 User=ubuntu
 Group=ubuntu
-WorkingDirectory=/home/ubuntu/fastapi/backend-admin
+WorkingDirectory=/var/www/lativ-fastapi/backend-admin
+
+# 1. 環境變數優化
 Environment="ENVIRONMENT=prod"
-Environment="PYTHONPATH=."
-ExecStart=/home/ubuntu/.local/bin/uv run /home/ubuntu/fastapi/backend-admin/src/main.py
-Restart=no
+Environment="PYTHONPATH=/home/ubuntu/fastapi/backend-admin/src"
+# 建議將輸出緩衝關閉，這樣在 journalctl 才能即時看到 log
+Environment="PYTHONUNBUFFERED=1"
+
+# 2. 啟動指令優化
+# 使用 uv run 時，建議確保環境變數已在 WorkingDirectory 下同步
+ExecStart=/home/ubuntu/.local/bin/uv run src/main.py
+
+# 3. 穩定性增強：自動重啟
+# 設定 Restart=always，當程式當機或意外退出時會自動拉起來
+Restart=always
+# 每次重啟前等待 5 秒，避免在嚴重錯誤時無限快速迴圈導致系統負載過高
+RestartSec=5s
+
+# 4. 資源限制與安全性 (選擇性)
+# 限制程式能開啟的檔案數量，對高併發 API 很重要
+LimitNOFILE=65535
+
+# 5. 日誌管理
 StandardOutput=journal
 StandardError=journal
+# 設定日誌標籤，方便搜尋：journalctl -t backend-admin
+SyslogIdentifier=backend-admin
 
 [Install]
 WantedBy=multi-user.target
