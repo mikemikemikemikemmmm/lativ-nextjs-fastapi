@@ -22,10 +22,11 @@ else
     echo "$SERVICE_NAME 服務未在運行，直接更新..."
 fi
 
-# 複製新的 service 檔案（將 User/Group 替換為當前執行者）
+# 複製新的 service 檔案（將 User/Group/uv路徑 替換為當前環境）
 CURRENT_USER=$(whoami)
-echo "更新 $SERVICE_NAME 的 service 檔案 (User=$CURRENT_USER)..."
-sed "s/User=ubuntu/User=$CURRENT_USER/; s/Group=ubuntu/Group=$CURRENT_USER/" \
+UV_PATH=$(command -v uv)
+echo "更新 $SERVICE_NAME 的 service 檔案 (User=$CURRENT_USER, uv=$UV_PATH)..."
+sed "s|User=ubuntu|User=$CURRENT_USER|; s|Group=ubuntu|Group=$CURRENT_USER|; s|/home/ubuntu/.local/bin/uv|$UV_PATH|" \
     "$SCRIPT_DIR/$SERVICE_NAME.service" > /tmp/$SERVICE_NAME.service
 sudo cp /tmp/$SERVICE_NAME.service "/etc/systemd/system/$SERVICE_NAME.service"
 
