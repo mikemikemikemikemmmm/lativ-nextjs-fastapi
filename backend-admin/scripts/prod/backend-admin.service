@@ -6,11 +6,11 @@ After=network.target syslog.target
 [Service]
 User=ubuntu
 Group=ubuntu
-WorkingDirectory=/var/www/lativ-fastapi/backend-admin
+WorkingDirectory=/var/www/lativ-fastapi
 
 # 1. 環境變數優化
 Environment="ENVIRONMENT=prod"
-Environment="PYTHONPATH=/home/ubuntu/fastapi/backend-admin/src"
+Environment="PYTHONPATH=/var/www/lativ-fastapi/src"
 # 建議將輸出緩衝關閉，這樣在 journalctl 才能即時看到 log
 Environment="PYTHONUNBUFFERED=1"
 

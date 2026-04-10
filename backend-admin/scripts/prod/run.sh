@@ -1,25 +1,17 @@
 #!/bin/bash
 set -e  # 發生錯誤時停止
 
-# 設定環境變數
-
 export PATH="$HOME/.local/bin:$PATH"
 export ENVIRONMENT=prod
-DIR=/var/www/lativ-fastapi/backend-admin
+# 腳本執行時 CWD 已是 /var/www/lativ-fastapi (由 deploy.yml 設定)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SERVICE_NAME=backend-admin
 
 echo ""
 echo "ENVIRONMENT=$ENVIRONMENT"
-echo "DIR=$DIR"
+echo "SCRIPT_DIR=$SCRIPT_DIR"
 echo "SERVICE_NAME=$SERVICE_NAME"
 echo ""
-
-cd $DIR
-echo "移動到 $DIR"
-uv --version || echo "cannot run uv"
-uv sync
-echo "uv sync 成功"
 
 #=================================
 
@@ -47,12 +39,3 @@ echo "檢查 $SERVICE_NAME 服務..."
 sudo systemctl status "$SERVICE_NAME"
 
 echo "backend-admin 部署成功"
-"
-else
-    echo "❌ Deployment failed. Check $LOG_FILE"
-    exit 1
-fi"
-else
-    echo "❌ Deployment failed. Check $LOG_FILE"
-    exit 1
-fi
