@@ -3,53 +3,68 @@ name: Deploy to GCP VM
 on:
   push:
     branches: [ main ]
-    # 建議加上 path 過濾，只有當 backend 資料夾變動時才觸發 (選擇性)
     paths:
       - 'backend-admin/**'
+      - '.github/**'
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
-    # 這裡可以根據需要保留或移除，若使用 SA KEY 則不需要 permissions 寫入 id-token
+
     permissions:
-      contents: 'read'
-      id-token: 'write'
+      contents: read
+      id-token: write
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    # 1. 登入 Google Cloud (使用你提供的 Service Account Key)
-    - id: 'auth'
-      uses: 'google-github-actions/auth@v2'
+    - name: Auth to GCP
+      uses: google-github-actions/auth@v2
       with:
         credentials_json: '${{ secrets.GCP_SA_KEY }}'
 
-    # 2. 設定 gcloud SDK
-    - name: 'Set up Cloud SDK'
-      uses: 'google-github-actions/setup-gcloud@v2'
+    - name: Setup gcloud
+      uses: google-github-actions/setup-gcloud@v2
 
-    # 3. 透過 IAP 隧道執行遠端指令
-    - name: 'Deploy via SSH IAP'
+    - name: Deploy via SSH (IAP)
       run: |
-        # 預先設定 SSH 權限以免跳出互動提示
-        gcloud compute config-ssh --quiet
+            gcloud compute config-ssh --quiet
 
-        gcloud compute ssh ${{ secrets.GCP_VM_NAME }} \
-          --project=${{ secrets.GCP_PROJECT_ID }} \
-          --zone=${{ secrets.GCP_ZONE }}  \
-          --tunnel-through-iap \
-          --command="
-            # 1. 進入專案目錄
-            cd /var/www/lativ-fastapi &&
-            
-            # 2. 拉取最新程式碼 (若之前設過 sparse-checkout，這裡只會拉取特定部分)
-            git pull origin main &&
-            
-            # 3. 更新虛擬環境中的套件
-            ./venv/bin/pip install -r requirements.txt &&
-            
-            # 4. 重啟服務 (使用 sudo 並確保 visudo 已設定免密碼)
-            sudo systemctl restart fastapi
-          "
+            # 定義變數方便維護
+            VM_NAME="${{ secrets.GCP_VM_NAME }}"
+            PROJECT="${{ secrets.GCP_PROJECT_ID }}"
+            ZONE="${{ secrets.GCP_ZONE }}"
+            REPO_URL="https://github.com/mikemikemikemikemmmm/lativ-nextjs-fastapi.git"
+            TARGET_DIR="/var/www/lativ-fastapi"
+
+            gcloud compute ssh $VM_NAME \
+            --project=$PROJECT \
+            --zone=$ZONE \
+            --tunnel-through-iap \
+            --command="
+                set -e
+                
+                # 1. 處理目錄與權限
+                if [ ! -d '$TARGET_DIR' ]; then
+                sudo mkdir -p $TARGET_DIR
+                sudo chown -R \$USER:\$USER $TARGET_DIR
+                fi
+
+                # 2. Git Clone 或 Pull
+                if [ ! -d '$TARGET_DIR/.git' ]; then
+                echo '📦 Cloning repository...'
+                git clone $REPO_URL $TARGET_DIR
+                cd $TARGET_DIR
+                else
+                echo '⬇️ Pulling latest changes...'
+                cd $TARGET_DIR
+                git fetch origin main
+                git reset --hard origin/main
+                fi
+
+                # 3. 執行專案內的部署腳本
+                echo '🏃 Running project deployment script...'
+                chmod +x ./backend-admin/scripts/prod/run.sh
+                ./backend-admin/scripts/prod/run.sh
+            "
