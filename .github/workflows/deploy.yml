@@ -69,6 +69,5 @@ jobs:
                 # 3. 執行專案內的部署腳本
                 cd $TARGET_DIR
                 echo '🏃 Running project deployment script...'
-                chmod +x ./backend-admin/scripts/prod/run.sh
-                ./backend-admin/scripts/prod/run.sh
+                --command="bash -l -c 'chmod +x ./backend-admin/scripts/prod/run.sh && ./backend-admin/scripts/prod/run.sh'"
             "
