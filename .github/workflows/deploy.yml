@@ -7,13 +7,22 @@ on:
       - 'backend-admin/**'
       - '.github/**'
 
+concurrency:
+  group: deploy-backend
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     permissions:
       contents: read
       id-token: write
+
+    env:
+      VM_NAME: ${{ secrets.GCP_VM_NAME }}
+      PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+      ZONE: ${{ secrets.GCP_ZONE }}
+      TARGET_DIR: "/var/www/lativ-fastapi"
 
     steps:
     - name: Checkout code
@@ -26,55 +35,37 @@ jobs:
 
     - name: Setup gcloud
       uses: google-github-actions/setup-gcloud@v2
-      
-    - name: Install uv
-      uses: astral-sh/setup-uv@v7 
-      with:
-          # Install a specific version of uv.
-          version: "0.11.6"
 
-    - name: Deploy via SSH (IAP)
+    - name: Compress Project
       run: |
-            gcloud compute config-ssh --quiet
+        # 只打包後端程式碼與必要的設定
+        tar -czf deploy.tar.gz backend-admin/
 
-            VM_NAME="${{ secrets.GCP_VM_NAME }}"
-            PROJECT="${{ secrets.GCP_PROJECT_ID }}"
-            ZONE="${{ secrets.GCP_ZONE }}"
-            REPO_URL="https://github.com/mikemikemikemikemmmm/lativ-nextjs-fastapi.git"
-            TARGET_DIR="/var/www/lativ-fastapi"
+    - name: Upload to VM via IAP
+      run: |
+        gcloud compute scp deploy.tar.gz "$VM_NAME":/tmp/deploy.tar.gz \
+          --project="$PROJECT_ID" \
+          --zone="$ZONE" \
+          --tunnel-through-iap
 
-            gcloud compute ssh $VM_NAME \
-            --project=$PROJECT \
-            --zone=$ZONE \
-            --tunnel-through-iap \
-            --command="
-                set -e
-                
-                # 1. 使用 sudo 建立目錄，並確保當前使用者擁有該目錄權限
-                if [ ! -d '$TARGET_DIR' ]; then
-                echo '📁 Creating target directory...'
-                sudo mkdir -p $TARGET_DIR
-                fi
-                
-                # 關鍵：強制修正權限，確保 $USER 擁有該目錄及其父目錄的寫入權
-                sudo chown -R \$USER:\$USER $TARGET_DIR
+    - name: Execute Remote Deployment
+      run: |
+        gcloud compute ssh "$VM_NAME" \
+          --project="$PROJECT_ID" \
+          --zone="$ZONE" \
+          --tunnel-through-iap \
+          --command="
+            set -e
+            
+            # 1. 準備目錄
+            sudo mkdir -p $TARGET_DIR
+            sudo chown -R \$USER:\$USER $TARGET_DIR
 
-                # 2. Git Clone 或 Pull
-                if [ ! -d '$TARGET_DIR/.git' ]; then
-                echo '📦 Cloning repository...'
-                # 在 clone 之前先確保目錄是空的，避免 git 因為目錄已存在而報錯
-                rm -rf $TARGET_DIR/* $TARGET_DIR/.* 2>/dev/null || true
-                git clone $REPO_URL $TARGET_DIR
-                else
-                echo '⬇️ Pulling latest changes...'
-                cd $TARGET_DIR
-                git fetch origin main
-                git reset --hard origin/main
-                fi
-
-                # 3. 執行專案內的部署腳本
-                cd $TARGET_DIR
-                echo '🏃 Running project deployment script...'
-                chmod +x ./backend-admin/scripts/prod/run.sh
-                ./backend-admin/scripts/prod/run.sh
-            "
+            # 2. 解壓縮並覆蓋 (使用 --strip-components 視目錄結構調整)
+            tar -xzf /tmp/deploy.tar.gz -C $TARGET_DIR/
+            
+            # 3. 執行部署腳本
+            cd $TARGET_DIR/backend-admin
+            chmod +x scripts/prod/run.sh
+            ./scripts/prod/run.sh
+          "

@@ -1,57 +1,61 @@
 #!/bin/bash
-# backend-admin/scripts/prod/run.sh
+# 遇到錯誤立即停止
+set -e
 
-set -eo pipefail
-
-# 1. 設定變數 (因為腳本是在專案目錄內執行，我們用相對路徑轉絕對路徑)
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly APP_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)" # 指向 backend-admin 目錄
-readonly SERVICE_NAME="backend-admin"
-readonly SERVICE_FILE_SRC="$SCRIPT_DIR/$SERVICE_NAME.service"
-readonly UV_PATH="$HOME/.local/bin/uv"
-# --- 修正重點：動態偵測 uv 路徑 ---
-if command -v uv &> /dev/null; then
-    UV_PATH="$(command -v uv)"
-elif [ -f "$HOME/.local/bin/uv" ]; then
-    UV_PATH="$HOME/.local/bin/uv"
-else
-    echo "❌ 錯誤: 找不到 uv 指令，請確保 VM 已安裝 uv"
-    exit 1
-fi
-# ------------------------------
+APP_PORT=8000
+# 獲取腳本所在目錄的上一層即為專案根目錄 (backend-admin)
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
 echo "------------------------------------------"
-echo "🚀 執行專案內部部署腳本..."
-echo "📂 當前 APP 目錄: $APP_DIR"
-echo "🛠️  使用 uv 路徑: $UV_PATH"
+echo "🚀 Starting Deployment: $(date)"
+echo "📂 Project Root: $PROJECT_ROOT"
 echo "------------------------------------------"
 
-cd "$APP_DIR" || exit 1
+cd "$PROJECT_ROOT"
 
-# 2. 執行 uv 同步
-echo "📦 正在更新依賴 (uv sync)..."
-# 使用偵測到的 UV_PATH
-if ! "$UV_PATH" sync --no-dev; then
-    echo "❌ uv sync 失敗"
-    exit 1
-fi
-# 3. 更新 Systemd 設定
-if [ -f "$SERVICE_FILE_SRC" ]; then
-    echo "⚙️  更新 Systemd service 檔案..."
-    sudo cp "$SERVICE_FILE_SRC" "/etc/systemd/system/$SERVICE_NAME.service"
-    sudo systemctl daemon-reload
-else
-    echo "⚠️  警告: 找不到 service 檔案 $SERVICE_FILE_SRC"
+# 1. 自動安裝 uv (如果尚未安裝)
+if ! command -v uv &> /dev/null; then
+    echo "📦 uv not found. Installing..."
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+    source $HOME/.cargo/env
 fi
 
-# 4. 重啟服務
-echo "🔄 正在重啟服務 $SERVICE_NAME..."
-sudo systemctl restart "$SERVICE_NAME"
+# 2. 同步虛擬環境
+# --frozen 確保嚴格遵守 uv.lock
+echo "🛠️  Syncing Python environment with uv..."
+uv sync --frozen --no-dev
 
-# 5. 驗證結果
-if systemctl is-active --quiet "$SERVICE_NAME"; then
-    echo "✅ $SERVICE_NAME 部署成功！"
+# 3. 處理舊進程 (優雅停止)
+echo "🛑 Checking for existing service on port $APP_PORT..."
+OLD_PID=$(lsof -t -i:$APP_PORT || true)
+
+if [ -n "$OLD_PID" ]; then
+    echo "Found old process $OLD_PID. Killing..."
+    kill -15 "$OLD_PID"
+    # 等待最多 5 秒確保 Port 已釋放
+    for i in {1..5}; do
+        if ! lsof -i:$APP_PORT > /dev/null; then break; fi
+        sleep 1
+    done
+fi
+
+# 4. 啟動新服務
+echo "🔥 Starting FastAPI application..."
+# 使用 nohup 並將日誌輸出到 logs 目錄
+mkdir -p "$PROJECT_ROOT/logs"
+nohup uv run uvicorn main:app \
+    --host 0.0.0.0 \
+    --port $APP_PORT \
+    --proxy-headers \
+    --forwarded-allow-ips='*' \
+    > "$PROJECT_ROOT/logs/uvicorn.log" 2>&1 &
+
+# 5. 簡易健康檢查
+sleep 2
+if ps -p $! > /dev/null; then
+    echo "✅ Deployment successful! PID: $!"
+    echo "日誌位置: $PROJECT_ROOT/logs/uvicorn.log"
 else
-    echo "❌ $SERVICE_NAME 啟動失敗！"
+    echo "❌ Deployment failed. Check logs/uvicorn.log"
     exit 1
 fi
