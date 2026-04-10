@@ -2,7 +2,6 @@ from fastapi import HTTPException, FastAPI, Request
 from sqlalchemy.exc import SQLAlchemyError
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError, ResponseValidationError
-from psycopg2.errors import ForeignKeyViolation
 from src.log import get_logger
 class ErrorHandler:
     @staticmethod
@@ -55,14 +54,6 @@ def setup_global_error_handler(app: FastAPI):
         return JSONResponse(
             status_code=400,
             content={"detail": "輸入驗證錯誤"},
-        )
-
-    @app.exception_handler(ForeignKeyViolation)
-    def handleForeignKeyViolation(request: Request, exc: Exception):
-        get_logger().logErr(f"foreign key violation,exc={exc}")
-        return JSONResponse(
-            status_code=400,
-            content={"detail": "此物件被其他物件使用中"},
         )
 
     @app.exception_handler(ResponseValidationError)
