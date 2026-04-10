@@ -37,54 +37,42 @@ jobs:
       uses: google-github-actions/setup-gcloud@v2
 
     - name: Compress backend
-      run: tar -czf deploy.tar.gz backend-admin/
+        # 直接在根目錄壓縮內容，避免解壓後多一層目錄
+      run: tar -czf deploy.tar.gz -C backend-admin .
 
-    - name: Upload to VM via IAP
+    - name: Upload to VM
       run: |
-        gcloud compute scp deploy.tar.gz "$VM_NAME":/tmp/deploy.tar.gz \
-          --project="$PROJECT_ID" \
-          --zone="$ZONE" \
-          --tunnel-through-iap
+          gcloud compute scp deploy.tar.gz "$VM_NAME":/tmp/deploy.tar.gz \
+            --project="$PROJECT_ID" \
+            --zone="$ZONE" \
+            --tunnel-through-iap
 
-    - name: Extract & install dependencies on VM
+    - name: Execute Remote Deploy
       run: |
-        gcloud compute ssh "$VM_NAME" \
-          --project="$PROJECT_ID" \
-          --zone="$ZONE" \
-          --tunnel-through-iap \
-          --command="
-            set -e
+          gcloud compute ssh "$VM_NAME" \
+            --project="$PROJECT_ID" \
+            --zone="$ZONE" \
+            --tunnel-through-iap \
+            --command="
+              set -e
+              # 1. 初始化路徑
+              export PATH=\$HOME/.local/bin:\$PATH
+              sudo mkdir -p $TARGET_DIR
+              sudo chown \$USER:\$USER $TARGET_DIR
 
-            # 1. 準備目錄
-            sudo mkdir -p $TARGET_DIR
-            sudo chown -R \$USER:\$USER $TARGET_DIR
+              # 2. 解壓並清理舊檔 (排除 logs 資料夾以防遺失紀錄)
+              find $TARGET_DIR -maxdepth 1 ! -name 'logs' ! -path $TARGET_DIR -exec rm -rf {} +
+              tar -xzf /tmp/deploy.tar.gz -C $TARGET_DIR/
+              rm /tmp/deploy.tar.gz
 
-            # 2. 解壓縮
-            tar -xzf /tmp/deploy.tar.gz -C $TARGET_DIR/
-            rm /tmp/deploy.tar.gz
+              # 3. 安裝/同步依賴
+              cd $TARGET_DIR
+              command -v uv &> /dev/null || (curl -LsSf https://astral.sh/uv/install.sh | sh)
+              
+              echo '🛠️ Syncing dependencies...'
+              uv sync --frozen --no-dev
 
-            # 3. 安裝 uv（若尚未安裝）
-            if ! command -v uv &> /dev/null; then
-              echo '📦 Installing uv...'
-              curl -LsSf https://astral.sh/uv/install.sh | sh
-              source \$HOME/.local/bin/env
-            fi
-
-            # 4. 同步 Python 依賴
-            echo '🛠️  Running uv sync...'
-            cd $TARGET_DIR/backend-admin
-            uv sync --frozen --no-dev
-          "
-
-    - name: Start service on VM
-      run: |
-        gcloud compute ssh "$VM_NAME" \
-          --project="$PROJECT_ID" \
-          --zone="$ZONE" \
-          --tunnel-through-iap \
-          --command="
-            set -e
-            cd $TARGET_DIR/backend-admin
-            chmod +x scripts/prod/run.sh
-            ./scripts/prod/run.sh
-          "
+              # 4. 執行啟動腳本
+              chmod +x scripts/prod/run.sh
+              ./scripts/prod/run.sh
+            "
