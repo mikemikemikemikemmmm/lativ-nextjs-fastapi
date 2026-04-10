@@ -2,7 +2,7 @@
 # 遇到錯誤立即停止
 set -e
 
-APP_PORT=8000
+APP_PORT=8000 
 # 獲取腳本所在目錄的上一層即為專案根目錄 (backend-admin)
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
