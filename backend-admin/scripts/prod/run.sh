@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e  # 發生錯誤時停止
 
+echo "start run.sh"
 export PATH="$HOME/.local/bin:$PATH"
 export ENVIRONMENT=prod
 # 腳本執行時 CWD 已是 /var/www/lativ-fastapi (由 deploy.yml 設定)
