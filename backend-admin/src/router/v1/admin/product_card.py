@@ -37,7 +37,7 @@ async def get_card_by_color_id(db: SessionDepend, color_id: int):
                 FROM product p
                 INNER JOIN sub_product sp
                 ON sp.product_id = p.id AND sp.color_id = :color_id
-            ) AS having_color_product hcp
+            ) AS hcp
             ON p.id = hcp.id
             INNER JOIN sub_product sp
             ON sp.product_id = p.id

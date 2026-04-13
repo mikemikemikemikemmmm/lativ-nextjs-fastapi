@@ -67,34 +67,42 @@ async def get_categorys(
     if nav_route:
         stmt = text(
             """
-            SELECT 
+            SELECT
                 c.id,
                 c.route,
                 c.name,
                 n.route AS nav_route,
-                json_agg(
-                    json_build_object(
-                        'id', sc.id,
-                        'route', sc.route,
-                        'name', sc.name
-                    )
-                    ORDER BY sc."order"
-                ) AS sub_categorys 
+                (
+                    SELECT json_group_array(json_object(
+                        'id', sc2.id,
+                        'route', sc2.route,
+                        'name', sc2.name
+                    ))
+                    FROM (
+                        SELECT sc3.id, sc3.route, sc3.name
+                        FROM sub_category sc3
+                        INNER JOIN series s2 ON s2.sub_category_id = sc3.id
+                        WHERE sc3.category_id = c.id
+                        AND EXISTS (
+                            SELECT 1
+                            FROM product p2
+                            INNER JOIN sub_product sp2 ON sp2.product_id = p2.id
+                            WHERE p2.series_id = s2.id
+                        )
+                        GROUP BY sc3.id, sc3.route, sc3.name, sc3."order"
+                        ORDER BY sc3."order"
+                    ) sc2
+                ) AS sub_categorys
             FROM nav n
-            INNER JOIN category c 
-                ON c.nav_id = n.id AND n.route = :nav_route
-            INNER JOIN sub_category sc
-                ON sc.category_id = c.id
-            INNER JOIN series s
-                ON s.sub_category_id = sc.id
+            INNER JOIN category c ON c.nav_id = n.id AND n.route = :nav_route
             WHERE EXISTS (
                 SELECT 1
-                FROM product p
-                INNER JOIN sub_product sp
-                    ON sp.product_id = p.id
-                WHERE p.series_id = s.id
+                FROM sub_category sc
+                INNER JOIN series s ON s.sub_category_id = sc.id
+                INNER JOIN product p ON p.series_id = s.id
+                INNER JOIN sub_product sp ON sp.product_id = p.id
+                WHERE sc.category_id = c.id
             )
-            GROUP BY c.id, c.name, c.route, c."order", n.route
             ORDER BY c."order"
             """
         )
@@ -104,34 +112,36 @@ async def get_categorys(
     if product_id:
         stmt = text(
             """
-            SELECT 
+            SELECT
                 c.id,
                 c.route,
                 c.name,
                 n.route AS nav_route,
-                json_agg(
-                    json_build_object(
-                        'id', sc.id,
-                        'route', sc.route,
-                        'name', sc.name
-                    )
-                    ORDER BY sc."order"
-                ) AS sub_categorys 
+                (
+                    SELECT json_group_array(json_object(
+                        'id', sc2.id,
+                        'route', sc2.route,
+                        'name', sc2.name
+                    ))
+                    FROM (
+                        SELECT sc3.id, sc3.route, sc3.name
+                        FROM sub_category sc3
+                        INNER JOIN series s2 ON s2.sub_category_id = sc3.id
+                        INNER JOIN product p2 ON p2.series_id = s2.id AND p2.id = :product_id
+                        WHERE sc3.category_id = c.id
+                        GROUP BY sc3.id, sc3.route, sc3.name, sc3."order"
+                        ORDER BY sc3."order"
+                    ) sc2
+                ) AS sub_categorys
             FROM nav n
-            INNER JOIN category c 
-                ON c.nav_id = n.id
-            INNER JOIN sub_category sc
-                ON sc.category_id = c.id
-            INNER JOIN series s
-                ON s.sub_category_id = sc.id
+            INNER JOIN category c ON c.nav_id = n.id
             WHERE EXISTS (
                 SELECT 1
-                FROM product p
-                INNER JOIN sub_product sp
-                    ON sp.product_id = p.id AND p.id = :product_id
-                WHERE p.series_id = s.id
+                FROM sub_category sc
+                INNER JOIN series s ON s.sub_category_id = sc.id
+                INNER JOIN product p ON p.series_id = s.id AND p.id = :product_id
+                WHERE sc.category_id = c.id
             )
-            GROUP BY c.id, c.name, c.route, c."order", n.route
             ORDER BY c."order"
             """
         )
@@ -152,41 +162,46 @@ async def get_series(
             s.id,
             s.name,
             sc.name AS sub_category_name,
-            json_agg(
-                jsonb_build_object(
-                    'id', p.id,
-                    'img_url', p.img_url,
-                    'name', p.name,
-                    'gender_id', g.id,
-                    'gender_name', g.name,
-                    'order', p."order",
-                    'sub_products', sp_json.sub_products
-                ) ORDER BY p."order"
+            (
+                SELECT json_group_array(json_object(
+                    'id', p2.id,
+                    'img_url', p2.img_url,
+                    'name', p2.name,
+                    'gender_id', g2.id,
+                    'gender_name', g2.name,
+                    'order', p2.p_order,
+                    'sub_products', (
+                        SELECT json_group_array(json_object(
+                            'id', sp.id,
+                            'price', sp.price,
+                            'color_id', col.id,
+                            'color_name', col.name,
+                            'color_img_file_name', col.img_url
+                        ))
+                        FROM (
+                            SELECT sp2.id, sp2.price, sp2.color_id
+                            FROM sub_product sp2
+                            WHERE sp2.product_id = p2.id
+                            ORDER BY sp2."order"
+                        ) sp
+                        INNER JOIN color col ON col.id = sp.color_id
+                    )
+                ))
+                FROM (
+                    SELECT p3.id, p3.img_url, p3.name, p3."order" AS p_order, p3.gender_id
+                    FROM product p3
+                    WHERE p3.series_id = s.id
+                    ORDER BY p3."order"
+                ) p2
+                INNER JOIN gender g2 ON g2.id = p2.gender_id
             ) AS products
-        FROM nav n 
-        INNER JOIN category c 
+        FROM nav n
+        INNER JOIN category c
             ON c.nav_id = n.id AND n.route = :nav_route AND c.route = :category_route
-        INNER JOIN sub_category sc 
+        INNER JOIN sub_category sc
             ON sc.category_id = c.id AND sc.route = :sub_category_route
         INNER JOIN series s ON s.sub_category_id = sc.id
-        INNER JOIN product p ON p.series_id = s.id
-        INNER JOIN gender g ON g.id = p.gender_id
-        LEFT JOIN LATERAL (
-            SELECT json_agg(
-                    jsonb_build_object(
-                        'id', sp.id,
-                        'price', sp.price,
-                        'color_id', col.id,
-                        'color_name', col.name,
-                        'color_img_file_name', col.img_url
-                    ) ORDER BY sp."order"
-                ) AS sub_products
-            FROM sub_product sp
-            INNER JOIN color col ON col.id = sp.color_id
-            WHERE sp.product_id = p.id
-        ) sp_json ON TRUE
-        GROUP BY s.id, sc.name
-        ORDER BY s."order";
+        ORDER BY s."order"
         """
     )
     result = (
@@ -212,24 +227,26 @@ async def get_product_cards(db: SessionDepend, nav_route: str):
             p.name,
             g.name AS gender_name,
             (
-                SELECT json_agg(
-                    jsonb_build_object(
-                        'id', sp.id,
-                        'price', sp.price,
-                        'color_id', col.id,
-                        'color_name', col.name,
-                        'color_img_file_name', col.img_url
-                    ) ORDER BY sp."order"
-                )
-                FROM sub_product sp
+                SELECT json_group_array(json_object(
+                    'id', sp.id,
+                    'price', sp.price,
+                    'color_id', col.id,
+                    'color_name', col.name,
+                    'color_img_file_name', col.img_url
+                ))
+                FROM (
+                    SELECT sp2.id, sp2.price, sp2.color_id
+                    FROM sub_product sp2
+                    WHERE sp2.product_id = p.id
+                    ORDER BY sp2."order"
+                ) sp
                 INNER JOIN color col ON col.id = sp.color_id
-                WHERE sp.product_id = p.id
             ) AS sub_products
         FROM nav n
         INNER JOIN category c ON c.nav_id = n.id AND n.route = :nav_route
         INNER JOIN sub_category sc ON sc.category_id = c.id
         INNER JOIN series s ON s.sub_category_id = sc.id
-        INNER JOIN product p ON p.series_id = s.id 
+        INNER JOIN product p ON p.series_id = s.id
         INNER JOIN gender g ON g.id = p.gender_id
         WHERE EXISTS (
             SELECT 1
@@ -237,7 +254,7 @@ async def get_product_cards(db: SessionDepend, nav_route: str):
             WHERE sp.product_id = p.id
         )
         GROUP BY p.id, p.name, p.img_url, g.name
-        ORDER BY p."order";
+        ORDER BY p."order"
         """
     )
     result = (await db.execute(stmt, {"nav_route": nav_route})).mappings().all()
@@ -248,48 +265,44 @@ async def get_product_cards(db: SessionDepend, nav_route: str):
 async def get_product_detail(db: SessionDepend, product_id: int):
     stmt = text(
         """
-        WITH subproduct_sizes AS (
-            SELECT
-                ssp.sub_product_id,
-                jsonb_agg(
-                    jsonb_build_object('id', si.id, 'name', si.name)
-                    ORDER BY si."order"
-                ) AS sizes
-            FROM size_sub_product ssp
-            INNER JOIN size si ON si.id = ssp.size_id
-            GROUP BY ssp.sub_product_id
-        ),
-        sub_products_agg AS (
-            SELECT
-                sp.product_id,
-                jsonb_agg(
-                    jsonb_build_object(
+        SELECT
+            p.id,
+            p.img_url,
+            p.name,
+            g.name AS gender_name,
+            COALESCE(
+                (
+                    SELECT json_group_array(json_object(
                         'id', sp.id,
                         'price', sp.price,
                         'img_file_name', sp.img_file_name,
                         'color_id', col.id,
                         'color_name', col.name,
                         'color_img_file_name', col.img_url,
-                        'sizes', COALESCE(sizes.sizes, '[]'::jsonb)
-                    )
-                    ORDER BY sp."order"
-                ) AS sub_products
-            FROM sub_product sp
-            INNER JOIN color col ON col.id = sp.color_id
-            LEFT JOIN subproduct_sizes sizes ON sizes.sub_product_id = sp.id
-            GROUP BY sp.product_id
-        )
-        SELECT
-            p.id,
-            p.img_url,
-            p.name,
-            g.name AS gender_name,
-            COALESCE(spa.sub_products, '[]'::jsonb) AS sub_products
+                        'sizes', (
+                            SELECT json_group_array(json_object('id', si.id, 'name', si.name))
+                            FROM (
+                                SELECT si2.id, si2.name
+                                FROM size_sub_product ssp2
+                                INNER JOIN size si2 ON si2.id = ssp2.size_id
+                                WHERE ssp2.sub_product_id = sp.id
+                                ORDER BY si2."order"
+                            ) si
+                        )
+                    ))
+                    FROM (
+                        SELECT sp2.id, sp2.price, sp2.img_file_name, sp2.color_id
+                        FROM sub_product sp2
+                        WHERE sp2.product_id = p.id
+                        ORDER BY sp2."order"
+                    ) sp
+                    INNER JOIN color col ON col.id = sp.color_id
+                ),
+                '[]'
+            ) AS sub_products
         FROM product p
         INNER JOIN gender g ON g.id = p.gender_id
-        LEFT JOIN sub_products_agg spa ON spa.product_id = p.id
         WHERE p.id = :product_id
-        ORDER BY p."order";
         """
     )
     result = (

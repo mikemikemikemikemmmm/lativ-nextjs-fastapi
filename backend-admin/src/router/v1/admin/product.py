@@ -114,38 +114,47 @@ async def delete_one(db: SessionDepend, id: int):
 @product_router.get("/{productId}")
 async def get_all(db: SessionDepend, productId: int):
     stmt = text("""
-        SELECT 
+        SELECT
             p.id,
             p.img_url,
             p.name,
             g.name AS gender_name,
             g.id AS gender_id,
-            COUNT(sp.id) AS sub_product_count,
+            (SELECT COUNT(*) FROM sub_product sp_c WHERE sp_c.product_id = p.id) AS sub_product_count,
             p.series_id,
             COALESCE(
-                JSON_AGG(
-                    JSON_BUILD_OBJECT(
+                (
+                    SELECT json_group_array(json_object(
                         'id', sp.id,
                         'price', sp.price,
                         'img_file_name', sp.img_file_name,
-                        'color_id', c.id,
-                        'color_name', c.name,
-                        'color_img_url', c.img_url,
+                        'color_id', col.id,
+                        'color_name', col.name,
+                        'color_img_url', col.img_url,
                         'size_ids', (
-                            SELECT ARRAY_AGG(ssp.size_id ORDER BY s."order")
-                            FROM size_sub_product ssp
-                            JOIN size s ON ssp.size_id = s.id
-                            WHERE ssp.sub_product_id = sp.id
+                            SELECT json_group_array(ssp.size_id)
+                            FROM (
+                                SELECT ssp2.size_id
+                                FROM size_sub_product ssp2
+                                JOIN size s ON ssp2.size_id = s.id
+                                WHERE ssp2.sub_product_id = sp.id
+                                ORDER BY s."order"
+                            ) ssp
                         )
-                    ) ORDER BY sp."order"
-                ) FILTER (WHERE sp.id IS NOT NULL), '[]'
+                    ))
+                    FROM (
+                        SELECT sp2.id, sp2.price, sp2.img_file_name, sp2.color_id
+                        FROM sub_product sp2
+                        WHERE sp2.product_id = p.id
+                        ORDER BY sp2."order"
+                    ) sp
+                    JOIN color col ON col.id = sp.color_id
+                ),
+                '[]'
             ) AS sub_products
         FROM product p
         JOIN gender g ON p.gender_id = g.id
-        LEFT JOIN sub_product sp ON sp.product_id = p.id
-        LEFT JOIN color c ON sp.color_id = c.id
         WHERE p.id = :productId
-        GROUP BY p.id, p.img_url, p.name, g.name, g.id, p.series_id;
     """)
 
     result = await db.execute(stmt, {"productId": productId})
