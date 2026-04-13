@@ -74,7 +74,7 @@ jobs:
  
             # 3. 建立 .env.prod（安全 decode）
             echo '📝 Creating .env.prod...'
-            printf '%s' '$ENV_B64' | base64 -d > \$TARGET_DIR/.env.prod
+            printf '%s' "$ENV_B64" | base64 -d > "$TARGET_DIR/.env.prod"
 
             # 4. 安裝/同步依賴
             cd \$TARGET_DIR
