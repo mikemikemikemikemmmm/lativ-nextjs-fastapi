@@ -1,4 +1,4 @@
-
+gcp.json
 *.env*
 *.aws*
 backend-guest/target

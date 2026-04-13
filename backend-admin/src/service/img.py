@@ -10,8 +10,9 @@ ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "webp", "gif"}
 
 def _get_storage_client():
     settings =get_settings()
-    creds_env = settings.google_application_credentials
-    info = json.loads(creds_env)
+    creds_path = settings.gcp_credentials_json_path
+    with open(creds_path, "r") as f:
+        info = json.load(f)
     credentials = service_account.Credentials.from_service_account_info(info)
     return storage.Client(credentials=credentials, project=info.get("project_id"))
 
