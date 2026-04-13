@@ -71,7 +71,7 @@ jobs:
             find \$TARGET_DIR -maxdepth 1 ! -name 'logs' ! -path \$TARGET_DIR -exec rm -rf {} +
             tar -xzf /tmp/deploy.tar.gz -C \$TARGET_DIR/
             rm -f /tmp/deploy.tar.gz
-
+ 
             # 3. 建立 .env.prod（安全 decode）
             echo '📝 Creating .env.prod...'
             printf '%s' '$ENV_B64' | base64 -d > \$TARGET_DIR/.env.prod
