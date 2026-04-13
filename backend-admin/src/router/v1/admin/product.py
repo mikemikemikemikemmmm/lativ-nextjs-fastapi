@@ -1,3 +1,4 @@
+import json
 from fastapi import APIRouter, File, Form, UploadFile
 from src.db import SessionDepend
 from src.models.product import ProductModel
@@ -161,4 +162,9 @@ async def get_all(db: SessionDepend, productId: int):
     record = result.mappings().first()
     if not record:
         return ErrorHandler.raise_404_not_found()
-    return record
+    record_dict = dict(record)
+    record_dict["sub_products"] = json.loads(record_dict["sub_products"] or "[]")
+    for sp in record_dict["sub_products"]:
+        if isinstance(sp.get("size_ids"), str):
+            sp["size_ids"] = json.loads(sp["size_ids"] or "[]")
+    return record_dict
