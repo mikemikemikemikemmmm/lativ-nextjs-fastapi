@@ -6,5 +6,8 @@ export const ENV = {
     imgUrlPrefix: import.meta.env.VITE_IMG_BASE_URL,
 }
 export const getImgUrl = (fileName: string) => {
-    return ENV.imgUrlPrefix + fileName
+    if(isDevEnvironment()){
+        return ENV.imgUrlPrefix  + fileName
+    }
+    return ENV.imgUrlPrefix + "prod/" + fileName
 }
