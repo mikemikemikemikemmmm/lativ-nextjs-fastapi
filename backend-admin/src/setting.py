@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     port:str = os.getenv("PORT","")
     img_max_size_mb: int = int(os.getenv("IMG_MAX_SIZE_MB", "5"))
     gcp_storage_bucket: str = os.getenv("GCP_STORAGE_BUCKET", "")
+    google_application_credentials: str = os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "")
 
 settings = Settings()
 
@@ -24,7 +25,7 @@ if empty_fields:
 else:
     print("所有環境變數欄位都有值")
 
-
+print(settings.google_application_credentials)
 @lru_cache
 def get_settings():
     return Settings()

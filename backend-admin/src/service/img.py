@@ -2,7 +2,6 @@ import uuid
 from fastapi import UploadFile
 from src.setting import get_settings
 import json
-import os
 from google.cloud import storage
 from google.oauth2 import service_account
 
@@ -10,33 +9,12 @@ ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "webp", "gif"}
 
 
 def _get_storage_client():
-
-    creds_env = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-
-    if not creds_env:
-        return storage.Client()
-
-    creds_env = creds_env.strip()
-
-    try:
-        info = json.loads(creds_env)
-    except json.JSONDecodeError as e:
-        raise ValueError(f"GOOGLE_APPLICATION_CREDENTIALS 不是合法 JSON: {e}")
-
-    if not isinstance(info, dict):
-        raise ValueError("GOOGLE_APPLICATION_CREDENTIALS 必須是 JSON object")
-
-    required_keys = {"type", "project_id", "private_key", "client_email"}
-    missing = required_keys - set(info.keys())
-    if missing:
-        raise ValueError(f"service account JSON 缺少欄位: {missing}")
-
+    settings =get_settings()
+    creds_env = settings.google_application_credentials
+    info = json.loads(creds_env)
     credentials = service_account.Credentials.from_service_account_info(info)
+    return storage.Client(credentials=credentials, project=info.get("project_id"))
 
-    return storage.Client(
-        credentials=credentials,
-        project=info.get("project_id")
-    )
 
 def _get_blob(bucket_name: str, blob_name: str):
     client = _get_storage_client()
