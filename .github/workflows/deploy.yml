@@ -10,10 +10,10 @@ on:
 concurrency:
   group: deploy-backend
   cancel-in-progress: true
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     permissions:
       contents: read
       id-token: write
@@ -37,47 +37,53 @@ jobs:
       uses: google-github-actions/setup-gcloud@v2
 
     - name: Compress backend
-        # 直接在根目錄壓縮內容，避免解壓後多一層目錄
-      run: tar -czf deploy.tar.gz -C backend-admin .
+      run: |
+        # 直接壓縮 backend-admin 內容
+        tar -czf deploy.tar.gz -C backend-admin .
 
     - name: Upload to VM
       run: |
-          gcloud compute scp deploy.tar.gz "$VM_NAME":/tmp/deploy.tar.gz \
-            --project="$PROJECT_ID" \
-            --zone="$ZONE" \
-            --tunnel-through-iap
+        gcloud compute scp deploy.tar.gz "$VM_NAME":/tmp/deploy.tar.gz \
+          --project="$PROJECT_ID" \
+          --zone="$ZONE" \
+          --tunnel-through-iap
 
     - name: Execute Remote Deploy
       run: |
-          gcloud compute ssh "$VM_NAME" \
-            --project="$PROJECT_ID" \
-            --zone="$ZONE" \
-            --tunnel-through-iap \
-            --command="
-              set -e
-              # 1. 初始化路徑
-              export PATH=\$HOME/.local/bin:\$PATH
-              sudo mkdir -p $TARGET_DIR
-              sudo chown \$USER:\$USER $TARGET_DIR
+        # 🔐 先在本地 encode，避免 remote parsing 問題
+        ENV_B64=$(printf "%s" "${{ secrets.ENV_FILE_CONTENT }}" | base64 | tr -d '\n')
 
-              # 2. 解壓並清理舊檔 (排除 logs 資料夾以防遺失紀錄)
-              find $TARGET_DIR -maxdepth 1 ! -name 'logs' ! -path $TARGET_DIR -exec rm -rf {} +
-              tar -xzf /tmp/deploy.tar.gz -C $TARGET_DIR/
-              rm /tmp/deploy.tar.gz
+        gcloud compute ssh "$VM_NAME" \
+          --project="$PROJECT_ID" \
+          --zone="$ZONE" \
+          --tunnel-through-iap \
+          --command="
+            set -e
 
-              echo '📝 Creating .env.prod...'
-              cat <<EOF > $TARGET_DIR/.env.prod
-              ${{ secrets.ENV_FILE_CONTENT }}
-              EOF
-              
-              # 3. 安裝/同步依賴
-              cd $TARGET_DIR
-              command -v uv &> /dev/null || (curl -LsSf https://astral.sh/uv/install.sh | sh)
-              
-              echo '🛠️ Syncing dependencies...'
-              uv sync --frozen --no-dev
+            TARGET_DIR=$TARGET_DIR
 
-              # 4. 執行啟動腳本
-              chmod +x scripts/prod/run.sh
-              ./scripts/prod/run.sh
-            "
+            # 1. 初始化路徑
+            export PATH=\$HOME/.local/bin:\$PATH
+            sudo mkdir -p \$TARGET_DIR
+            sudo chown \$USER:\$USER \$TARGET_DIR
+
+            # 2. 解壓並清理舊檔 (保留 logs)
+            find \$TARGET_DIR -maxdepth 1 ! -name 'logs' ! -path \$TARGET_DIR -exec rm -rf {} +
+            tar -xzf /tmp/deploy.tar.gz -C \$TARGET_DIR/
+            rm -f /tmp/deploy.tar.gz
+
+            # 3. 建立 .env.prod（安全 decode）
+            echo '📝 Creating .env.prod...'
+            printf '%s' '$ENV_B64' | base64 -d > \$TARGET_DIR/.env.prod
+
+            # 4. 安裝/同步依賴
+            cd \$TARGET_DIR
+            command -v uv >/dev/null 2>&1 || (curl -LsSf https://astral.sh/uv/install.sh | sh)
+
+            echo '🛠️ Syncing dependencies...'
+            uv sync --frozen --no-dev
+
+            # 5. 啟動服務
+            chmod +x scripts/prod/run.sh
+            ./scripts/prod/run.sh
+          "
