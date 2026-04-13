@@ -20,7 +20,6 @@ ExecStart=/var/www/lativ-fastapi/.venv/bin/python -m src.main
 
 # 3. 穩定性增強：自動重啟
 # 設定 Restart=always，當程式當機或意外退出時會自動拉起來
-Restart=always
 # 每次重啟前等待 5 秒，避免在嚴重錯誤時無限快速迴圈導致系統負載過高
 RestartSec=5s
 
