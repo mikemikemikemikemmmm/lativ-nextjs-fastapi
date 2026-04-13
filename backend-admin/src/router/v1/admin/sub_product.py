@@ -53,9 +53,9 @@ async def create_one(
     await db.flush()  # 生成 new_data.id
 
     for size in sizes:
-        new_data.sizes.append(
-            SizeSubProductModel(sub_product_id=new_data.id, size_id=size.id)
-        )
+        new_size_sub_product = SizeSubProductModel(sub_product_id=new_data.id, size_id=size.id)
+        db.add(new_size_sub_product)
+        new_data.sizes.append(new_size_sub_product)
 
     try:
         await db.commit()

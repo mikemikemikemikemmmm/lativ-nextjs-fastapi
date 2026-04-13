@@ -9,8 +9,7 @@ if TYPE_CHECKING:
 class SizeSubProductModel(BaseSQLModel):
     __tablename__ = "size_sub_product"
 
-    # 覆寫 BaseSQLModel 的自增 id，避免與 composite PK 共存（nullable 以免 SQLite NOT NULL 衝突）
-    id: Mapped[Optional[int]] = mapped_column(Integer, primary_key=False, autoincrement=False, nullable=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True, nullable=True)
 
     is_show: Mapped[Optional[bool]]
     is_available: Mapped[Optional[bool]]
