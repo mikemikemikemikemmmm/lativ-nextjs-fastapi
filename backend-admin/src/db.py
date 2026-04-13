@@ -7,17 +7,12 @@ from sqlalchemy.pool import NullPool
 
 
 setting = get_settings()
-_is_sqlite = setting.sql_url.startswith("sqlite")
-
-if _is_sqlite:
-    engine = create_async_engine(url=setting.sql_url, poolclass=NullPool)
-else:
-    engine = create_async_engine(
-        url=setting.sql_url,
-        pool_size=10,
-        max_overflow=20,
-        pool_pre_ping=True,
-    )
+engine = create_async_engine(
+    url=setting.sql_url,
+    pool_size=10,
+    max_overflow=20,
+    pool_pre_ping=True,
+)
 
 AsyncSessionLocal = async_sessionmaker(
     bind=engine, class_=AsyncSession, expire_on_commit=False
