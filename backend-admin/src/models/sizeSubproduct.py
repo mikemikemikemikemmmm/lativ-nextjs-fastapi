@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 class SizeSubProductModel(BaseSQLModel):
     __tablename__ = "size_sub_product"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True, nullable=True)
+    id: Mapped[Optional[int]] = mapped_column(Integer, primary_key=False, autoincrement=False, nullable=True)
 
     is_show: Mapped[Optional[bool]]
     is_available: Mapped[Optional[bool]]
