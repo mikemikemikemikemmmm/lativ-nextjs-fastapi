@@ -1,8 +1,8 @@
-"""init
+"""asd
 
-Revision ID: a52a81f5d85a
+Revision ID: acaff2e2a3f3
 Revises: 
-Create Date: 2025-08-29 16:43:04.872299
+Create Date: 2026-04-14 01:38:26.849977
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'a52a81f5d85a'
+revision: str = 'acaff2e2a3f3'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -39,13 +39,15 @@ def upgrade() -> None:
     sa.UniqueConstraint('name')
     )
     op.create_table('nav',
-    sa.Column('order', sa.Integer(), server_default=sa.text("nextval('nav_order_seq')"), nullable=False),
+    sa.Column('order', sa.Integer(), nullable=False),
     sa.Column('route', sa.String(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
+    sa.Column('img_file_name', sa.String(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('order'),
     sa.UniqueConstraint('route')
     )
     op.create_table('size',
@@ -59,30 +61,32 @@ def upgrade() -> None:
     sa.UniqueConstraint('order')
     )
     op.create_table('category',
+    sa.Column('order', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
+    sa.Column('route', sa.String(), nullable=False),
     sa.Column('nav_id', sa.Integer(), nullable=False),
-    sa.Column('order', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.ForeignKeyConstraint(['nav_id'], ['nav.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('nav_id', 'name', name='category_nav_name_uc'),
-    sa.UniqueConstraint('nav_id', 'order', name='category_nav_order_uc')
+    sa.UniqueConstraint('nav_id', 'route', name='category_nav_route_uc'),
+    sa.UniqueConstraint('order')
     )
     op.create_table('sub_category',
     sa.Column('route', sa.String(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
+    sa.Column('order', sa.Integer(), nullable=False),
     sa.Column('category_id', sa.Integer(), nullable=False),
-    sa.Column('order', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.ForeignKeyConstraint(['category_id'], ['category.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('category_id', 'name', name='category_sub_category_name_uc'),
-    sa.UniqueConstraint('category_id', 'order', name='category_sub_category_order_uc'),
-    sa.UniqueConstraint('category_id', 'route', name='category_sub_category_route_uc')
+    sa.UniqueConstraint('category_id', 'route', name='category_sub_category_route_uc'),
+    sa.UniqueConstraint('order')
     )
     op.create_table('series',
     sa.Column('order', sa.Integer(), nullable=False),
@@ -99,41 +103,44 @@ def upgrade() -> None:
     )
     op.create_table('product',
     sa.Column('name', sa.String(), nullable=False),
+    sa.Column('img_url', sa.String(), nullable=False),
+    sa.Column('order', sa.Integer(), nullable=False),
     sa.Column('gender_id', sa.Integer(), nullable=False),
     sa.Column('series_id', sa.Integer(), nullable=False),
-    sa.Column('order', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.ForeignKeyConstraint(['gender_id'], ['gender.id'], ),
     sa.ForeignKeyConstraint(['series_id'], ['series.id'], ),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('series_id', 'order', name='series_id_product_order_uc')
+    sa.UniqueConstraint('order')
     )
     op.create_table('sub_product',
+    sa.Column('img_file_name', sa.String(), nullable=False),
     sa.Column('price', sa.Integer(), nullable=False),
+    sa.Column('order', sa.Integer(), nullable=False),
     sa.Column('color_id', sa.Integer(), nullable=False),
     sa.Column('product_id', sa.Integer(), nullable=False),
-    sa.Column('order', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.ForeignKeyConstraint(['color_id'], ['color.id'], ),
     sa.ForeignKeyConstraint(['product_id'], ['product.id'], ),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('product_id', 'order', name='sub_product_id_order_uc')
+    sa.UniqueConstraint('img_file_name'),
+    sa.UniqueConstraint('order')
     )
     op.create_table('size_sub_product',
-    sa.Column('is_show', sa.Boolean(), nullable=False),
-    sa.Column('is_available', sa.Boolean(), nullable=False),
+    sa.Column('id', sa.Integer(), autoincrement=False, nullable=True),
+    sa.Column('is_show', sa.Boolean(), nullable=True),
+    sa.Column('is_available', sa.Boolean(), nullable=True),
     sa.Column('size_id', sa.Integer(), nullable=False),
     sa.Column('sub_product_id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
-    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.ForeignKeyConstraint(['size_id'], ['size.id'], ),
     sa.ForeignKeyConstraint(['sub_product_id'], ['sub_product.id'], ),
-    sa.PrimaryKeyConstraint('size_id', 'sub_product_id', 'id')
+    sa.PrimaryKeyConstraint('size_id', 'sub_product_id')
     )
     # ### end Alembic commands ###
 

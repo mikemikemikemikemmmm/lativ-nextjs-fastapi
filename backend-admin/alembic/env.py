@@ -1,4 +1,5 @@
 from src.utils.env import load_env
+
 load_env()
 import os
 from logging.config import fileConfig
@@ -12,7 +13,7 @@ from alembic import context
 # access to the values within the .ini file in use.
 config = context.config
 # 注入 SQL_URL
-config.set_main_option("sqlalchemy.url", os.getenv("SQL_URL"))
+config.set_main_option("sqlalchemy.url", os.getenv("SQL_URL_SYNC"))
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -24,6 +25,7 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 from src.models.base import Base
+
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,

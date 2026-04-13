@@ -1,3 +1,4 @@
+import json
 from fastapi import APIRouter
 from src.db import SessionDepend
 from sqlalchemy import text
@@ -106,8 +107,8 @@ async def get_categorys(
             ORDER BY c."order"
             """
         )
-        result = (await db.execute(stmt, {"nav_route": nav_route})).mappings().all()
-        return result
+        rows = (await db.execute(stmt, {"nav_route": nav_route})).mappings().all()
+        return [{**r, "sub_categorys": json.loads(r["sub_categorys"])} for r in rows]
 
     if product_id:
         stmt = text(
@@ -145,8 +146,8 @@ async def get_categorys(
             ORDER BY c."order"
             """
         )
-        result = (await db.execute(stmt, {"product_id": product_id})).mappings().all()
-        return result
+        rows = (await db.execute(stmt, {"product_id": product_id})).mappings().all()
+        return [{**r, "sub_categorys": json.loads(r["sub_categorys"])} for r in rows]
 
 
 @guest_router.get("/series")
@@ -204,7 +205,7 @@ async def get_series(
         ORDER BY s."order"
         """
     )
-    result = (
+    rows = (
         await db.execute(
             stmt,
             {
@@ -214,6 +215,15 @@ async def get_series(
             },
         )
     ).mappings().all()
+    result = []
+    for r in rows:
+        row = dict(r)
+        products = json.loads(row["products"])
+        for p in products:
+            if isinstance(p.get("sub_products"), str):
+                p["sub_products"] = json.loads(p["sub_products"])
+        row["products"] = products
+        result.append(row)
     return result
 
 
@@ -257,8 +267,8 @@ async def get_product_cards(db: SessionDepend, nav_route: str):
         ORDER BY p."order"
         """
     )
-    result = (await db.execute(stmt, {"nav_route": nav_route})).mappings().all()
-    return result
+    rows = (await db.execute(stmt, {"nav_route": nav_route})).mappings().all()
+    return [{**r, "sub_products": json.loads(r["sub_products"])} for r in rows]
 
 
 @guest_router.get("/products")
@@ -310,4 +320,10 @@ async def get_product_detail(db: SessionDepend, product_id: int):
     ).mappings().first()
     if not result:
         return ErrorHandler.raise_404_not_found()
-    return result
+    row = dict(result)
+    sub_products = json.loads(row["sub_products"])
+    for sp in sub_products:
+        if isinstance(sp.get("sizes"), str):
+            sp["sizes"] = json.loads(sp["sizes"])
+    row["sub_products"] = sub_products
+    return row
