@@ -1,15 +1,15 @@
 import uuid
 from fastapi import UploadFile
 from src.setting import get_settings
+import json
+import os
+from google.cloud import storage
+from google.oauth2 import service_account
 
 ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "webp", "gif"}
 
 
 def _get_storage_client():
-    import json
-    import os
-    from google.cloud import storage
-    from google.oauth2 import service_account
 
     creds_env = os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "")
     if creds_env.strip().startswith("{"):
