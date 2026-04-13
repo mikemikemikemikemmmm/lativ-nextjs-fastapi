@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     jwt_key:str = os.getenv("JWT_KEY","")
     log_dir:str = os.getenv("LOG_DIR","")
     port:str = os.getenv("PORT","")
+    img_max_size_mb: int = int(os.getenv("IMG_MAX_SIZE_MB", "5"))
+    gcp_storage_bucket: str = os.getenv("GCP_STORAGE_BUCKET", "")
 
 settings = Settings()
 

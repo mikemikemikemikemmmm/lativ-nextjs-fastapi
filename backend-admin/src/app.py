@@ -1,9 +1,8 @@
 import os
 from pathlib import Path
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
 from src.lifespan import lifespan
-from src.setting import is_dev_environment
+from src.setting import is_dev_environment, get_settings
 from src.router.root import root_router
 from src.middleware.setup import setup_global_middleware
 from src.errorHandler._global import setup_global_error_handler
@@ -19,10 +18,14 @@ app = FastAPI(
     root_path="/admin"
 )
 
-_env = os.getenv("ENVIRONMENT", "dev")
-_assets_dir = Path(__file__).resolve().parent.parent / "assets" / _env
-_assets_dir.mkdir(parents=True, exist_ok=True)
-app.mount("/assets", StaticFiles(directory=str(_assets_dir)), name="assets")
+_settings = get_settings()
+if not _settings.gcp_storage_bucket:
+    from fastapi.staticfiles import StaticFiles
+    _env = os.getenv("ENVIRONMENT", "dev")
+    _assets_dir = Path(__file__).resolve().parent.parent / "assets" / _env
+    _assets_dir.mkdir(parents=True, exist_ok=True)
+    app.mount("/assets", StaticFiles(directory=str(_assets_dir)), name="assets")
+    print("本地靜態資源已掛載 /assets")
 
 
 @app.get("/health_check")

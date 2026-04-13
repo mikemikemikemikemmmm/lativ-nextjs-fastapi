@@ -16,7 +16,7 @@ Environment="PYTHONUNBUFFERED=1"
 
 # 2. 啟動指令優化
 # 使用 uv run 時，建議確保環境變數已在 WorkingDirectory 下同步
-ExecStart=/home/ubuntu/.local/bin/uv run python -m src.main
+ExecStart=/var/www/lativ-fastapi/.venv/bin/python -m src.main
 
 # 3. 穩定性增強：自動重啟
 # 設定 Restart=always，當程式當機或意外退出時會自動拉起來
