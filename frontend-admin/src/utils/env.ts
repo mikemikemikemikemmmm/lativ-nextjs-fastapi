@@ -6,6 +6,6 @@ export const ENV = {
     imgUrlPrefix: process.env.NEXT_PUBLIC_IMG_BASE_URL
 }
 export const getImgUrl = (fileName: string) => {
-    return `${ENV.imgUrlPrefix}/prod/${fileName}`
+    return `${ENV.imgUrlPrefix}prod/${fileName}`
 }
 export const isServerComponent = typeof window === "undefined";
