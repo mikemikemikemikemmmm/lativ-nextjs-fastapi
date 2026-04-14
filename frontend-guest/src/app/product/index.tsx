@@ -36,6 +36,9 @@ export function ProductPage() {
     const [size, setSize] = useState<SizeRead>(() => {
         return subproduct.sizes[0] || null
     })
+    useEffect(() => {
+        setSize(subproduct.sizes[0] || null)
+    }, [subproduct])
     const handleColor = (c: SubProductRead) => {
         setSubproduct(c)
     }
