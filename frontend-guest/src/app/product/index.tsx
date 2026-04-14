@@ -16,6 +16,7 @@ export const ProductPageLoader = async ({ params }: LoaderFunctionArgs) => {
     if (p.error || c.error) {
         throw redirect("/404")
     }
+    console.log(p,c,123)
     return { detail: p.data[0], categorys: c.data }
 }
 export function ProductPage() {
