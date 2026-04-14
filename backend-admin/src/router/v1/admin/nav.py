@@ -1,5 +1,6 @@
 from src.db import SessionDepend
 from src.models.nav import NavModel
+from src.models.category import CategoryModel
 from src.service.common import common_service
 from src.errorHandler._global import ErrorHandler
 from fastapi import APIRouter, File, Form, UploadFile
@@ -106,6 +107,8 @@ async def delete_one(db: SessionDepend, id: int):
     item = result.scalars().first()
     if not item:
         return ErrorHandler.raise_404_not_found("物件不存在")
+
+    await common_service.assert_no_children(db, id, [(CategoryModel, CategoryModel.nav_id)])
 
     try:
         delete_img(item.img_file_name)

@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from sqlalchemy import select
 from src.db import SessionDepend
 from src.models.category import CategoryModel, CreateSchema, UpdateSchema
+from src.models.subCategory import SubCategoryModel
 from src.service.common import common_service
 category_router = APIRouter()
 
@@ -13,6 +14,7 @@ async def create_one(db: SessionDepend, create_data: CreateSchema):
 
 @category_router.delete("/{id}")
 async def delete_one(db: SessionDepend, id: int):
+    await common_service.assert_no_children(db, id, [(SubCategoryModel, SubCategoryModel.category_id)])
     return await common_service.delete_one_by_id(db, CategoryModel, id)
 
 

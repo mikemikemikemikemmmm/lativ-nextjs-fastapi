@@ -2,6 +2,7 @@ import json
 from fastapi import APIRouter, File, Form, UploadFile
 from src.db import SessionDepend
 from src.models.product import ProductModel
+from src.models.subProduct import SubProductModel
 from src.service.common import common_service
 from sqlalchemy import text,select
 from src.errorHandler._global import ErrorHandler
@@ -96,6 +97,8 @@ async def delete_one(db: SessionDepend, id: int):
     product = result.scalars().first()
     if not product:
         return ErrorHandler.raise_404_not_found("產品不存在")
+
+    await common_service.assert_no_children(db, id, [(SubProductModel, SubProductModel.product_id)])
 
     try:
         delete_img(product.img_url)

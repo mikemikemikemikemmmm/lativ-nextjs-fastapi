@@ -14,13 +14,13 @@ class ProductModel(BaseSQLModel):
     name: Mapped[str]
     img_url: Mapped[str]
     order: Mapped[int] = mapped_column(unique=True)
-    gender_id: Mapped[int]= mapped_column(ForeignKey("gender.id"))
+    gender_id: Mapped[int]= mapped_column(ForeignKey("gender.id", ondelete="RESTRICT"))
     gender: Mapped["GenderModel"] = relationship()
 
-    series_id: Mapped[int]= mapped_column(ForeignKey("series.id"))
+    series_id: Mapped[int]= mapped_column(ForeignKey("series.id", ondelete="RESTRICT"))
     series: Mapped["SeriesModel"] = relationship(back_populates="products")
 
-    sub_products: Mapped[List["SubProductModel"]] = relationship(back_populates="product")
+    sub_products: Mapped[List["SubProductModel"]] = relationship(back_populates="product", passive_deletes=True)
 
 class BaseSchema(BasePydanticSchema):
     name: str

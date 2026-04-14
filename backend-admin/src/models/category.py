@@ -14,10 +14,10 @@ class CategoryModel(BaseSQLModel):
     order: Mapped[int] = mapped_column(unique=True)
     name: Mapped[str]
     route: Mapped[str]
-    nav_id: Mapped[int] = mapped_column(ForeignKey("nav.id"))
+    nav_id: Mapped[int] = mapped_column(ForeignKey("nav.id", ondelete="RESTRICT"))
     nav: Mapped["NavModel"] = relationship(back_populates="categorys")
 
-    sub_categorys: Mapped["SubCategoryModel"] = relationship(back_populates="category")
+    sub_categorys: Mapped["SubCategoryModel"] = relationship(back_populates="category", passive_deletes=True)
 
     __table_args__ = (
         UniqueConstraint("nav_id", "name", name="category_nav_name_uc"),

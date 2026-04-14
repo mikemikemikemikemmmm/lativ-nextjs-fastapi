@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from sqlalchemy import text
 from src.db import SessionDepend
 from src.models.series import SeriesModel, CreateSchema, UpdateSchema
+from src.models.product import ProductModel
 from src.service.common import common_service
 
 series_router = APIRouter()
@@ -19,6 +20,7 @@ async def update_one(db: SessionDepend, update_data: UpdateSchema, id: int):
 
 @series_router.delete("/{id}")
 async def delete_one(db: SessionDepend, id: int):
+    await common_service.assert_no_children(db, id, [(ProductModel, ProductModel.series_id)])
     return await common_service.delete_one_by_id(db, SeriesModel, id)
 
 

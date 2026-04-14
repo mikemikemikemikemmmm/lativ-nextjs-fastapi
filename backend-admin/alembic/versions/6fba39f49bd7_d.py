@@ -1,8 +1,8 @@
-"""asd
+"""d
 
-Revision ID: acaff2e2a3f3
+Revision ID: 6fba39f49bd7
 Revises: 
-Create Date: 2026-04-14 01:38:26.849977
+Create Date: 2026-04-14 16:35:33.431700
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'acaff2e2a3f3'
+revision: str = '6fba39f49bd7'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -68,7 +68,7 @@ def upgrade() -> None:
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.ForeignKeyConstraint(['nav_id'], ['nav.id'], ),
+    sa.ForeignKeyConstraint(['nav_id'], ['nav.id'], ondelete='RESTRICT'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('nav_id', 'name', name='category_nav_name_uc'),
     sa.UniqueConstraint('nav_id', 'route', name='category_nav_route_uc'),
@@ -82,7 +82,7 @@ def upgrade() -> None:
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.ForeignKeyConstraint(['category_id'], ['category.id'], ),
+    sa.ForeignKeyConstraint(['category_id'], ['category.id'], ondelete='RESTRICT'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('category_id', 'name', name='category_sub_category_name_uc'),
     sa.UniqueConstraint('category_id', 'route', name='category_sub_category_route_uc'),
@@ -95,7 +95,7 @@ def upgrade() -> None:
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.ForeignKeyConstraint(['sub_category_id'], ['sub_category.id'], ),
+    sa.ForeignKeyConstraint(['sub_category_id'], ['sub_category.id'], ondelete='RESTRICT'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name'),
     sa.UniqueConstraint('order'),
@@ -110,8 +110,8 @@ def upgrade() -> None:
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.ForeignKeyConstraint(['gender_id'], ['gender.id'], ),
-    sa.ForeignKeyConstraint(['series_id'], ['series.id'], ),
+    sa.ForeignKeyConstraint(['gender_id'], ['gender.id'], ondelete='RESTRICT'),
+    sa.ForeignKeyConstraint(['series_id'], ['series.id'], ondelete='RESTRICT'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('order')
     )
@@ -124,8 +124,8 @@ def upgrade() -> None:
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.ForeignKeyConstraint(['color_id'], ['color.id'], ),
-    sa.ForeignKeyConstraint(['product_id'], ['product.id'], ),
+    sa.ForeignKeyConstraint(['color_id'], ['color.id'], ondelete='RESTRICT'),
+    sa.ForeignKeyConstraint(['product_id'], ['product.id'], ondelete='RESTRICT'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('img_file_name'),
     sa.UniqueConstraint('order')
@@ -138,8 +138,8 @@ def upgrade() -> None:
     sa.Column('sub_product_id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['size_id'], ['size.id'], ),
-    sa.ForeignKeyConstraint(['sub_product_id'], ['sub_product.id'], ),
+    sa.ForeignKeyConstraint(['size_id'], ['size.id'], ondelete='RESTRICT'),
+    sa.ForeignKeyConstraint(['sub_product_id'], ['sub_product.id'], ondelete='RESTRICT'),
     sa.PrimaryKeyConstraint('size_id', 'sub_product_id')
     )
     # ### end Alembic commands ###

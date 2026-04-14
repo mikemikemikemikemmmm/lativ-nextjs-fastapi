@@ -14,9 +14,9 @@ class SizeSubProductModel(BaseSQLModel):
     is_show: Mapped[Optional[bool]]
     is_available: Mapped[Optional[bool]]
 
-    size_id: Mapped[int] = mapped_column(ForeignKey("size.id"), primary_key=True)
+    size_id: Mapped[int] = mapped_column(ForeignKey("size.id", ondelete="RESTRICT"), primary_key=True)
     size: Mapped["SizeModel"] = relationship()
 
     sub_product_id: Mapped[int] = mapped_column(
-        ForeignKey("sub_product.id"), primary_key=True
+        ForeignKey("sub_product.id", ondelete="RESTRICT"), primary_key=True
     )

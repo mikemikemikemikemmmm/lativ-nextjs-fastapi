@@ -12,7 +12,7 @@ class NavModel(BaseSQLModel):
     route: Mapped[str] = mapped_column(unique=True)
     name: Mapped[str] 
     img_file_name:Mapped[str] 
-    categorys: Mapped[List["CategoryModel"]] = relationship(back_populates="nav")
+    categorys: Mapped[List["CategoryModel"]] = relationship(back_populates="nav", passive_deletes=True)
 
 
 class BaseSchema(BasePydanticSchema):

@@ -1,4 +1,5 @@
 from sqlalchemy import select, func
+from sqlalchemy.exc import IntegrityError
 from typing import Type, TypeVar, Sequence, Callable
 from pydantic import BaseModel as BasePydanticSchema
 import random
@@ -109,6 +110,15 @@ class common_service:
         return True
 
     @staticmethod
+    async def assert_no_children(session: AsyncSession, parent_id: int, child_fks: list[tuple]):
+        for child_model, fk_col in child_fks:
+            count = await session.scalar(
+                select(func.count()).select_from(child_model).where(fk_col == parent_id)
+            )
+            if count:
+                ErrorHandler.raise_custom_error(409, "此物件已被其他物件參照，禁止刪除")
+
+    @staticmethod
     async def get_max_order(db: AsyncSession, model: ModelType):
         if not getattr(model, "order", None):
             return ErrorHandler.raise_500_server_error("Items not found")
@@ -140,6 +150,9 @@ class common_service:
             await db.delete(item)
             await db.commit()
             return True
+        except IntegrityError:
+            await db.rollback()
+            raise
         except Exception as e:
             await db.rollback()
             print(e)

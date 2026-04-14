@@ -16,13 +16,13 @@ class SubProductModel(BaseSQLModel):
     price:Mapped[int]
     order: Mapped[int] = mapped_column(unique=True)
     
-    color_id: Mapped[int]= mapped_column(ForeignKey("color.id"))
+    color_id: Mapped[int]= mapped_column(ForeignKey("color.id", ondelete="RESTRICT"))
     color: Mapped["ColorModel"] = relationship()
-    
-    product_id: Mapped[int]= mapped_column(ForeignKey("product.id"))
+
+    product_id: Mapped[int]= mapped_column(ForeignKey("product.id", ondelete="RESTRICT"))
     product: Mapped["ProductModel"] = relationship(back_populates="sub_products")
 
-    sizes: Mapped[List["SizeSubProductModel"]] = relationship()
+    sizes: Mapped[List["SizeSubProductModel"]] = relationship(passive_deletes=True)
 
 class BaseSchema(BasePydanticSchema):
     sizes: str

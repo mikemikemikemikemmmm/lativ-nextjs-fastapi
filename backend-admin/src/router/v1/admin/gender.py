@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from src.db import SessionDepend
 from src.models.gender import CreateSchema, GenderModel, UpdateSchema
+from src.models.product import ProductModel
 from src.service.common import common_service
 
 gender_router = APIRouter()
@@ -24,4 +25,5 @@ async def update_one(db: SessionDepend, update_data: UpdateSchema, id: int):
 
 @gender_router.delete("/{id}")
 async def delete_one(db: SessionDepend, id: int):
+    await common_service.assert_no_children(db, id, [(ProductModel, ProductModel.gender_id)])
     return await common_service.delete_one_by_id(db, GenderModel, id)

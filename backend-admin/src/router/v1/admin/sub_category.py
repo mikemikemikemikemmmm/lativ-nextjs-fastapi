@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from src.db import SessionDepend
 from src.models.subCategory import CreateSchema, SubCategoryModel, UpdateSchema
+from src.models.series import SeriesModel
 from src.service.common import common_service
 from pydantic import BaseModel as BasePydanticSchema
 from sqlalchemy import text,select
@@ -66,4 +67,5 @@ async def update_one(db: SessionDepend, update_data: UpdateSchema, id: int):
 
 @sub_category_router.delete("/{id}")
 async def delete_one(db: SessionDepend, id: int):
+    await common_service.assert_no_children(db, id, [(SeriesModel, SeriesModel.sub_category_id)])
     return await common_service.delete_one_by_id(db, SubCategoryModel, id)

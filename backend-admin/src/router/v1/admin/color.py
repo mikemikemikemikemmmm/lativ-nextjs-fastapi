@@ -1,6 +1,8 @@
 from fastapi import APIRouter, File, Form, UploadFile
 from src.db import SessionDepend
 from src.models.color import ColorModel
+from src.models.subProduct import SubProductModel
+from src.service.common import common_service
 from src.errorHandler._global import ErrorHandler
 from src.service.img import save_img, delete_img
 from sqlalchemy import text
@@ -101,6 +103,8 @@ async def delete_one(db: SessionDepend, id: int):
     item = result.scalars().first()
     if not item:
         return ErrorHandler.raise_404_not_found("物件不存在")
+
+    await common_service.assert_no_children(db, id, [(SubProductModel, SubProductModel.color_id)])
     # 刪除圖片
     try:
         delete_img(item.img_url)

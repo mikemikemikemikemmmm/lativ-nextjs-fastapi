@@ -15,10 +15,10 @@ class SubCategoryModel(BaseSQLModel):
     name: Mapped[str]
     order: Mapped[int] = mapped_column(unique=True)
 
-    category_id: Mapped[int] = mapped_column(ForeignKey("category.id"))
+    category_id: Mapped[int] = mapped_column(ForeignKey("category.id", ondelete="RESTRICT"))
     category: Mapped["CategoryModel"] = relationship(back_populates="sub_categorys")
 
-    series: Mapped["SeriesModel"] = relationship(back_populates="sub_category")
+    series: Mapped["SeriesModel"] = relationship(back_populates="sub_category", passive_deletes=True)
     
     __table_args__ = (
         UniqueConstraint("category_id", "route", name="category_sub_category_route_uc"),
