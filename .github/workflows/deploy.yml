@@ -39,12 +39,15 @@ jobs:
 
       - name: Deploy and Execute
         run: |
+          # 強制設定 gcloud 不進行任何互動式詢問，並設置一個虛擬金鑰路徑以防止觸發生成
+          export GCLOUD_SSH_KEYFILE=/tmp/dummy_key
           # 1. 準備檔案並透過 SSH 管道直接傳輸到目標目錄，避開 scp 金鑰問題
           echo "📦 Compressing and uploading..."
           tar czf - -C backend-admin . | gcloud compute ssh "$VM_NAME" \
             --project="$PROJECT_ID" \
             --zone="$ZONE" \
             --tunnel-through-iap \
+            --quiet \
             --command="mkdir -p /tmp/deploy_staging && tar xzf - -C /tmp/deploy_staging"
 
           # 2. 執行部署邏輯
