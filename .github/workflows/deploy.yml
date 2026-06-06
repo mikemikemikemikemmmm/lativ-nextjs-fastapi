@@ -10,6 +10,7 @@ on:
 concurrency:
   group: deploy-backend
   cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -25,67 +26,65 @@ jobs:
       TARGET_DIR: "/var/www/lativ-fastapi"
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Auth to GCP
-      uses: google-github-actions/auth@v2
-      with:
-        credentials_json: '${{ secrets.GCP_SA_KEY }}'
+      - name: Auth to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
 
-    - name: Setup gcloud
-      uses: google-github-actions/setup-gcloud@v2
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
 
+      - name: Deploy and Execute
+        run: |
+          # 1. 準備檔案並透過 SSH 管道直接傳輸到目標目錄，避開 scp 金鑰問題
+          echo "📦 Compressing and uploading..."
+          tar czf - -C backend-admin . | gcloud compute ssh "$VM_NAME" \
+            --project="$PROJECT_ID" \
+            --zone="$ZONE" \
+            --tunnel-through-iap \
+            --command="mkdir -p /tmp/deploy_staging && tar xzf - -C /tmp/deploy_staging"
 
-    - name: Compress backend
-      run: |
-        # 直接壓縮 backend-admin 內容
-        tar -czf deploy.tar.gz -C backend-admin .
+          # 2. 執行部署邏輯
+          echo "🚀 Executing deployment on VM..."
+          # 將 secret 轉為 Base64 傳遞，避免特殊字元被 Shell 解析錯誤
+          ENV_B64=$(printf "%s" "${{ secrets.ENV_FILE_CONTENT }}" | base64 | tr -d '\n')
+          
+          gcloud compute ssh "$VM_NAME" \
+            --project="$PROJECT_ID" \
+            --zone="$ZONE" \
+            --tunnel-through-iap \
+            --command="
+              set -e
+              TARGET_DIR=\"$TARGET_DIR\"
+              
+              # 初始化路徑與權限
+              sudo mkdir -p \$TARGET_DIR
+              sudo chown -R \$USER:\$USER \$TARGET_DIR
 
-    - name: Upload to VM
-      run: |
-        gcloud compute scp deploy.tar.gz "$VM_NAME":/tmp/deploy.tar.gz \
-          --project="$PROJECT_ID" \
-          --zone="$ZONE" \
-          --quiet \
-          --tunnel-through-iap
+              # 清理舊檔案 (保留 logs)
+              find \$TARGET_DIR -maxdepth 1 ! -name 'logs' ! -path \$TARGET_DIR -exec rm -rf {} +
+              
+              # 從暫存區移動檔案
+              cp -r /tmp/deploy_staging/* \$TARGET_DIR/
+              rm -rf /tmp/deploy_staging
+              
+              # 建立 .env.prod
+              printf '%s' '$ENV_B64' | base64 -d > \"\$TARGET_DIR/.env.prod\"
 
-    - name: Execute Remote Deploy
-      run: |
-        # 🔐 先在本地 encode，避免 remote parsing 問題
-        ENV_B64=$(printf "%s" "${{ secrets.ENV_FILE_CONTENT }}" | base64 | tr -d '\n')
+              # 安裝/同步依賴
+              cd \$TARGET_DIR
+              if ! command -v uv &> /dev/null; then
+                curl -LsSf https://astral.sh/uv/install.sh | sh
+                export PATH=\$HOME/.local/bin:\$PATH
+              fi
 
-        gcloud compute ssh "$VM_NAME" \
-          --project="$PROJECT_ID" \
-          --zone="$ZONE" \
-          --tunnel-through-iap \
-          --command="
-            set -e
+              echo '🛠️ Syncing dependencies...'
+              \$HOME/.local/bin/uv sync --frozen --no-dev
 
-            TARGET_DIR=$TARGET_DIR
-
-            # 1. 初始化路徑
-            export PATH=\$HOME/.local/bin:\$PATH
-            sudo mkdir -p \$TARGET_DIR
-            sudo chown \$USER:\$USER \$TARGET_DIR
-
-            # 2. 解壓並清理舊檔 (保留 logs)
-            find \$TARGET_DIR -maxdepth 1 ! -name 'logs' ! -path \$TARGET_DIR -exec rm -rf {} +
-            tar -xzf /tmp/deploy.tar.gz -C \$TARGET_DIR/
-            rm -f /tmp/deploy.tar.gz
- 
-            # 3. 建立 .env.prod（安全 decode）
-            echo '📝 Creating .env.prod...'
-            printf '%s' "$ENV_B64" | base64 -d > "$TARGET_DIR/.env.prod"
-
-            # 4. 安裝/同步依賴
-            cd \$TARGET_DIR
-            command -v uv >/dev/null 2>&1 || (curl -LsSf https://astral.sh/uv/install.sh | sh)
-
-            echo '🛠️ Syncing dependencies...'
-            uv sync --frozen --no-dev
-
-            # 5. 啟動服務
-            chmod +x scripts/prod/run.sh
-            ./scripts/prod/run.sh
-          "
+              # 啟動服務
+              chmod +x scripts/prod/run.sh
+              ./scripts/prod/run.sh
+            "
