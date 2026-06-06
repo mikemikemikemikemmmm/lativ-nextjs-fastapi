@@ -51,7 +51,7 @@ jobs:
           # 建立一個空的 known_hosts 以防 gcloud 嘗試寫入時鎖死
           touch ~/.ssh/google_compute_known_hosts
           chmod 644 ~/.ssh/google_compute_known_hosts
-          
+           
       - name: Deploy and Execute
         run: |
           $(gcloud info --format="value(basic.python_location)") -m pip install numpy
