@@ -61,35 +61,37 @@ jobs:
             --project="$PROJECT_ID" \
             --zone="$ZONE" \
             --tunnel-through-iap \
-            --command="
-              set -e
-              TARGET_DIR=\"$TARGET_DIR\"
+            --verbosity=debug \
+            --command="whoami"
+            # --command="
+            #   set -e
+            #   TARGET_DIR=\"$TARGET_DIR\"
               
-              # 初始化路徑與權限
-              sudo mkdir -p \$TARGET_DIR
-              sudo chown -R \$USER:\$USER \$TARGET_DIR
+            #   # 初始化路徑與權限
+            #   sudo mkdir -p \$TARGET_DIR
+            #   sudo chown -R \$USER:\$USER \$TARGET_DIR
 
-              # 清理舊檔案 (保留 logs)
-              find \$TARGET_DIR -maxdepth 1 ! -name 'logs' ! -path \$TARGET_DIR -exec rm -rf {} +
+            #   # 清理舊檔案 (保留 logs)
+            #   find \$TARGET_DIR -maxdepth 1 ! -name 'logs' ! -path \$TARGET_DIR -exec rm -rf {} +
               
-              # 從暫存區移動檔案
-              cp -r /tmp/deploy_staging/* \$TARGET_DIR/
-              rm -rf /tmp/deploy_staging
+            #   # 從暫存區移動檔案
+            #   cp -r /tmp/deploy_staging/* \$TARGET_DIR/
+            #   rm -rf /tmp/deploy_staging
               
-              # 建立 .env.prod
-              printf '%s' '$ENV_B64' | base64 -d > \"\$TARGET_DIR/.env.prod\"
+            #   # 建立 .env.prod
+            #   printf '%s' '$ENV_B64' | base64 -d > \"\$TARGET_DIR/.env.prod\"
 
-              # 安裝/同步依賴
-              cd \$TARGET_DIR
-              if ! command -v uv &> /dev/null; then
-                curl -LsSf https://astral.sh/uv/install.sh | sh
-                export PATH=\$HOME/.local/bin:\$PATH
-              fi
+            #   # 安裝/同步依賴
+            #   cd \$TARGET_DIR
+            #   if ! command -v uv &> /dev/null; then
+            #     curl -LsSf https://astral.sh/uv/install.sh | sh
+            #     export PATH=\$HOME/.local/bin:\$PATH
+            #   fi
 
-              echo '🛠️ Syncing dependencies...'
-              \$HOME/.local/bin/uv sync --frozen --no-dev
+            #   echo '🛠️ Syncing dependencies...'
+            #   \$HOME/.local/bin/uv sync --frozen --no-dev
 
-              # 啟動服務
-              chmod +x scripts/prod/run.sh
-              ./scripts/prod/run.sh
-            "
+            #   # 啟動服務
+            #   chmod +x scripts/prod/run.sh
+            #   ./scripts/prod/run.sh
+            # "
