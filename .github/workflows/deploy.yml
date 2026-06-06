@@ -51,19 +51,20 @@ jobs:
             --project="$PROJECT_ID" \
             --zone="$ZONE" \
             --tunnel-through-iap \
+            --troubleshoot \
             --quiet \
             --command="mkdir -p /tmp/deploy_staging && tar xzf - -C /tmp/deploy_staging"
 
-          # 2. 執行部署邏輯
-          echo "🚀 Executing deployment on VM..."
-          # 將 secret 轉為 Base64 傳遞，避免特殊字元被 Shell 解析錯誤
-          ENV_B64=$(printf "%s" "${{ secrets.ENV_FILE_CONTENT }}" | base64 | tr -d '\n')
+          # # 2. 執行部署邏輯
+          # echo "🚀 Executing deployment on VM..."
+          # # 將 secret 轉為 Base64 傳遞，避免特殊字元被 Shell 解析錯誤
+          # ENV_B64=$(printf "%s" "${{ secrets.ENV_FILE_CONTENT }}" | base64 | tr -d '\n')
         
 
-          gcloud compute ssh "$VM_NAME" \
-            --project="$PROJECT_ID" \
-            --zone="$ZONE" \
-            --tunnel-through-iap \
+          # gcloud compute ssh "$VM_NAME" \
+          #   --project="$PROJECT_ID" \
+          #   --zone="$ZONE" \
+          #   --tunnel-through-iap \
             # --command="
             #   set -e
             #   TARGET_DIR=\"$TARGET_DIR\"
