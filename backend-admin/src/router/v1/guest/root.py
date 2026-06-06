@@ -119,31 +119,40 @@ async def get_categorys(
                 c.name,
                 n.route AS nav_route,
                 (
-                    SELECT json_group_array(json_object(
-                        'id', sc2.id,
-                        'route', sc2.route,
-                        'name', sc2.name
-                    ))
+                    SELECT json_group_array(
+                        json_object(
+                            'id', sc2.id,
+                            'route', sc2.route,
+                            'name', sc2.name
+                        )
+                    )
                     FROM (
-                        SELECT sc3.id, sc3.route, sc3.name
-                        FROM sub_category sc3
-                        INNER JOIN series s2 ON s2.sub_category_id = sc3.id
-                        INNER JOIN product p2 ON p2.series_id = s2.id AND p2.id = :product_id
-                        WHERE sc3.category_id = c.id
-                        GROUP BY sc3.id, sc3.route, sc3.name, sc3."order"
-                        ORDER BY sc3."order"
+                        SELECT
+                            sc.id,
+                            sc.route,
+                            sc.name
+                        FROM sub_category sc
+                        WHERE sc.category_id = c.id
+                        ORDER BY sc."order"
                     ) sc2
                 ) AS sub_categorys
             FROM nav n
-            INNER JOIN category c ON c.nav_id = n.id
-            WHERE EXISTS (
-                SELECT 1
-                FROM sub_category sc
-                INNER JOIN series s ON s.sub_category_id = sc.id
-                INNER JOIN product p ON p.series_id = s.id AND p.id = :product_id
-                WHERE sc.category_id = c.id
+            INNER JOIN category c
+                ON c.nav_id = n.id
+            WHERE n.id = (
+                SELECT DISTINCT n2.id
+                FROM product p
+                JOIN series s
+                    ON s.id = p.series_id
+                JOIN sub_category sc
+                    ON sc.id = s.sub_category_id
+                JOIN category c2
+                    ON c2.id = sc.category_id
+                JOIN nav n2
+                    ON n2.id = c2.nav_id
+                WHERE p.id = :product_id
             )
-            ORDER BY c."order"
+            ORDER BY c."order";
             """
         )
         rows = (await db.execute(stmt, {"product_id": product_id})).mappings().all()
