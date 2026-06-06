@@ -38,10 +38,11 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
         
       - name: Add metaData
-        run: gcloud compute instances add-metadata instance-20260306-130539 \
-              --project="$PROJECT_ID" \
-              --zone="$ZONE" \
-              --metadata enable-oslogin=TRUE
+        run: |
+          gcloud compute instances add-metadata instance-20260306-130539 \
+            --project="$PROJECT_ID" \
+            --zone="$ZONE" \
+            --metadata=enable-oslogin=TRUE
 
 
       - name: Deploy and Execute
