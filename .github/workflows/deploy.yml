@@ -59,7 +59,6 @@ jobs:
           tar czf - -C backend-admin . | gcloud compute ssh github-deploy-sa@"$VM_NAME" \
             --project="$PROJECT_ID" \
             --zone="$ZONE" \
-            --disable-os-login \
             --tunnel-through-iap \
             --ssh-flag="-o ConnectTimeout=10" \
             --ssh-flag="-o ServerAliveInterval=10" \
