@@ -56,7 +56,7 @@ jobs:
         run: |
           $(gcloud info --format="value(basic.python_location)") -m pip install numpy
           echo "📦 Compressing and uploading..."
-          tar czf - -C backend-admin . | gcloud compute ssh debian@"$VM_NAME" \
+          tar czf - -C backend-admin . | gcloud compute ssh github-deploy-sa@@"$VM_NAME" \
             --project="$PROJECT_ID" \
             --zone="$ZONE" \
             --disable-os-login \
