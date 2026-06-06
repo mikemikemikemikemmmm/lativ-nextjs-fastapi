@@ -37,26 +37,25 @@ jobs:
       - name: Setup gcloud
         uses: google-github-actions/setup-gcloud@v2
         
-      - name: Add metaData
-        run: |
-          gcloud compute instances add-metadata instance-20260306-130539 \
-            --project="$PROJECT_ID" \
-            --zone="$ZONE" \
-            --metadata=enable-oslogin=TRUE
+      # - name: Add metaData
+      #   run: |
+      #     gcloud compute instances add-metadata instance-20260306-130539 \
+      #       --project="$PROJECT_ID" \
+      #       --zone="$ZONE" \
 
-      - name: Prepare SSH environment
-        run: |
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          # 建立一個空的 known_hosts 以防 gcloud 嘗試寫入時鎖死
-          touch ~/.ssh/google_compute_known_hosts
-          chmod 644 ~/.ssh/google_compute_known_hosts
+      # - name: Prepare SSH environment
+      #   run: |
+      #     mkdir -p ~/.ssh
+      #     chmod 700 ~/.ssh
+      #     # 建立一個空的 known_hosts 以防 gcloud 嘗試寫入時鎖死
+      #     touch ~/.ssh/google_compute_known_hosts
+      #     chmod 644 ~/.ssh/google_compute_known_hosts
            
       - name: Deploy and Execute
         run: |
           $(gcloud info --format="value(basic.python_location)") -m pip install numpy
           echo "📦 Compressing and uploading..."
-          tar czf - -C backend-admin . | gcloud compute ssh github-deploy-sa@"$VM_NAME" \
+          tar czf - -C backend-admin . | gcloud compute ssh "$VM_NAME" \
             --project="$PROJECT_ID" \
             --zone="$ZONE" \
             --tunnel-through-iap \
