@@ -53,10 +53,8 @@ jobs:
             --project="$PROJECT_ID" \
             --zone="$ZONE" \
             --tunnel-through-iap \
-            --troubleshoot \
             --ssh-flag="-o ConnectTimeout=10" \
             --ssh-flag="-o ServerAliveInterval=10" \
-            --quiet \
             --command="mkdir -p /tmp/deploy_staging && tar xzf - -C /tmp/deploy_staging"
 
           # 2. 執行部署邏輯
