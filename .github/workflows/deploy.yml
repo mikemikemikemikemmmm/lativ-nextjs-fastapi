@@ -52,6 +52,10 @@ jobs:
       #     chmod 644 ~/.ssh/google_compute_known_hosts
            
       - name: Deploy and Execute
+        env:
+          CLOUDSDK_CORE_DISABLE_PROMPTS: 1
+          # 解決編碼問題
+          LC_ALL: C.UTF-8
         run: |
           $(gcloud info --format="value(basic.python_location)") -m pip install numpy
           echo "📦 Compressing and uploading..."
