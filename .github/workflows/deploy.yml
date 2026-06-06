@@ -36,16 +36,22 @@ jobs:
     - name: Setup gcloud
       uses: google-github-actions/setup-gcloud@v2
 
+
+    - name: Setup SSH
+      run: |
+        gcloud compute config-ssh --quiet
+
     - name: Compress backend
       run: |
         # 直接壓縮 backend-admin 內容
         tar -czf deploy.tar.gz -C backend-admin .
-
+        
     - name: Upload to VM
       run: |
         gcloud compute scp deploy.tar.gz "$VM_NAME":/tmp/deploy.tar.gz \
           --project="$PROJECT_ID" \
           --zone="$ZONE" \
+          --quiet \
           --tunnel-through-iap
 
     - name: Execute Remote Deploy
