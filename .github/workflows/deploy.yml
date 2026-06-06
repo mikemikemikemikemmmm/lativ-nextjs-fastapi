@@ -37,11 +37,12 @@ jobs:
       - name: Setup gcloud
         uses: google-github-actions/setup-gcloud@v2
         
-      - name: Setup SSH Known Hosts
-        run: |
-          mkdir -p ~/.ssh
-          touch ~/.ssh/google_compute_known_hosts
-          chmod 600 ~/.ssh/google_compute_known_hosts
+      - name: Add metaData
+        run: gcloud compute instances add-metadata instance-20260306-130539 \
+              --project="$PROJECT_ID" \
+              --zone="$ZONE" \
+              --metadata enable-oslogin=TRUE
+
 
       - name: Deploy and Execute
         run: |
@@ -51,7 +52,7 @@ jobs:
             --project="$PROJECT_ID" \
             --zone="$ZONE" \
             --tunnel-through-iap \
-            # --troubleshoot \
+            --troubleshoot \
             --ssh-flag="-o ConnectTimeout=10" \
             --ssh-flag="-o ServerAliveInterval=10" \
             --quiet \
