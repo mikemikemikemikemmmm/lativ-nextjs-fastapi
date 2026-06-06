@@ -36,7 +36,7 @@ jobs:
 
       - name: Setup gcloud
         uses: google-github-actions/setup-gcloud@v2
-
+ 
       - name: Deploy and Execute
         run: |
           # 強制設定 gcloud 不進行任何互動式詢問，並設置一個虛擬金鑰路徑以防止觸發生成
