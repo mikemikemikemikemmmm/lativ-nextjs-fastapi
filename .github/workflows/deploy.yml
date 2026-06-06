@@ -37,10 +37,11 @@ jobs:
       - name: Setup gcloud
         uses: google-github-actions/setup-gcloud@v2
         
-      - name: Prepare SSH Keys
+      - name: Setup SSH Known Hosts
         run: |
-          # 強制忽略舊金鑰並重新產生，同樣加上 --quiet
-          gcloud compute config-ssh --quiet 
+          mkdir -p ~/.ssh
+          touch ~/.ssh/google_compute_known_hosts
+          chmod 600 ~/.ssh/google_compute_known_hosts
 
       - name: Deploy and Execute
         run: |
@@ -50,7 +51,6 @@ jobs:
             --project="$PROJECT_ID" \
             --zone="$ZONE" \
             --tunnel-through-iap \
-            --verbosity=debug \
             --quiet \
             --command="mkdir -p /tmp/deploy_staging && tar xzf - -C /tmp/deploy_staging"
 
